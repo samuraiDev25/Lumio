@@ -1,10 +1,10 @@
-'use client'
-import styles from "./page.module.css";
+'use client';
+import styles from './page.module.css';
 
 export default function Home() {
   return (
     <div className={styles.page}>
-  MAIN PAGE
+      <h1>MAIN PAGE</h1>
     </div>
   );
 }
