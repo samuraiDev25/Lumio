@@ -1,10 +1,9 @@
-'use client'
+'use client';
 
-export default function СreatePassword() {
-    return (
-
-        <div>
-            <h1>CREATE PASSWORD</h1>
-        </div>
-    );
+export default function CreatePassword() {
+  return (
+    <div>
+      <h1>Create Password</h1>
+    </div>
+  );
 }

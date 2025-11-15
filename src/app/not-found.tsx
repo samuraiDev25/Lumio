@@ -1,12 +1,9 @@
-'use client'
+'use client';
 
 export default function notFound() {
-
-
-    return (
-
-        <div>
-            <h1>NOT FOUND</h1>
-        </div>
-    );
+  return (
+    <div>
+      <h1>NOT FOUND</h1>
+    </div>
+  );
 }
