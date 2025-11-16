@@ -1,4 +1,7 @@
+* text=auto
 # === Enforce LF endings for code ===
+*.cjs    text eol=lf
+*.mjs    text eol=lf
 *.js     text eol=lf
 *.jsx    text eol=lf
 *.ts     text eol=lf
@@ -30,3 +33,5 @@
 
 # === Shell scripts ===
 *.sh text eol=lf
+.gitattributes text eol=lf
+
