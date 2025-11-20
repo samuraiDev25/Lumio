@@ -4,6 +4,9 @@ module.exports = {
     'stylelint-config-standard-scss',
     'stylelint-config-clean-order',
   ],
-  rules: {},
+  plugins: ['stylelint-prettier'],
+  rules: {
+    'prettier/prettier': true, // Prettier проверяет формат
+  },
   ignoreFiles: ['**/node_modules/**', '**/.next/**'],
 };
