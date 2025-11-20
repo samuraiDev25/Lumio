@@ -25,7 +25,7 @@ button {
   color: inherit;
 
   &:focus-visible {
-    outline: var(--outline-focus);
+    outline: 2px solid var(--color-info-900);
     outline-offset: 2px;
   }
 
@@ -54,7 +54,7 @@ a:visited {
   color: currentcolor;
 
   &:focus-visible {
-    outline: var(--outline-focus);
+    outline: 2px solid var(--color-info-900);
     outline-offset: 2px;
   }
 }
