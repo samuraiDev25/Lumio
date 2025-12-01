@@ -13,7 +13,9 @@
     "lint:css:fix": "stylelint '**/*.{css,scss}' --fix",
     "format": "prettier . --write",
     "lint": "npm run lint:js && npm run lint:css",
-    "lint:fix": "npm run lint:js:fix && npm run lint:css:fix && npm run format"
+    "lint:fix": "npm run lint:js:fix && npm run lint:css:fix && npm run format",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.10.1",
@@ -39,6 +41,10 @@
     "stylelint-config-standard": "^39.0.1",
     "stylelint-config-standard-scss": "^16.0.0",
     "stylelint-prettier": "^4.1.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "storybook": "^10.1.2",
+    "@storybook/nextjs-vite": "^10.1.2",
+    "vite": "^7.2.6",
+    "eslint-plugin-storybook": "^10.1.2"
   }
 }

@@ -2,13 +2,17 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import prettierPlugin from 'eslint-plugin-prettier';
 import nextTs from 'eslint-config-next/typescript';
+import storybookPlugin from 'eslint-plugin-storybook';
 
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
 
   {
-    plugins: { prettier: prettierPlugin },
+    plugins: {
+      prettier: prettierPlugin,
+      storybook: storybookPlugin,
+    },
     rules: {
       'prettier/prettier': 'error',
     },
