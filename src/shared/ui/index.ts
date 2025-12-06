@@ -1,1 +1,1 @@
-export { SelectBox } from '../ui/Select/SelectBox';
+export { SelectBox } from './Select/SelectBox';
