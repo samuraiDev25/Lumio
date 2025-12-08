@@ -1,3 +1,5 @@
+@use 'colors' as colors;
+
 :root {
   // Font sizes
   --font-size-12: 0.75rem; // 12px
@@ -23,4 +25,20 @@
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
+}
+
+@mixin typography($fontSize, $fontWeight, $lineHeight, $color: colors.$text-color) {
+  font-size: $fontSize;
+  font-weight: $fontWeight;
+  line-height: $lineHeight;
+  color: $color;
+}
+
+@mixin uik-typography-error {
+  @include typography(
+      var(--font-size-s),
+      var(--font-weight-400),
+      var(--line-height-m),
+      var(--color-danger-500)
+  );
 }
