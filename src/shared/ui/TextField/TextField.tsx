@@ -4,6 +4,7 @@ import * as React from 'react';
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { cn } from '@/shared/lib/utils';
 import styles from './TextField.module.scss';
+import { EyeOffOutline, EyeOutline, SearchOutline } from '@/shared/ui/icons';
 
 export interface TextFieldProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -44,23 +45,10 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
           : 'password'
         : initialType;
 
-    const searchIcon =
-      variant === 'search' ? (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path
-            d="M11.5 11.5L14 14"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-          <path
-            d="M7 12C9.76142 12 12 9.76142 12 7C12 4.23858 9.76142 2 7 2C4.23858 2 2 4.23858 2 7C2 9.76142 4.23858 12 7 12Z"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-        </svg>
-      ) : null;
+    // Иконка поиска
+    const searchIcon = variant === 'search' ? <SearchOutline /> : null;
 
+    // Иконка пароля
     const passwordIcon =
       variant === 'password' ? (
         <button
@@ -70,57 +58,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
           disabled={disabled}
           aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
         >
-          {showPassword ? (
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M1 8C1 8 3 3 8 3C13 3 15 8 15 8C15 8 13 13 8 13C3 13 1 8 1 8Z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10Z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          ) : (
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M6.5 3.5L9.5 12.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-              <path
-                d="M1.5 8H3.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-              <path
-                d="M12.5 8H14.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-              <path
-                d="M5 5.5L3 3.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-              <path
-                d="M11 10.5L13 12.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          )}
+          {showPassword ? <EyeOutline /> : <EyeOffOutline />}
         </button>
       ) : null;
 
