@@ -1,0 +1,58 @@
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px;
+  background-color: var(--color-dark-900);
+  color: var(--color-light-100);
+}
+
+.pageButton {
+  background: none;
+  color: var(--color-light-100);
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: var(--color-dark-500);
+    color: var(--color-light-100);
+  }
+
+  &.active {
+    background-color: var(--color-light-100);
+    color: var(--color-dark-900);
+    border: 1px solid transparent; /* Убираем границу у active */
+  }
+
+  &.focus {
+    border: 1px solid var(--color-accent-700);
+  }
+
+  &:focus-visible {
+    border: 1px solid var(--color-accent-700);
+  }
+  &.active:focus-visible {
+    background-color: var(--color-light-100);
+    color: var(--color-dark-900);
+    border: 1px solid var(--color-accent-700);
+  }
+}
+.dots {
+  padding: 6px 10px;
+  color: var(--color-light-100);
+}
+
+.pageSizeSelect {
+  margin: 0 10px;
+  background-color: var(--color-dark-500);
+  color: var(--color-light-100);
+  border: 1px solid var(--color-dark-300);
+  padding: 6px;
+  border-radius: 4px;
+  .active {
+    background-color: var(--color-dark-300);
+  }
+}
+

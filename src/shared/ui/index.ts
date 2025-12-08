@@ -1,1 +1,2 @@
-export { TextField } from './TextField';
+export { TextField } from './TextField/TextField';
+export { Pagination } from './Pagination/Pagination';
