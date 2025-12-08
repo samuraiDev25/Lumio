@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { TextField } from '@/shared/ui/TextField';
+import { TextField } from '@/shared/ui';
 
 const meta = {
   title: 'UI/TextField',
