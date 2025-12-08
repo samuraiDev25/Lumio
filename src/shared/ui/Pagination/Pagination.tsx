@@ -1,6 +1,9 @@
+'use client';
+
 import s from './Pagination.module.scss';
 import { useState } from 'react';
 import { ArrowIosBack, ArrowIosForward } from '@/shared/ui/icons';
+import { PageSizeSelector } from '@/shared/ui/Pagination/PageSizeSelector/PageSizeSelector';
 
 type PaginationProps = {
   totalPages: number;
@@ -97,21 +100,11 @@ export const Pagination = ({
       >
         <ArrowIosForward />
       </button>
-      <label className={s.label}>
-        Show
-        <select
-          className={s.pageSizeSelect}
-          value={pageSize}
-          onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-        >
-          {pageSizeOptions.map((size) => (
-            <option key={size} value={size} className={s.option}>
-              {size}
-            </option>
-          ))}
-        </select>
-        on page
-      </label>
+      <PageSizeSelector
+        pageSize={pageSize}
+        pageSizeOptions={pageSizeOptions}
+        handlePageSizeChange={handlePageSizeChange}
+      />
     </div>
   );
 };

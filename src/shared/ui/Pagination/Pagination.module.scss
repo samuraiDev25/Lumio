@@ -23,7 +23,7 @@
   &.active {
     background-color: var(--color-light-100);
     color: var(--color-dark-900);
-    border: 1px solid transparent; /* Убираем границу у active */
+    border: 1px solid transparent; // убираем границу
   }
 
   &.focus {
@@ -43,16 +43,44 @@
   padding: 6px 10px;
   color: var(--color-light-100);
 }
-
-.pageSizeSelect {
+//Radix Select
+.trigger {
   margin: 0 10px;
   background-color: var(--color-dark-500);
   color: var(--color-light-100);
   border: 1px solid var(--color-dark-300);
-  padding: 6px;
+  padding: 3px 6px;
+  gap: 5px;
   border-radius: 4px;
-  .active {
-    background-color: var(--color-dark-300);
+  height: 30px;
+  min-width: 60px;
+
+  &:focus-visible {
+    border: 1px solid var(--color-accent-700);
   }
+}
+.trigger:focus {
+  outline: none; /* убираем рамку при клике */
+}
+.value {
+  padding-right: 10px;
+}
+.content {
+  background-color: var(--color-dark-500);
+  border: 1px solid var(--color-dark-300);
+
+  width: 64px;
+  overflow: hidden;
+}
+
+.item {
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.item:hover {
+  background-color: var(--color-dark-100);
+  border: 1px solid var(--color-dark-300);
 }
 
