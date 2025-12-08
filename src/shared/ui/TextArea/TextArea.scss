@@ -1,0 +1,279 @@
+.text-area-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 284px;
+  Height: 84px;
+  font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.text-area-label {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px;
+  color: #8D9094;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  user-select: none;
+}
+
+.text-area-label--disabled {
+  color: #4C4C4C;
+  cursor: not-allowed;
+}
+
+.text-area-wrapper {
+  position: relative;
+  box-sizing: border-box;
+  width: 284px;
+  min-height: 84px;
+  background: #171717;
+  border: 1px solid #4C4C4C;
+  border-radius: 2px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  opacity: 1;
+}
+
+/* Default State */
+.text-area-wrapper[data-state="default"] {
+  border-color: #4C4C4C;
+}
+
+/* Hover State */
+.text-area-wrapper--hover,
+.text-area-wrapper[data-state="hover"] {
+  border-color: #FFFFFF; // По Figma hover меняет цвет на белый
+  cursor: pointer;
+}
+
+/* Active State (когда есть текст) */
+.text-area-wrapper--active,
+.text-area-wrapper[data-state="active"] {
+  border-color: #FFFFFF;
+}
+
+.text-area-wrapper--active .text-area-element,
+.text-area-wrapper[data-state="active"] .text-area-element {
+  color: #FFFFFF;
+}
+
+/* Focus State - ФИКС: убран border-width: 1px */
+.text-area-wrapper--focused,
+.text-area-wrapper[data-state="focused"] {
+  border: 1px solid #2F68CC; // Только 1px синяя рамка
+  box-shadow: 0 0 0 1px rgba(47, 104, 204, 0.2);
+}
+
+.text-area-wrapper--focused .text-area-element,
+.text-area-wrapper[data-state="focused"] .text-area-element {
+  color: #FFFFFF;
+}
+
+/* Error State */
+.text-area-wrapper--error,
+.text-area-wrapper[data-state="error"] {
+  border-color: #CC1439;
+  background: #171717;
+}
+
+.text-area-wrapper--error .text-area-element,
+.text-area-wrapper[data-state="error"] .text-area-element {
+  color: #FFFFFF;
+}
+
+/* Disabled State */
+.text-area-wrapper--disabled,
+.text-area-wrapper[data-state="disabled"] {
+  border-color: #4C4C4C;
+  background: #171717;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.text-area-element {
+  width: 100%;
+  height: 84px;
+  padding: 8px 12px;
+  border: none;
+  outline: none;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: #FFFFFF;
+  background: transparent;
+  resize: vertical;
+  min-height: 84px;
+  transition: all 0.2s ease;
+  caret-color: #2F68CC;
+  box-sizing: border-box;
+}
+
+.text-area-element::placeholder {
+  color: #8D9094;
+  font-size: 16px;
+  font-weight: 400;
+  opacity: 1;
+}
+
+/* Placeholder для разных состояний */
+.text-area-wrapper[data-state="default"] .text-area-element::placeholder,
+.text-area-wrapper[data-state="hover"] .text-area-element::placeholder {
+  color: #8D9094;
+}
+
+.text-area-wrapper[data-state="active"] .text-area-element::placeholder,
+.text-area-wrapper[data-state="focused"] .text-area-element::placeholder {
+  color: #8D9094;
+}
+
+/* Disabled стили */
+.text-area-wrapper--disabled .text-area-element,
+.text-area-wrapper[data-state="disabled"] .text-area-element,
+.text-area-wrapper--disabled .text-area-element::placeholder,
+.text-area-wrapper[data-state="disabled"] .text-area-element::placeholder {
+  color: #4C4C4C;
+  cursor: not-allowed;
+}
+
+.text-area-element:disabled {
+  cursor: not-allowed;
+  resize: none;
+}
+
+.text-area-element:read-only {
+  background-color: #171717;
+  cursor: default;
+  user-select: text;
+}
+
+.text-area-counter {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: #8D9094;
+  background-color: rgba(23, 23, 23, 0.9);
+  padding: 2px 6px;
+  border-radius: 2px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.text-area-wrapper--error .text-area-counter,
+.text-area-wrapper[data-state="error"] .text-area-counter {
+  color: #CC1439;
+}
+
+.text-area-wrapper--disabled .text-area-counter,
+.text-area-wrapper[data-state="disabled"] .text-area-counter {
+  color: #4C4C4C;
+}
+
+.text-area-wrapper--focused .text-area-counter,
+.text-area-wrapper[data-state="focused"] .text-area-counter {
+  color: #2F68CC;
+}
+
+.text-area-error {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px;
+  color: #CC1439;
+  margin-top: 2px;
+  min-height: 16px;
+  animation: fadeIn 0.2s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Анимация фокуса - упрощена для соответствия Figma */
+@keyframes focusPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(47, 104, 204, 0.2);
+  }
+  70% {
+    box-shadow: 0 0 0 4px rgba(47, 104, 204, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(47, 104, 204, 0);
+  }
+}
+
+.text-area-wrapper--focused,
+.text-area-wrapper[data-state="focused"] {
+  animation: focusPulse 1.5s infinite;
+}
+
+// Storybook-specific styles for grid layout
+.storybook-grid-container {
+  padding: 40px;
+  background-color: #0D0D0D;
+  border-radius: 8px;
+  min-width: 1200px;
+  max-width: 1400px;
+}
+
+.storybook-grid-header {
+  color: #FFFEFE;
+  margin-bottom: 32px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.storybook-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 30px;
+  position: relative;
+}
+
+.storybook-grid-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: #46515E;
+
+  &:nth-child(1) { left: calc(100% / 6); }
+  &:nth-child(2) { left: calc(200% / 6); }
+  &:nth-child(3) { left: calc(300% / 6); }
+  &:nth-child(4) { left: calc(400% / 6); }
+  &:nth-child(5) { left: calc(500% / 6); }
+}
+
+.storybook-grid-column {
+  text-align: center;
+}
+
+.storybook-grid-column-title {
+  color: #FFFEFE;
+  font-family: 'Roboto', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  margin-bottom: 20px;
+}
