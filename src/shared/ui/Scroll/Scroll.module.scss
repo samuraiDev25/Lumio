@@ -1,0 +1,79 @@
+// Основные стили
+.scrollRoot {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000000;
+  position: relative;
+}
+
+.scrollViewport {
+  width: 100%;
+  height: 100%;
+  padding-right: 14px; // Место для вертикального скроллбара
+}
+
+// Вертикальный скроллбар
+.scrollScrollbar {
+  display: flex;
+  user-select: none;
+  touch-action: none;
+  background: transparent;
+  transition: background 160ms ease-out;
+
+  &[data-orientation='vertical'] {
+    width: 14px; // По Figma: 14px общая ширина (4px thumb + 5px padding с каждой стороны)
+    padding: 5px;
+  }
+
+  &[data-orientation='horizontal'] {
+    height: 14px;
+    padding: 5px;
+    flex-direction: column;
+  }
+
+  &:hover {
+    .scrollThumb {
+      background: #8D9094; // Light/900 - hover цвет из Figma
+    }
+  }
+}
+
+// Бегунок скроллбара
+.scrollThumb {
+  flex: 1;
+  background: #333333; // Dark/300 - default цвет из Figma
+  border-radius: 3px; // Из Figma
+  position: relative;
+
+  // Минимальная область для клика
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  // Hover состояние
+  &:hover {
+    background: #8D9094; // Light/900
+  }
+}
+
+// Уголок
+.scrollCorner {
+  background: #4C4C4C; // Dark/100 - цвет разделительной линии
+}
+
+// Разделительная линия (если нужно по дизайну)
+.scrollDivider {
+  position: absolute;
+  background: #4C4C4C; // Dark/100
+  width: 1px;
+  height: 100%;
+}
