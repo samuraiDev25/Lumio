@@ -6,8 +6,7 @@ import { cn } from '@/shared/lib/utils';
 import styles from './TextField.module.scss';
 import { EyeOffOutline, EyeOutline, SearchOutline } from '@/shared/ui/icons';
 
-export interface TextFieldProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   fullWidth?: boolean;
