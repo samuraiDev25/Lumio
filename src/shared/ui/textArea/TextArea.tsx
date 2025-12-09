@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './TextArea.module.scss';
+import styles from './TextArea.module.scss';
 
 export interface TextAreaProps {
   value?: string;
@@ -18,20 +18,20 @@ export interface TextAreaProps {
 }
 
 export const TextArea: React.FC<TextAreaProps> = ({
-  value = '',
-  placeholder = '',
-  label = '',
-  error = false,
-  errorMessage = '',
-  disabled = false,
-  onChange,
-  onFocus,
-  onBlur,
-  rows = 3,
-  maxLength,
-  readOnly = false,
-  className = '',
-}) => {
+                                                    value = '',
+                                                    placeholder = '',
+                                                    label = '',
+                                                    error = false,
+                                                    errorMessage = '',
+                                                    disabled = false,
+                                                    onChange,
+                                                    onFocus,
+                                                    onBlur,
+                                                    rows = 3,
+                                                    maxLength,
+                                                    readOnly = false,
+                                                    className = '',
+                                                  }) => {
   const [internalValue, setInternalValue] = useState(value);
   const [isFocused, setIsFocused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -68,12 +68,12 @@ export const TextArea: React.FC<TextAreaProps> = ({
 
   // Формируем классы состояний
   const getStateClasses = () => {
-    if (disabled) return 'text-area-wrapper--disabled';
-    if (hasError) return 'text-area-wrapper--error';
-    if (isFocused) return 'text-area-wrapper--focused';
-    if (isHovered) return 'text-area-wrapper--hover';
-    if (isActive) return 'text-area-wrapper--active';
-    return 'text-area-wrapper--default';
+    if (disabled) return styles.textAreaWrapperDisabled;
+    if (hasError) return styles.textAreaWrapperError;
+    if (isFocused) return styles.textAreaWrapperFocused;
+    if (isHovered) return styles.textAreaWrapperHover;
+    if (isActive) return styles.textAreaWrapperActive;
+    return styles.textAreaWrapperDefault;
   };
 
   // Альтернативно можно использовать data-атрибуты для CSS
@@ -87,23 +87,23 @@ export const TextArea: React.FC<TextAreaProps> = ({
   };
 
   return (
-    <div className={`text-area-container ${className}`}>
+    <div className={`${styles.textAreaContainer} ${className}`}>
       {label && (
         <label
-          className={`text-area-label ${disabled ? 'text-area-label--disabled' : ''}`}
+          className={`${styles.textAreaLabel} ${disabled ? styles.textAreaLabelDisabled : ''}`}
         >
           {label}
         </label>
       )}
 
       <div
-        className={`text-area-wrapper ${getStateClasses()}`}
+        className={`${styles.textAreaWrapper} ${getStateClasses()}`}
         data-state={getDataState()}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <textarea
-          className="text-area-element"
+          className={styles.textAreaElement}
           value={internalValue}
           placeholder={placeholder}
           onChange={handleChange}
@@ -118,14 +118,14 @@ export const TextArea: React.FC<TextAreaProps> = ({
         />
 
         {maxLength && (
-          <div className="text-area-counter">
+          <div className={styles.textAreaCounter}>
             {characterCount}/{maxLength}
           </div>
         )}
       </div>
 
       {hasError && (
-        <div id="error-message" className="text-area-error" role="alert">
+        <div id="error-message" className={styles.textAreaError} role="alert">
           {errorMessage || 'Ошибка'}
         </div>
       )}
