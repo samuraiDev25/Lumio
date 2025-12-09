@@ -1,5 +1,5 @@
 // Основные стили
-.scroll-root {
+.scrollRoot {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -7,14 +7,14 @@
   position: relative;
 }
 
-.scroll-viewport {
+.scrollViewport {
   width: 100%;
   height: 100%;
   padding-right: 14px; // Место для вертикального скроллбара
 }
 
 // Вертикальный скроллбар
-.scroll-scrollbar {
+.scrollScrollbar {
   display: flex;
   user-select: none;
   touch-action: none;
@@ -33,14 +33,14 @@
   }
 
   &:hover {
-    .scroll-thumb {
+    .scrollThumb {
       background: #8D9094; // Light/900 - hover цвет из Figma
     }
   }
 }
 
 // Бегунок скроллбара
-.scroll-thumb {
+.scrollThumb {
   flex: 1;
   background: #333333; // Dark/300 - default цвет из Figma
   border-radius: 3px; // Из Figma
@@ -66,12 +66,12 @@
 }
 
 // Уголок
-.scroll-corner {
+.scrollCorner {
   background: #4C4C4C; // Dark/100 - цвет разделительной линии
 }
 
 // Разделительная линия (если нужно по дизайну)
-.scroll-divider {
+.scrollDivider {
   position: absolute;
   background: #4C4C4C; // Dark/100
   width: 1px;

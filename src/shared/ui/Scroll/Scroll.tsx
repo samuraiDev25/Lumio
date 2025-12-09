@@ -1,6 +1,6 @@
 import React from 'react';
 import * as ScrollArea from '@radix-ui/react-scroll-area';
-import './Scroll.scss';
+import styles from './Scroll.module.scss';
 
 export interface ScrollProps {
   children: React.ReactNode;
@@ -19,21 +19,21 @@ export const Scroll: React.FC<ScrollProps> = ({
                                               }) => {
   return (
     <ScrollArea.Root
-      className={`scroll-root ${className}`}
+      className={`${styles.scrollRoot} ${className}`}
       type={type}
       style={{ maxHeight }}
     >
-      <ScrollArea.Viewport className="scroll-viewport">
+      <ScrollArea.Viewport className={styles.scrollViewport}>
         {children}
-        {showDivider && <div className="scroll-divider" />}
+        {showDivider && <div className={styles.scrollDivider} />}
       </ScrollArea.Viewport>
-      <ScrollArea.Scrollbar className="scroll-scrollbar" orientation="vertical">
-        <ScrollArea.Thumb className="scroll-thumb" />
+      <ScrollArea.Scrollbar className={styles.scrollScrollbar} orientation="vertical">
+        <ScrollArea.Thumb className={styles.scrollThumb} />
       </ScrollArea.Scrollbar>
-      <ScrollArea.Scrollbar className="scroll-scrollbar" orientation="horizontal">
-        <ScrollArea.Thumb className="scroll-thumb" />
+      <ScrollArea.Scrollbar className={styles.scrollScrollbar} orientation="horizontal">
+        <ScrollArea.Thumb className={styles.scrollThumb} />
       </ScrollArea.Scrollbar>
-      <ScrollArea.Corner className="scroll-corner" />
+      <ScrollArea.Corner className={styles.scrollCorner} />
     </ScrollArea.Root>
   );
 };

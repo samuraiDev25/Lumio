@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import Scroll, { ScrollProps } from '../../shared/ui/Scroll/Scroll';
-import '../../shared/ui/Scroll/Scroll.scss';
+import Scroll, { ScrollProps } from '@/shared/ui/scroll/Scroll';
+import '@/shared/ui/scroll/Scroll.module.scss';
 
 const meta: Meta<ScrollProps> = {
-  title: 'UI-KIT/Scroll',
+  title: 'UI-KIT/scroll',
   component: Scroll,
   parameters: {
     layout: 'centered',
