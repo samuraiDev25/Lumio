@@ -1,4 +1,4 @@
 export { Checkbox } from './checkbox/CheckBox';
-export { SelectBox } from './Select/SelectBox';
-export { TextField } from './TextField/TextField';
-export { Pagination } from './Pagination/Pagination';
+export { SelectBox } from './select/SelectBox';
+export { TextField } from './textField/TextField';
+export { Pagination } from './pagination/Pagination';
