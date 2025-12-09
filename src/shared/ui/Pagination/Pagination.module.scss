@@ -1,0 +1,86 @@
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px;
+  background-color: var(--color-dark-900);
+  color: var(--color-light-100);
+}
+
+.pageButton {
+  background: none;
+  color: var(--color-light-100);
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: var(--color-dark-500);
+    color: var(--color-light-100);
+  }
+
+  &.active {
+    background-color: var(--color-light-100);
+    color: var(--color-dark-900);
+    border: 1px solid transparent; // убираем границу
+  }
+
+  &.focus {
+    border: 1px solid var(--color-accent-700);
+  }
+
+  &:focus-visible {
+    border: 1px solid var(--color-accent-700);
+  }
+  &.active:focus-visible {
+    background-color: var(--color-light-100);
+    color: var(--color-dark-900);
+    border: 1px solid var(--color-accent-700);
+  }
+}
+.dots {
+  padding: 6px 10px;
+  color: var(--color-light-100);
+}
+//Radix Select
+.trigger {
+  margin: 0 10px;
+  background-color: var(--color-dark-500);
+  color: var(--color-light-100);
+  border: 1px solid var(--color-dark-300);
+  padding: 3px 6px;
+  gap: 5px;
+  border-radius: 4px;
+  height: 30px;
+  min-width: 60px;
+
+  &:focus-visible {
+    border: 1px solid var(--color-accent-700);
+  }
+}
+.trigger:focus {
+  outline: none; /* убираем рамку при клике */
+}
+.value {
+  padding-right: 10px;
+}
+.content {
+  background-color: var(--color-dark-500);
+  border: 1px solid var(--color-dark-300);
+
+  width: 64px;
+  overflow: hidden;
+}
+
+.item {
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.item:hover {
+  background-color: var(--color-dark-100);
+  border: 1px solid var(--color-dark-300);
+}
+
