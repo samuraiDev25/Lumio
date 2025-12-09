@@ -1,6 +1,6 @@
 'use client';
 import TabsDemo from '@/shared/ui/Tabs/Tabs';
-import TextArea from '@/shared/ui/TextArea';
+import TextArea from '@/shared/ui/textArea/TextArea';
 
 export default function Home() {
   return (
