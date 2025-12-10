@@ -63,7 +63,6 @@ export const DisabledGroup: Story = {
 // ===================== Управляемый пример с useState =====================
 const ControlledExample = ({
   value = 'option1',
-  onChange = () => {},
   options = [],
 }: {
   value?: string;
