@@ -1,0 +1,72 @@
+.root {
+  width: 100%;
+}
+
+.list {
+  display: flex;
+  width: 100%;
+}
+
+.trigger {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 16px 50px;
+  font-size: var(--font-size-14);
+  font-weight: 500;
+  color: var(--color-dark-100);
+  cursor: pointer;
+
+  &[data-state='inactive'] {
+    color: var(--color-dark-100);
+    border-bottom: solid 1px var(--color-dark-100);
+  }
+
+  &:focus:not([data-state='active']) {
+    color: var(--color-dark-100);
+  }
+
+  &:active:not([data-state='active']) {
+    background-color: #73a4ff57;
+    color: #9e9e9e;
+  }
+
+  &[data-state='active'] {
+    color: var(--color-accent-500);
+    border-bottom: solid 1px var(--color-accent-500);
+  }
+
+  &:active {
+    background-color: #3378ee50;
+  }
+
+  &:focus:not([data-state='inactive']) {
+    color: var(--color-accent-500);
+    outline: 1px solid var(--color-accent-500);
+  }
+
+  // Hover state column styling
+  &:hover {
+    background-color: #2759af49;
+  }
+
+  // Focus state column styling
+  &:focus {
+    outline: 1px solid var(--color-accent-500);
+  }
+
+  // Disabled state column styling
+  &:disabled:not([data-state='active']) {
+    color: var(--color-dark-300);
+    cursor: not-allowed;
+    border-bottom: solid 1px var(--color-dark-300);
+  }
+
+  &:disabled:not([data-state='inactive']) {
+    color: var(--color-accent-900);
+    cursor: not-allowed;
+    border-bottom: solid 1px var(--color-accent-900);
+  }
+}
