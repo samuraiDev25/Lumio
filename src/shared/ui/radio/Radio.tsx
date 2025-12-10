@@ -52,7 +52,6 @@ export const Radio = ({
             >
               <RadioGroup.Indicator className={s.RadioGroupIndicator} />
             </RadioGroup.Item>
-
             <span>{opt.label}</span>
           </label>
         );

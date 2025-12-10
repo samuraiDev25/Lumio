@@ -20,7 +20,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-// ===================== Стандартная история =====================
+// ===================== Стандартная история ====================
 export const Default: Story = {
   args: {
     name: 'example',
