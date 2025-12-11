@@ -5,7 +5,7 @@ import * as Select from '@radix-ui/react-select';
 import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
 import s from './Select.module.scss';
 import { useState } from 'react';
-import { SelectItem } from '@/shared/ui/Select/SelectItem/SekectItem';
+import { SelectItem } from '@/shared/ui/select/selectItem/SelectItem';
 
 export const SelectBox = (props: CustomSelectProps) => {
   const {

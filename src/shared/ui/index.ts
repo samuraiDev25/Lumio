@@ -5,3 +5,4 @@ export { Pagination } from './pagination/Pagination';
 export { TextArea } from './textArea/TextArea';
 export { Scroll } from '@/shared/ui/scroll/Scroll';
 export { Button } from './button/Button';
+export { DatePicker } from './datePicker/DatePicker';
