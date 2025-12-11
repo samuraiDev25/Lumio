@@ -27,11 +27,55 @@
   --font-weight-bold: 700;
 }
 
-@mixin typography($fontSize, $fontWeight, $lineHeight, $color: var(--color-light-100)) {
+@mixin typography($fontSize, $fontWeight, $lineHeight, $color: colors.$text-color) {
   font-size: $fontSize;
   font-weight: $fontWeight;
   line-height: $lineHeight;
   color: $color;
+}
+
+@mixin uik-large {
+  @include typography(var(--font-size-xxl), var(--font-weight-600), var(--line-height-l));
+}
+
+@mixin uik-h1-typography {
+  @include typography(var(--font-size-xl), var(--font-weight-700), var(--line-height-l));
+}
+
+@mixin uik-h2-typography {
+  @include typography(var(--font-size-l), var(--font-weight-700), var(--line-height-m));
+}
+
+@mixin uik-h3-typography {
+  @include typography(var(--font-size-m), var(--font-weight-600), var(--line-height-s));
+}
+
+@mixin uik-regular-text-16 {
+  @include typography(var(--font-size-m), var(--font-weight-400), var(--line-height-m));
+}
+
+@mixin uik-bold-text-16 {
+  @include typography(var(--font-size-m), var(--font-weight-700), var(--line-height-m));
+}
+
+@mixin uik-regular-text-14 {
+  @include typography(var(--font-size-s), var(--font-weight-400), var(--line-height-m));
+}
+
+@mixin uik-medium-text-14 {
+  @include typography(var(--font-size-s), var(--font-weight-500), var(--line-height-m));
+}
+
+@mixin uik-bold-text-14 {
+  @include typography(var(--font-size-s), var(--font-weight-700), var(--line-height-m));
+}
+
+@mixin uik-small-text {
+  @include typography(var(--font-size-xs), var(--font-weight-400), var(--line-height-s));
+}
+
+@mixin uik-semi-bold-small-text {
+  @include typography(var(--font-size-xs), var(--font-weight-600), var(--line-height-s));
 }
 
 @mixin uik-typography-error {

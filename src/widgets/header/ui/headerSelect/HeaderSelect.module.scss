@@ -1,0 +1,26 @@
+.trigger {
+  width: 163px;
+}
+
+.content {
+  width: 100%;
+  max-width: 163px;
+}
+
+.item {
+  position: relative;
+}
+
+.icon {
+  position: absolute;
+}
+
+.text {
+  display: inline-block;
+  margin-left: 32px;
+}
+
+.open {
+  border: 1px solid var(--color-light-100);
+  background-color: var(--color-dark-500);
+}

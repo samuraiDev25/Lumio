@@ -1,111 +1,42 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import Scroll, { ScrollProps } from '@/shared/ui/scroll/Scroll';
+import { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { Scroll } from '@/shared/ui';
 
-const meta: Meta<ScrollProps> = {
+const meta = {
   title: 'Components/scroll',
   component: Scroll,
-  parameters: {
-    layout: 'centered',
-    backgrounds: {
-      default: 'dark',
-      values: [
-        { name: 'dark', value: '#0D0D0D' },
-        { name: 'light', value: '#FFFFFF' },
-      ],
-    },
-  },
-  tags: ['autodocs'],
-  argTypes: {
-    maxHeight: {
-      control: 'text',
-      description: 'Максимальная высота контейнера',
-    },
-    type: {
-      control: 'select',
-      options: ['auto', 'hover', 'scroll', 'always'],
-      description: 'Тип отображения скроллбара',
-    },
-    showDivider: {
-      control: 'boolean',
-      description: 'Показать разделительную линию',
-    },
-    children: {
-      control: 'text',
-      description: 'Контент для скролла',
-    },
-  },
-} satisfies Meta<ScrollProps>;
+} satisfies Meta<typeof Scroll>;
 
 export default meta;
-type Story = StoryObj<ScrollProps>;
 
-// Пример контента для скролла
-const LongContent = () => (
-  <div style={{ padding: '20px', color: '#FFFFFF' }}>
-    <h3>Длинный контент для скролла</h3>
-    {Array.from({ length: 20 }).map((_, i) => (
-      <p key={i}>Пункт контента номер {i + 1}</p>
-    ))}
-  </div>
-);
+type Stories = StoryObj<typeof Scroll>;
 
-export const Default: Story = {
-  name: 'Default',
+export const BaseScrollbar: Stories = {
   args: {
-    maxHeight: '300px',
-    type: 'hover',
-    showDivider: false,
-    children: <LongContent />,
+    children:
+      'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deserunt, doloremque, sed! Aspernatur corporis ducimus, et optio quaerat repudiandae veniam. Accusamus amet facilis ipsa itaque saepe tenetur! A accusantium aperiam architecto consequuntur deserunt dicta, exercitationem ipsam maxime minima molestiae mollitia nam nihil numquam odio officia perferendis porro quae quam quia quis rem repellendus sed soluta sunt veritatis. Ab adipisci aliquam dolor ipsa laborum libero necessitatibus praesentium provident quasi quibusdam saepe, totam? Aliquid asperiores illo, iure reprehenderit sed soluta! Beatae cumque cupiditate delectus, dolore error eum hic illum incidunt minus nemo repudiandae voluptates. Adipisci aut, fuga natus obcaecati quasi rem ullam! Praesentium!',
+    maxWidth: 200,
+    maxHeight: 200,
+    type: 'auto',
   },
-};
-
-export const WithDivider: Story = {
-  name: 'With Divider',
-  args: {
-    maxHeight: '300px',
-    type: 'hover',
-    showDivider: true,
-    children: <LongContent />,
+  render: (args) => {
+    return (
+      <div
+        style={{
+          padding: '10px',
+          border: '2px solid var(--color-light-100)',
+          height: 'fit-content',
+          width: 'fit-content',
+          color: '--color-light-100',
+        }}
+      >
+        <Scroll
+          maxWidth={args.maxWidth}
+          maxHeight={args.maxHeight}
+          type={args.type}
+        >
+          {args.children}
+        </Scroll>
+      </div>
+    );
   },
-};
-
-export const AlwaysVisible: Story = {
-  name: 'Always Visible',
-  args: {
-    maxHeight: '300px',
-    type: 'always',
-    showDivider: false,
-    children: <LongContent />,
-  },
-};
-
-export const HorizontalScroll: Story = {
-  name: 'Horizontal Scroll',
-  render: () => (
-    <div style={{ width: '500px' }}>
-      <Scroll maxHeight="200px" type="hover">
-        <div style={{
-          display: 'flex',
-          gap: '20px',
-          padding: '20px',
-          minWidth: '1000px',
-          color: '#FFFFFF'
-        }}>
-          {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} style={{
-              width: '150px',
-              height: '100px',
-              backgroundColor: '#333333',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              Блок {i + 1}
-            </div>
-          ))}
-        </div>
-      </Scroll>
-    </div>
-  ),
 };
