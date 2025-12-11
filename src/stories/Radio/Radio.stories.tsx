@@ -3,7 +3,7 @@ import React from 'react';
 import { Radio, RadioOption } from '@/shared/ui/radio/Radio';
 
 const meta = {
-  title: 'UI/Radio',
+  title: 'Components/Radio',
   component: Radio,
   argTypes: {
     name: { control: 'text' },

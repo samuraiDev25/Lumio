@@ -9,7 +9,7 @@ interface TextAreaStoryProps extends TextAreaProps {
 }
 
 const meta: Meta<TextAreaStoryProps> = {
-  title: 'UI-KIT/TextArea',
+  title: 'Components/TextArea',
   component: TextArea as React.ComponentType<TextAreaStoryProps>,
   parameters: {
     layout: 'centered',
