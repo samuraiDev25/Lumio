@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import TextArea, { TextAreaProps } from './TextArea';
-import './TextArea.scss';
+import { TextArea, TextAreaProps } from '@/shared/ui/textArea/TextArea';
 
 // Расширяем стандартные пропсы TextArea для Storybook
 interface TextAreaStoryProps extends TextAreaProps {

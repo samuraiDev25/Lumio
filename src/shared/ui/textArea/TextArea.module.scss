@@ -1,14 +1,14 @@
-.text-area-container {
+.textAreaContainer {
   display: flex;
   flex-direction: column;
   gap: 4px;
   width: 284px;
-  Height: 84px;
+  height: 84px;
   font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-.text-area-label {
-  font-family: 'Inter';
+.textAreaLabel {
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
@@ -22,12 +22,12 @@
   user-select: none;
 }
 
-.text-area-label--disabled {
+.textAreaLabelDisabled {
   color: #4C4C4C;
   cursor: not-allowed;
 }
 
-.text-area-wrapper {
+.textAreaWrapper {
   position: relative;
   box-sizing: border-box;
   width: 284px;
@@ -41,68 +41,68 @@
 }
 
 /* Default State */
-.text-area-wrapper[data-state="default"] {
+.textAreaWrapper[data-state="default"] {
   border-color: #4C4C4C;
 }
 
 /* Hover State */
-.text-area-wrapper--hover,
-.text-area-wrapper[data-state="hover"] {
+.textAreaWrapperHover,
+.textAreaWrapper[data-state="hover"] {
   border-color: #FFFFFF; // По Figma hover меняет цвет на белый
   cursor: pointer;
 }
 
 /* Active State (когда есть текст) */
-.text-area-wrapper--active,
-.text-area-wrapper[data-state="active"] {
+.textAreaWrapperActive,
+.textAreaWrapper[data-state="active"] {
   border-color: #FFFFFF;
 }
 
-.text-area-wrapper--active .text-area-element,
-.text-area-wrapper[data-state="active"] .text-area-element {
+.textAreaWrapperActive .textAreaElement,
+.textAreaWrapper[data-state="active"] .textAreaElement {
   color: #FFFFFF;
 }
 
 /* Focus State - ФИКС: убран border-width: 1px */
-.text-area-wrapper--focused,
-.text-area-wrapper[data-state="focused"] {
+.textAreaWrapperFocused,
+.textAreaWrapper[data-state="focused"] {
   border: 1px solid #2F68CC; // Только 1px синяя рамка
   box-shadow: 0 0 0 1px rgba(47, 104, 204, 0.2);
 }
 
-.text-area-wrapper--focused .text-area-element,
-.text-area-wrapper[data-state="focused"] .text-area-element {
+.textAreaWrapperFocused .textAreaElement,
+.textAreaWrapper[data-state="focused"] .textAreaElement {
   color: #FFFFFF;
 }
 
 /* Error State */
-.text-area-wrapper--error,
-.text-area-wrapper[data-state="error"] {
+.textAreaWrapperError,
+.textAreaWrapper[data-state="error"] {
   border-color: #CC1439;
   background: #171717;
 }
 
-.text-area-wrapper--error .text-area-element,
-.text-area-wrapper[data-state="error"] .text-area-element {
+.textAreaWrapperError .textAreaElement,
+.textAreaWrapper[data-state="error"] .textAreaElement {
   color: #FFFFFF;
 }
 
 /* Disabled State */
-.text-area-wrapper--disabled,
-.text-area-wrapper[data-state="disabled"] {
+.textAreaWrapperDisabled,
+.textAreaWrapper[data-state="disabled"] {
   border-color: #4C4C4C;
   background: #171717;
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.text-area-element {
+.textAreaElement {
   width: 100%;
   height: 84px;
   padding: 8px 12px;
   border: none;
   outline: none;
-  font-family: 'Inter';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 16px;
@@ -116,7 +116,7 @@
   box-sizing: border-box;
 }
 
-.text-area-element::placeholder {
+.textAreaElement::placeholder {
   color: #8D9094;
   font-size: 16px;
   font-weight: 400;
@@ -124,41 +124,41 @@
 }
 
 /* Placeholder для разных состояний */
-.text-area-wrapper[data-state="default"] .text-area-element::placeholder,
-.text-area-wrapper[data-state="hover"] .text-area-element::placeholder {
+.textAreaWrapper[data-state="default"] .textAreaElement::placeholder,
+.textAreaWrapper[data-state="hover"] .textAreaElement::placeholder {
   color: #8D9094;
 }
 
-.text-area-wrapper[data-state="active"] .text-area-element::placeholder,
-.text-area-wrapper[data-state="focused"] .text-area-element::placeholder {
+.textAreaWrapper[data-state="active"] .textAreaElement::placeholder,
+.textAreaWrapper[data-state="focused"] .textAreaElement::placeholder {
   color: #8D9094;
 }
 
 /* Disabled стили */
-.text-area-wrapper--disabled .text-area-element,
-.text-area-wrapper[data-state="disabled"] .text-area-element,
-.text-area-wrapper--disabled .text-area-element::placeholder,
-.text-area-wrapper[data-state="disabled"] .text-area-element::placeholder {
+.textAreaWrapperDisabled .textAreaElement,
+.textAreaWrapper[data-state="disabled"] .textAreaElement,
+.textAreaWrapperDisabled .textAreaElement::placeholder,
+.textAreaWrapper[data-state="disabled"] .textAreaElement::placeholder {
   color: #4C4C4C;
   cursor: not-allowed;
 }
 
-.text-area-element:disabled {
+.textAreaElement:disabled {
   cursor: not-allowed;
   resize: none;
 }
 
-.text-area-element:read-only {
+.textAreaElement:read-only {
   background-color: #171717;
   cursor: default;
   user-select: text;
 }
 
-.text-area-counter {
+.textAreaCounter {
   position: absolute;
   bottom: 8px;
   right: 12px;
-  font-family: 'Inter';
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 12px;
@@ -171,23 +171,23 @@
   user-select: none;
 }
 
-.text-area-wrapper--error .text-area-counter,
-.text-area-wrapper[data-state="error"] .text-area-counter {
+.textAreaWrapperError .textAreaCounter,
+.textAreaWrapper[data-state="error"] .textAreaCounter {
   color: #CC1439;
 }
 
-.text-area-wrapper--disabled .text-area-counter,
-.text-area-wrapper[data-state="disabled"] .text-area-counter {
+.textAreaWrapperDisabled .textAreaCounter,
+.textAreaWrapper[data-state="disabled"] .textAreaCounter {
   color: #4C4C4C;
 }
 
-.text-area-wrapper--focused .text-area-counter,
-.text-area-wrapper[data-state="focused"] .text-area-counter {
+.textAreaWrapperFocused .textAreaCounter,
+.textAreaWrapper[data-state="focused"] .textAreaCounter {
   color: #2F68CC;
 }
 
-.text-area-error {
-  font-family: 'Inter';
+.textAreaError {
+  font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
@@ -222,13 +222,13 @@
   }
 }
 
-.text-area-wrapper--focused,
-.text-area-wrapper[data-state="focused"] {
+.textAreaWrapperFocused,
+.textAreaWrapper[data-state="focused"] {
   animation: focusPulse 1.5s infinite;
 }
 
 // Storybook-specific styles for grid layout
-.storybook-grid-container {
+.storybookGridContainer {
   padding: 40px;
   background-color: #0D0D0D;
   border-radius: 8px;
@@ -236,7 +236,7 @@
   max-width: 1400px;
 }
 
-.storybook-grid-header {
+.storybookGridHeader {
   color: #FFFEFE;
   margin-bottom: 32px;
   font-family: 'Roboto', sans-serif;
@@ -245,14 +245,14 @@
   text-align: center;
 }
 
-.storybook-grid {
+.storybookGrid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 30px;
   position: relative;
 }
 
-.storybook-grid-divider {
+.storybookGridDivider {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -266,11 +266,11 @@
   &:nth-child(5) { left: calc(500% / 6); }
 }
 
-.storybook-grid-column {
+.storybookGridColumn {
   text-align: center;
 }
 
-.storybook-grid-column-title {
+.storybookGridColumnTitle {
   color: #FFFEFE;
   font-family: 'Roboto', sans-serif;
   font-size: 20px;
