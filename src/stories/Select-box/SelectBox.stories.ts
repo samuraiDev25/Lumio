@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { SelectBox } from '@/shared/ui';
 
 const meta: Meta<typeof SelectBox> = {
-  title: 'UI/SelectBox',
+  title: 'Components/SelectBox',
   component: SelectBox,
   tags: ['autodocs'],
 };

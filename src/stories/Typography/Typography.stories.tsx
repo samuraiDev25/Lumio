@@ -2,7 +2,7 @@ import { Typography } from '@/shared/ui/typography/Typography';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'UI/Typography',
+  title: 'Components/Typography',
   component: Typography,
   argTypes: {
     variant: {

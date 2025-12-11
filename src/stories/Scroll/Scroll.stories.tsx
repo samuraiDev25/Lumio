@@ -2,8 +2,8 @@ import { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { Scroll } from '@/shared/ui';
 
 const meta = {
+  title: 'Components/scroll',
   component: Scroll,
-  title: 'Scrollbar',
 } satisfies Meta<typeof Scroll>;
 
 export default meta;
