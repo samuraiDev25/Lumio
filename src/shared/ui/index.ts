@@ -1,7 +1,9 @@
 export { Checkbox } from './checkbox/CheckBox';
 export { SelectBox } from './select/SelectBox';
+export { SelectItem } from './select/selectItem/SelectItem';
 export { TextField } from './textField/TextField';
 export { Pagination } from './pagination/Pagination';
 export { TextArea } from './textArea/TextArea';
-export { Scroll } from '@/shared/ui/scroll/Scroll';
+export { Scroll } from './scroll/Scroll';
 export { Button } from './button/Button';
+export { Container } from './container/Container';
