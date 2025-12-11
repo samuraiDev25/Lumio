@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 const meta = {
   component: Modal,
-  title: 'Modal',
+  title: 'Components/Modal',
 } satisfies Meta<typeof Modal>;
 
 export default meta;
