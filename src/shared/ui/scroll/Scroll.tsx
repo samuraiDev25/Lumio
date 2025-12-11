@@ -1,41 +1,67 @@
-import React from 'react';
+import { ComponentPropsWithoutRef, FC, ReactNode } from 'react';
+
 import * as ScrollArea from '@radix-ui/react-scroll-area';
-import styles from './Scroll.module.scss';
+import { clsx } from 'clsx';
 
-export interface ScrollProps {
-  children: React.ReactNode;
-  maxHeight?: string | number;
-  type?: 'auto' | 'hover' | 'scroll' | 'always';
-  showDivider?: boolean;
+import s from './Scroll.module.scss';
+
+export type ScrollbarProps = {
+  children: ReactNode;
   className?: string;
-}
+  /** maxHeight viewport in pixels */
+  maxHeight?: number | string;
+  /** maxWidth viewport in pixels */
+  maxWidth?: number | string;
+  type?: ScrollArea.ScrollAreaProps['type'];
+} & ComponentPropsWithoutRef<'div'>;
 
-export const Scroll: React.FC<ScrollProps> = ({
-                                                children,
-                                                maxHeight = '300px',
-                                                type = 'hover',
-                                                showDivider = false,
-                                                className = '',
-                                              }) => {
+export const Scroll: FC<ScrollbarProps> = ({
+  children,
+  className,
+  maxHeight = '100%',
+  maxWidth = '100%',
+  type = 'auto',
+  ...rest
+}) => {
+  const classNames = {
+    root: clsx(s.root, className),
+    scrollbar: s.scrollbar,
+    thumb: s.thumb,
+    viewport: s.viewport,
+  };
+
+  const maxHeightConverted =
+    typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight;
+  const maxWidthConverted =
+    typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth;
+
+  const viewportStyles = {
+    maxHeight: maxHeightConverted,
+    maxWidth: maxWidthConverted,
+  };
+
   return (
-    <ScrollArea.Root
-      className={`${styles.scrollRoot} ${className}`}
-      type={type}
-      style={{ maxHeight }}
-    >
-      <ScrollArea.Viewport className={styles.scrollViewport}>
-        {children}
-        {showDivider && <div className={styles.scrollDivider} />}
-      </ScrollArea.Viewport>
-      <ScrollArea.Scrollbar className={styles.scrollScrollbar} orientation="vertical">
-        <ScrollArea.Thumb className={styles.scrollThumb} />
-      </ScrollArea.Scrollbar>
-      <ScrollArea.Scrollbar className={styles.scrollScrollbar} orientation="horizontal">
-        <ScrollArea.Thumb className={styles.scrollThumb} />
-      </ScrollArea.Scrollbar>
-      <ScrollArea.Corner className={styles.scrollCorner} />
+    <ScrollArea.Root asChild type={type}>
+      <div className={classNames.root} {...rest}>
+        <ScrollArea.Viewport
+          className={classNames.viewport}
+          style={viewportStyles}
+        >
+          {children}
+        </ScrollArea.Viewport>
+        <ScrollArea.Scrollbar
+          className={classNames.scrollbar}
+          orientation={'vertical'}
+        >
+          <ScrollArea.Thumb className={classNames.thumb} />
+        </ScrollArea.Scrollbar>
+        <ScrollArea.Scrollbar
+          className={classNames.scrollbar}
+          orientation={'horizontal'}
+        >
+          <ScrollArea.Thumb className={classNames.thumb} />
+        </ScrollArea.Scrollbar>
+      </div>
     </ScrollArea.Root>
   );
 };
-
-export default Scroll;
