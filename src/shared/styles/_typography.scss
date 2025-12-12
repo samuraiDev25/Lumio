@@ -1,4 +1,3 @@
-@use 'colors' as colors;
 
 :root {
   // Font sizes
@@ -27,7 +26,7 @@
   --font-weight-bold: 700;
 }
 
-@mixin typography($fontSize, $fontWeight, $lineHeight, $color: colors.$text-color) {
+@mixin typography($fontSize, $fontWeight, $lineHeight, $color: var(--color-light-100)) {
   font-size: $fontSize;
   font-weight: $fontWeight;
   line-height: $lineHeight;
