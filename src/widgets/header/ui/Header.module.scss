@@ -34,11 +34,6 @@
   @include t.uik-h3-typography;
 }
 
-.logo h1 {
-  @include t.uik-large;
-
-  font-size: 26px;
-}
 
 .selectBox {
   display: flex;
