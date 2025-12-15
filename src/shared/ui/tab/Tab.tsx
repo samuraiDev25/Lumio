@@ -4,16 +4,17 @@
 import s from './Tab.module.scss';
 import * as Tabs from '@radix-ui/react-tabs';
 
-interface Props {
+export type Props = {
   items: {
     label: string;
     value: string;
     children: React.ReactNode;
+    disabled?: boolean;
   }[];
   defaultTab?: string;
-}
+};
 
-export default function Tab({ items, defaultTab }: Props) {
+export const Tab = ({ items, defaultTab }: Props) => {
   const defaultValue = defaultTab || items[0]?.value;
 
   return (
@@ -24,7 +25,12 @@ export default function Tab({ items, defaultTab }: Props) {
     >
       <Tabs.List className={s.list}>
         {items.map((tab) => (
-          <Tabs.Trigger className={s.trigger} key={tab.value} value={tab.value}>
+          <Tabs.Trigger
+            className={s.trigger}
+            key={tab.value}
+            value={tab.value}
+            disabled={tab.disabled}
+          >
             {tab.label}
           </Tabs.Trigger>
         ))}
@@ -37,4 +43,4 @@ export default function Tab({ items, defaultTab }: Props) {
       ))}
     </Tabs.Root>
   );
-}
+};
