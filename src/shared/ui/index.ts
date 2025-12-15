@@ -9,3 +9,4 @@ export { Button } from './button/Button';
 export { Container } from './container/Container';
 export { DatePicker } from './datePicker/DatePicker';
 export { Radio } from './radio/Radio';
+export { Tab } from './tab/Tab';
