@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as Select from '@radix-ui/react-select';
 import { ChevronDownIcon, ChevronUpIcon } from '@radix-ui/react-icons';
 import s from './Select.module.scss';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { SelectItem } from '@/shared/ui/select/selectItem/SelectItem';
 
 export const SelectBox = (props: CustomSelectProps) => {
@@ -14,6 +14,7 @@ export const SelectBox = (props: CustomSelectProps) => {
     disabled = false,
     error = null,
     options = [],
+    children,
   } = props;
 
   const [value, setValue] = useState('');
@@ -48,11 +49,13 @@ export const SelectBox = (props: CustomSelectProps) => {
             sideOffset={0}
           >
             <Select.Viewport className={s.viewport}>
-              {options.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
+              {children
+                ? children
+                : options.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
             </Select.Viewport>
           </Select.Content>
         </Select.Portal>
@@ -66,7 +69,8 @@ export type CustomSelectProps = {
   placeholder?: string;
   disabled?: boolean;
   error?: string | null;
-  options: SelectOption[];
+  options?: SelectOption[];
+  children?: ReactNode;
 };
 export type SelectOption = {
   value: string;
