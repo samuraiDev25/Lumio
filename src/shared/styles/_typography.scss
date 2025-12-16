@@ -34,54 +34,54 @@
 }
 
 @mixin uik-large {
-  @include typography(var(--font-size-xxl), var(--font-weight-600), var(--line-height-l));
+  @include typography(var(--font-size-26), var(--font-weight-semibold), var(--line-height-36));
 }
 
 @mixin uik-h1-typography {
-  @include typography(var(--font-size-xl), var(--font-weight-700), var(--line-height-l));
+  @include typography(var(--font-size-20), var(--font-weight-bold), var(--line-height-36));
 }
 
 @mixin uik-h2-typography {
-  @include typography(var(--font-size-l), var(--font-weight-700), var(--line-height-m));
+  @include typography(var(--font-size-18), var(--font-weight-bold), var(--line-height-24));
 }
 
 @mixin uik-h3-typography {
-  @include typography(var(--font-size-m), var(--font-weight-600), var(--line-height-s));
+  @include typography(var(--font-size-16), var(--font-weight-semibold), var(--line-height-16));
 }
 
 @mixin uik-regular-text-16 {
-  @include typography(var(--font-size-m), var(--font-weight-400), var(--line-height-m));
+  @include typography(var(--font-size-16), var(--font-weight-regular), var(--line-height-24));
 }
 
 @mixin uik-bold-text-16 {
-  @include typography(var(--font-size-m), var(--font-weight-700), var(--line-height-m));
+  @include typography(var(--font-size-16), var(--font-weight-bold), var(--line-height-24));
 }
 
 @mixin uik-regular-text-14 {
-  @include typography(var(--font-size-s), var(--font-weight-400), var(--line-height-m));
+  @include typography(var(--font-size-14), var(--font-weight-regular), var(--line-height-24));
 }
 
 @mixin uik-medium-text-14 {
-  @include typography(var(--font-size-s), var(--font-weight-500), var(--line-height-m));
+  @include typography(var(--font-size-14), var(--font-weight-medium), var(--line-height-24));
 }
 
 @mixin uik-bold-text-14 {
-  @include typography(var(--font-size-s), var(--font-weight-700), var(--line-height-m));
+  @include typography(var(--font-size-14), var(--font-weight-bold), var(--line-height-24));
 }
 
 @mixin uik-small-text {
-  @include typography(var(--font-size-xs), var(--font-weight-400), var(--line-height-s));
+  @include typography(var(--font-size-12), var(--font-weight-regular), var(--line-height-16));
 }
 
 @mixin uik-semi-bold-small-text {
-  @include typography(var(--font-size-xs), var(--font-weight-600), var(--line-height-s));
+  @include typography(var(--font-size-12), var(--font-weight-semibold), var(--line-height-16));
 }
 
 @mixin uik-typography-error {
   @include typography(
-      var(--font-size-s),
-      var(--font-weight-400),
-      var(--line-height-m),
+      var(--font-size-14),
+      var(--font-weight-regular),
+      var(--line-height-24),
       var(--color-danger-500)
   );
 }
