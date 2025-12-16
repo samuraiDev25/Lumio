@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import * as Select from '@radix-ui/react-select';
 import s from '../Select.module.scss';

@@ -13,11 +13,11 @@ export const Header = () => {
         <div className={s.headerWrapper}>
           <Link href={'/'}>
             <Typography variant={'large'} as={'span'}>
-              Inctagram
+              Instagram
             </Typography>
           </Link>
           <div className={s.selectBox}>
-            {/*<HeaderSelect />*/}
+            <HeaderSelect />
             <div className={s.buttonWrapper}>
               <Button variant={'link'} asChild>
                 <Link href={'/auth/sign-in'}>Log in</Link>
