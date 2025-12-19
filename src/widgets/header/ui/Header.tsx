@@ -2,9 +2,9 @@
 
 import s from './Header.module.scss';
 import { Button, Container } from '@/shared/ui';
-import { HeaderSelect } from '@/widgets/header/ui/headerSelect/HeaderSelect';
+import { HeaderSelect } from '@/widgets/header/ui/';
 import Link from 'next/link';
-import { Typography } from '@/shared/ui/typography/Typography';
+import { Typography } from '@/shared/ui/';
 
 export const Header = () => {
   return (
@@ -13,7 +13,7 @@ export const Header = () => {
         <div className={s.headerWrapper}>
           <Link href={'/'}>
             <Typography variant={'large'} as={'span'}>
-              Inctagram
+              Instagram
             </Typography>
           </Link>
           <div className={s.selectBox}>

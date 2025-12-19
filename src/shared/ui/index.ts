@@ -1,6 +1,5 @@
 export { Checkbox } from './checkbox/CheckBox';
-export { SelectBox } from './select/SelectBox';
-export { SelectItem } from './select/selectItem/SelectItem';
+export { Select } from './select/Select';
 export { TextField } from './textField/TextField';
 export { Pagination } from './pagination/Pagination';
 export { TextArea } from './textArea/TextArea';
@@ -10,3 +9,4 @@ export { Container } from './container/Container';
 export { DatePicker } from './datePicker/DatePicker';
 export { Radio } from './radio/Radio';
 export { Tab } from './tab/Tab';
+export { Typography } from './typography/Typography';
