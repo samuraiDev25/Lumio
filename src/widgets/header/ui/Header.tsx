@@ -3,6 +3,7 @@
 import s from './Header.module.scss';
 import { Button, Container } from '@/shared/ui';
 import { HeaderSelect } from '@/widgets/header/ui/';
+import { LogOutButton } from '@/features/logout/ui';
 import Link from 'next/link';
 import { Typography } from '@/shared/ui/';
 
@@ -25,6 +26,13 @@ export const Header = () => {
               <Button variant={'primary'} asChild>
                 <Link href={'/auth/sign-up'}>Sign up</Link>
               </Button>
+              <LogOutButton
+                variant={'outline'}
+                onLogout={() => {
+                  // TODO: Добавить логику выхода из системы
+                  console.log('Logout clicked');
+                }}
+              />
             </div>
           </div>
         </div>
