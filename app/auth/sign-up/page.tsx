@@ -1,9 +1,11 @@
 'use client';
 
+import { SignUpForm } from '@/features/auth/ui/sighUpForm/SignUpForm';
+
 export default function SignUp() {
   return (
     <div>
-      <h1>SIGN UP</h1>
+      <SignUpForm />
     </div>
   );
 }

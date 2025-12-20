@@ -1,9 +1,11 @@
 'use client';
 
-export default function TermsOfService() {
+import TermsOfService from '@/features/auth/ui/termsOfService/TermsOfService';
+
+export default function Terms() {
   return (
     <div>
-      <h1>Terms of service</h1>
+      <TermsOfService />
     </div>
   );
 }

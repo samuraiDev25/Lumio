@@ -8,13 +8,13 @@ import { useState } from 'react';
 type Props = {
   pageSize: number;
   pageSizeOptions: number[];
-  handlePageSizeChange: (size: number) => void;
+  handlePageSizeChangeAction: (size: number) => void;
 };
 
 export const PageSizeSelector = ({
   pageSize,
   pageSizeOptions,
-  handlePageSizeChange,
+  handlePageSizeChangeAction,
 }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -23,7 +23,7 @@ export const PageSizeSelector = ({
       Show
       <Select.Root
         value={String(pageSize)}
-        onValueChange={(value) => handlePageSizeChange(Number(value))}
+        onValueChange={(value) => handlePageSizeChangeAction(Number(value))}
         onOpenChange={setIsOpen}
       >
         <Select.Trigger className={s.trigger}>
