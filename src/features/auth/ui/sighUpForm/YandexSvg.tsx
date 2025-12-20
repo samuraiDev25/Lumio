@@ -1,6 +1,6 @@
-import type { SVGProps } from 'react';
-import { Ref, forwardRef, memo } from 'react';
-const SvgYandex = (props: SVGProps<SVGSVGElement>, ref: Ref<SVGSVGElement>) => (
+import { forwardRef, memo } from 'react';
+
+const SvgYandex = () => (
   <svg
     width="36"
     height="36"
