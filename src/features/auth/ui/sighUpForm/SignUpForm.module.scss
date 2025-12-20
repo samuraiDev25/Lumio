@@ -1,0 +1,99 @@
+@use '../../../../shared/styles/_colors.scss';
+@use '../../../../shared/styles/_typography.scss';
+
+.signUpForm {
+  margin: 50px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 380px;
+  border-radius: 2px;
+  border: 1px solid var(--color-dark-300);
+  background-color: var(--color-dark-500);
+}
+
+.title {
+  font-size: var(--font-size-20);
+  margin-bottom: 13px;
+}
+
+.formWrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+  width: 330px;
+}
+
+.buttonLink {
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.checkBoxWrapper {
+  margin: 12px auto;
+}
+
+.checkBox {
+  display: flex;
+  flex-direction: row;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.label {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  user-select: none;
+  @include typography.uik-small-text;
+}
+
+.link {
+  color: var(--color-accent-300);
+  text-decoration: none;
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-16);
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.submitWrapper {
+  text-align: center;
+  width: 330px;
+}
+.titleButton {
+  @include typography.uik-h3-typography;
+}
+// Sign In
+.signInWrapper {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.signInText {
+  color: var(--color-light-100);
+  font-size: 1rem;
+  margin: 1.125rem 0 0.4rem;
+}
+
+.signInLink {
+  color: var(--color-accent-500);
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  display: inline-block;
+  &:hover {
+    color: var(--color-accent-100);
+  }
+}
+
+

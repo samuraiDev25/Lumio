@@ -58,15 +58,15 @@ export const DatePicker = ({ mode, disabled = false }: DatePickerProps) => {
                 <DatePickerMultipleMode
                   today={today}
                   selectedWeek={selectedWeek}
-                  onSelect={handleMultipleSelect}
-                  onError={setError}
+                  onSelectAction={handleMultipleSelect}
+                  onErrorAction={setError}
                 />
               ) : (
                 <DatePickerRangeMode
                   today={today}
                   selectedRange={selectedRange}
-                  onSelect={handleRangeSelect}
-                  onError={setError}
+                  onSelectAction={handleRangeSelect}
+                  onErrorAction={setError}
                 />
               ))}
           </Popover.Content>

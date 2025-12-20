@@ -1,0 +1,20 @@
+.fullscreenPage {
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 80vw;
+  height: 90vh;
+  color: var(--color-light-100);
+  font-size: var(--font-size-14);
+  text-align: center;
+}
+
+.backLink {
+display: flex;
+  justify-content: start;
+  flex-direction: column;
+  text-decoration: underline;
+  font-size: 14px;
+}

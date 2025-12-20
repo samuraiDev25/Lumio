@@ -6,39 +6,39 @@ import './DatePicker.global.scss';
 type Props = {
   today: Date;
   selectedRange?: DateRange;
-  onSelect: (range: DateRange | undefined) => void;
-  onError: (error: string | null) => void;
+  onSelectAction: (range: DateRange | undefined) => void;
+  onErrorAction: (error: string | null) => void;
 };
 
 export const DatePickerRangeMode = ({
   today,
   selectedRange,
-  onSelect,
-  onError,
+  onSelectAction,
+  onErrorAction,
 }: Props) => {
   const validateRange = (range?: DateRange) => {
     if (!range?.from) {
-      onError?.(null);
+      onErrorAction?.(null);
       return true;
     }
 
     if (!range.to) {
-      onError?.(null);
+      onErrorAction?.(null);
       return true;
     }
 
     if (range.to < today) {
-      onError?.('Error, select current month or last month');
+      onErrorAction?.('Error, select current month or last month');
       return false;
     }
 
-    onError?.(null);
+    onErrorAction?.(null);
     return true;
   };
 
   const handleSelect = (range: DateRange | undefined) => {
     if (validateRange(range)) {
-      onSelect(range);
+      onSelectAction(range);
     }
   };
 
