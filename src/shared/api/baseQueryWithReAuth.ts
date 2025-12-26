@@ -11,8 +11,10 @@ const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_BASE_API_URL,
   prepareHeaders: (headers) => {
     const token = localStorage.getItem('accessToken');
-
-    headers.set('Authorization', `Bearer ${token}`);
+    // Без этой проверки при token = null отправлялось бы "Bearer null"
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
 
     return headers;
   },
