@@ -96,4 +96,14 @@
   }
 }
 
+//Modal after signUp
+.modalText {
+  @include typography.uik-regular-text-16;
+
+}
+.buttonModal {
+  float: right;
+  margin-bottom: 2.25rem;
+}
+
 

@@ -43,6 +43,7 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
+    "@hookform/devtools": "^4.4.0",
     "@storybook/addon-a11y": "^10.1.4",
     "@storybook/nextjs-vite": "^10.1.2",
     "@types/node": "^20",
