@@ -8,23 +8,23 @@ import { getWeekForDay } from '@/shared/ui/datePicker/utilsDate';
 type Props = {
   today: Date;
   selectedWeek?: Date[];
-  onSelect: (day: Date, week: Date[]) => void;
-  onError: (error: string | null) => void;
+  onSelectAction: (day: Date, week: Date[]) => void;
+  onErrorAction: (error: string | null) => void;
 };
 export const DatePickerMultipleMode = ({
   today,
   selectedWeek = [],
-  onSelect,
-  onError,
+  onSelectAction,
+  onErrorAction,
 }: Props) => {
   const validateDays = (day: Date, week: Date[]) => {
     const lastDayOfWeek = week[6];
     if (lastDayOfWeek <= today) {
-      onError('Error!!');
-      onSelect(day, week);
+      onErrorAction('Error!!');
+      onSelectAction(day, week);
     } else {
-      onError?.(null);
-      onSelect(day, week);
+      onErrorAction?.(null);
+      onSelectAction(day, week);
     }
   };
 

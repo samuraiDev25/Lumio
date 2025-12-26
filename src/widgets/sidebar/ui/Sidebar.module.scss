@@ -1,0 +1,402 @@
+/* === БАЗОВЫЕ СТИЛИ САЙДБАРА === */
+.sidebar {
+  position: fixed;
+  z-index: 999;
+  top: calc(var(--header-height, 60px));
+  left: 0;
+
+  box-sizing: border-box;
+  width: 220px;
+  height: calc(100vh - var(--header-height, 60px));
+  margin: 0;
+  padding: 0 0 36px 60px;
+  border-top: 1px solid var(--color-dark-300, #333);
+  border-right: 1px solid var(--color-dark-300, #333);
+
+  background: var(--color-dark-700, #0d0d0d);
+
+  ul,
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+.nav-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.nav-list {
+  position: relative;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* === АБСОЛЮТНОЕ ПОЗИЦИОНИРОВАНИЕ === */
+
+/* Feed */
+.nav-list > :first-child {
+  position: absolute;
+  top: 72px;
+  left: 0;
+}
+
+/* Create */
+.nav-list > :nth-child(2) {
+  position: absolute;
+  top: 120px;
+  left: 0;
+}
+
+/* My Profile */
+.nav-list > :nth-child(3) {
+  position: absolute;
+  top: 168px;
+  left: 0;
+}
+
+/* Messenger */
+.nav-list > :nth-child(4) {
+  position: absolute;
+  top: 216px;
+  left: 0;
+}
+
+/* Search */
+.nav-list > :nth-child(5) {
+  position: absolute;
+  top: 264px;
+  left: 0;
+}
+
+/* Statistics */
+.nav-list > :nth-child(6) {
+  position: absolute;
+  top: 348px;
+  left: 0;
+}
+
+/* Favorites */
+.nav-list > :nth-child(7) {
+  position: absolute;
+  top: 396px;
+  left: 0;
+}
+
+.logout-section {
+  position: absolute;
+  bottom: 36px;
+  left: 0;
+
+  box-sizing: border-box;
+  width: 100%;
+  padding-left: 60px;
+}
+
+/* Убираем маркер добавляется к li */
+.logout-section > li {
+  list-style: none;
+}
+
+/* ========== СТИЛИ .icon ========== */
+
+.icon {
+  width: 24px;
+  height: 24px;
+  color: var(--icon-color, currentColor);
+  transition: color 0.2s ease;
+}
+
+/* ========== ТЕКСТ КОНТЕЙНЕРЫ ДЛЯ КОНКРЕТНЫХ ЭЛЕМЕНТОВ ========== */
+.feed .text-container,
+.create .text-container,
+.my-profile .text-container,
+.messenger .text-container,
+.search .text-container,
+.statistics .text-container,
+.favorites .text-container,
+.logout-item .text-container {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  white-space: nowrap;
+}
+
+/* === ШИРИНЫ ЭЛЕМЕНТОВ === */
+.feed {
+  width: 69px;
+
+  .text-container {
+    width: 33px;
+  }
+}
+
+.create {
+  width: 81px;
+
+  .text-container {
+    width: 45px;
+  }
+}
+
+.my-profile {
+  width: 104px;
+
+  .text-container {
+    width: 68px;
+  }
+}
+
+.messenger {
+  width: 111px;
+
+  .text-container {
+    width: 75px;
+  }
+}
+
+.search {
+  width: 83px;
+
+  .text-container {
+    width: 47px;
+  }
+}
+
+.statistics {
+  width: 99px;
+
+  .text-container {
+    width: 63px;
+  }
+}
+
+.favorites {
+  width: 98px;
+
+  .text-container {
+    width: 62px;
+  }
+}
+
+.logout-item {
+  width: 89px;
+
+  .text-container {
+    justify-content: center;
+    width: 53px;
+    text-align: center;
+  }
+}
+
+/* ========== МИКСИНЫ ДЛЯ ПОВТОРЯЮЩИХСЯ СТИЛЕЙ ========== */
+
+/* Миксин для disabled состояния */
+@mixin disabled-state {
+  --icon-color: var(--color-dark-100);
+
+  cursor: not-allowed;
+  color: var(--color-dark-100);
+  opacity: 0.5;
+
+  &:hover {
+    background: transparent;
+  }
+
+  &:focus-visible {
+    --icon-color: var(--color-dark-100);
+
+    border-radius: 2px;
+    color: var(--color-dark-100);
+    outline: 2px solid var(--color-dark-300);
+    outline-offset: -2px;
+  }
+}
+
+/* ========== БАЗОВЫЕ СТИЛИ ДЛЯ .nav-link ========== */
+.nav-link {
+  /* CSS переменная для цвета иконки */
+  --icon-color: var(--color-light-100);
+
+  cursor: pointer;
+
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  height: 24px;
+  padding: 0;
+  border: none;
+
+  font-family: var(--font-family-primary, 'Inter'), sans-serif;
+  font-size: var(--font-size-14, 0.875rem);
+  font-weight: var(--font-weight-medium, 500);
+  line-height: var(--line-height-24, 1.5rem);
+  color: var(--color-light-100);
+  text-decoration: none;
+
+  background: transparent;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+
+  transition: all 0.2s ease;
+
+  .icon-container {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+
+    width: 24px;
+    height: 24px;
+  }
+
+  .text-container {
+    display: flex;
+    align-items: center;
+    height: 24px;
+    white-space: nowrap;
+  }
+
+  /* Disabled состояние */
+  &.disabled {
+    @include disabled-state;
+  }
+
+  /* Focus состояние */
+  &:focus-visible {
+    --icon-color: var(--color-light-100);
+
+    border-radius: 2px;
+    color: var(--color-light-100);
+    outline: 2px solid var(--color-accent-700);
+    outline-offset: -2px;
+  }
+
+  /* Hover состояние */
+  &:hover:not(.disabled, .logout) {
+    --icon-color: var(--color-accent-100);
+
+    color: var(--color-accent-100);
+  }
+
+  /* Active состояние (не logout) */
+  &.active:not(.logout) {
+    --icon-color: var(--color-accent-500);
+
+    color: var(--color-accent-500);
+
+    .text-container {
+      font-weight: 700;
+    }
+  }
+}
+
+/* ========== ОТДЕЛЬНЫЙ БЛОК ДЛЯ LOGOUT ========== */
+.nav-link.logout {
+  --icon-color: var(--color-light-100);
+
+  color: var(--color-light-100);
+
+  /* Logout focus */
+  &:focus-visible {
+    --icon-color: var(--color-light-100);
+
+    border-radius: 2px;
+    color: var(--color-light-100);
+    outline: 2px solid var(--color-accent-700);
+    outline-offset: -2px;
+  }
+
+  /* Logout hover */
+  &:hover:not(.disabled) {
+    --icon-color: var(--color-accent-100);
+
+    color: var(--color-accent-100);
+  }
+
+  /* Logout active */
+  &.active {
+    --icon-color: var(--color-accent-500);
+
+    color: var(--color-accent-500);
+
+    .text-container {
+      font-weight: 700;
+    }
+
+    /* Logout active focus */
+    &:focus-visible {
+      --icon-color: var(--color-accent-500);
+
+      border-radius: 2px;
+      color: var(--color-accent-500);
+      outline: 2px solid var(--color-accent-700);
+      outline-offset: -2px;
+    }
+
+    /* Logout active hover */
+    &:hover:not(.disabled) {
+      --icon-color: var(--color-accent-300);
+
+      color: var(--color-accent-300);
+    }
+  }
+}
+
+/* ========== СТИЛИ С .sidebar ========== */
+
+/* Disabled sidebar */
+.sidebar.disabled .nav-link {
+  @include disabled-state;
+
+  /* Active состояния для disabled sidebar */
+  &.active:not(.logout) {
+    --icon-color: var(--color-dark-100);
+
+    color: var(--color-dark-100);
+  }
+
+  &.logout {
+    --icon-color: var(--color-dark-100);
+
+    color: var(--color-dark-100);
+
+    &:hover:not(.disabled) {
+      --icon-color: var(--color-dark-100);
+
+      color: var(--color-dark-100);
+    }
+
+    &.active {
+      --icon-color: var(--color-dark-100);
+
+      color: var(--color-dark-100);
+
+      &:focus-visible {
+        --icon-color: var(--color-dark-100);
+
+        color: var(--color-dark-100);
+      }
+
+      &:hover:not(.disabled) {
+        --icon-color: var(--color-dark-100);
+
+        color: var(--color-dark-100);
+      }
+    }
+  }
+}
+
+/* Общие focus для sidebar */
+.sidebar .nav-list .nav-link:focus-visible,
+.sidebar .logout-section .nav-link:focus-visible {
+  border-radius: 2px;
+  color: var(--color-light-100);
+  outline: 2px solid var(--color-accent-700);
+  outline-offset: -2px;
+}

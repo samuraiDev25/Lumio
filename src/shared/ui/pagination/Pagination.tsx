@@ -3,7 +3,7 @@
 import s from './Pagination.module.scss';
 import { useState } from 'react';
 import { ArrowIosBack, ArrowIosForward } from '@/shared/ui/icons';
-import { PageSizeSelector } from '@/shared/ui/Pagination/pageSizeSelector/PageSizeSelector';
+import { PageSizeSelector } from '@/shared/ui/pagination/pageSizeSelector/PageSizeSelector';
 
 type PaginationProps = {
   totalPages: number;
@@ -103,7 +103,7 @@ export const Pagination = ({
       <PageSizeSelector
         pageSize={pageSize}
         pageSizeOptions={pageSizeOptions}
-        handlePageSizeChange={handlePageSizeChange}
+        handlePageSizeChangeAction={handlePageSizeChange}
       />
     </div>
   );
