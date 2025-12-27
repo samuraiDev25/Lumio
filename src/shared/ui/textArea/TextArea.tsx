@@ -18,20 +18,20 @@ export interface TextAreaProps {
 }
 
 export const TextArea: React.FC<TextAreaProps> = ({
-                                                    value = '',
-                                                    placeholder = '',
-                                                    label = '',
-                                                    error = false,
-                                                    errorMessage = '',
-                                                    disabled = false,
-                                                    onChange,
-                                                    onFocus,
-                                                    onBlur,
-                                                    rows = 3,
-                                                    maxLength,
-                                                    readOnly = false,
-                                                    className = '',
-                                                  }) => {
+  value = '',
+  placeholder = '',
+  label = '',
+  error = false,
+  errorMessage = '',
+  disabled = false,
+  onChange,
+  onFocus,
+  onBlur,
+  rows = 3,
+  maxLength,
+  readOnly = false,
+  className = '',
+}) => {
   const [internalValue, setInternalValue] = useState(value);
   const [isFocused, setIsFocused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
