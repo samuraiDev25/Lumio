@@ -1,10 +1,11 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { baseQueryWithReauth } from './baseQuery';
+import { baseQueryWithReauth } from '@/shared/api/baseQueryWithReAuth';
 
 export const baseApi = createApi({
-  reducerPath: 'baseApi',
+  reducerPath: 'lumioApi',
   baseQuery: baseQueryWithReauth,
   tagTypes: ['Me'],
-  // eslint-disable-next-line
-  endpoints: _ => ({}),
+  endpoints: () => ({}),
 });
+
+export type baseApi = typeof baseApi;
