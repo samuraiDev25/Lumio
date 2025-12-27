@@ -1,8 +1,8 @@
 'use client';
 
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
-import { SidebarItemProps } from './types';
-import s from './Sidebar.module.scss';
+import { SidebarItemProps } from '../types';
+import s from '../Sidebar.module.scss';
 import React from 'react';
 
 export const SidebarItem = ({
