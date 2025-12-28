@@ -10,7 +10,3 @@ export { DatePicker } from './datePicker/DatePicker';
 export { Radio } from './radio/Radio';
 export { Tab } from './tab/Tab';
 export { Typography } from './typography/Typography';
-export { Modal } from './modal/Modal';
-export { Dialog } from './dialog/Dialog';
-export { Card } from './card/Card';
-export { Label } from './label/Label';

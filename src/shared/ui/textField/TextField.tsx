@@ -1,99 +1,132 @@
-import { ComponentProps, FC, KeyboardEvent, ReactNode } from 'react';
-import { useGetId } from './useGetId';
-import s from './TextField.module.scss';
-import { clsx } from 'clsx';
-import { Search } from '@/shared/ui/icons';
-import { Label } from '@/shared/ui';
+'use client';
 
-export type TextFieldProps = {
-  errorMessage?: string;
-  iconEnd?: ReactNode;
-  iconStart?: ReactNode;
-  label?: ReactNode;
-  onEndIconClick?: () => void;
-  onEnter?: (e: KeyboardEvent<HTMLInputElement>) => void;
-  search?: boolean;
-  value?: string;
-} & ComponentProps<'input'>;
+import * as React from 'react';
+import * as LabelPrimitive from '@radix-ui/react-label';
+import { cn } from '@/shared/lib/utils';
+import styles from './TextField.module.scss';
+import { EyeOffOutline, EyeOutline, SearchOutline } from '@/shared/ui/icons';
 
-export const TextField: FC<TextFieldProps> = ({
-  errorMessage,
-  iconEnd,
-  iconStart,
-  label,
-  onEndIconClick,
-  onEnter,
-  search,
-  className,
-  id,
-  onKeyDown,
-  required,
-  ref,
-  disabled,
-  ...rest
-}) => {
-  const showError = !disabled && !!errorMessage && errorMessage.length > 0;
-  const textFieldId = useGetId(id);
+export interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+  fullWidth?: boolean;
+  startIcon?: React.ReactNode;
+  endIcon?: React.ReactNode;
+  variant?: 'default' | 'search' | 'password';
+}
 
-  if (search) {
-    iconStart = <Search />;
-  }
+export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
+  (
+    {
+      className,
+      label,
+      error,
+      fullWidth = false,
+      startIcon,
+      endIcon,
+      variant = 'default',
+      type: initialType = 'text',
+      id,
+      disabled,
+      placeholder,
+      ...props
+    },
+    ref,
+  ) => {
+    const generatedId = React.useId();
+    const inputId = id || generatedId;
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (onEnter && e.key === 'Enter') {
-      onEnter(e);
-    }
-    onKeyDown?.(e);
-  };
+    const [showPassword, setShowPassword] = React.useState(false);
+    const type =
+      variant === 'password'
+        ? showPassword
+          ? 'text'
+          : 'password'
+        : initialType;
 
-  const classNames = {
-    root: clsx(s.box, className),
-    inputContainer: s.inputContainer,
-    label: clsx(s.label, disabled && s.disabled),
-    iconEnd: clsx(s.iconEnd, disabled && s.disabled),
-    iconStart: clsx(s.iconStart, showError && s.error, disabled && s.disabled),
-    input: clsx(s.input, showError && s.error),
-    errorText: clsx(s.errorText),
-  };
+    // Иконка поиска
+    const searchIcon = variant === 'search' ? <SearchOutline /> : null;
 
-  const dataIconStart = iconStart ? 'start' : '';
-  const dataIconEnd = iconEnd ? 'end' : '';
-  const dataIcon = dataIconStart + dataIconEnd;
-
-  return (
-    <div className={classNames.root}>
-      {label && (
-        <Label
-          className={classNames.label}
-          htmlFor={textFieldId}
-          label={label}
-          required={required}
-        />
-      )}
-      <div className={classNames.inputContainer}>
-        {!!iconStart && (
-          <span className={classNames.iconStart}>{iconStart}</span>
-        )}
-        <input
-          className={classNames.input}
-          data-icon={dataIcon}
-          id={textFieldId}
-          onKeyDown={handleKeyDown}
-          ref={ref}
-          required={required}
-          type={'text'}
+    // Иконка пароля
+    const passwordIcon =
+      variant === 'password' ? (
+        <button
+          type="button"
+          className={styles['password-toggle']}
+          onClick={() => setShowPassword(!showPassword)}
           disabled={disabled}
-          {...rest}
-        />
-        {!!iconEnd && (
-          <span className={classNames.iconEnd} onClick={onEndIconClick}>
-            {iconEnd}
-          </span>
+          aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
+        >
+          {showPassword ? <EyeOutline /> : <EyeOffOutline />}
+        </button>
+      ) : null;
+
+    const finalStartIcon = startIcon || searchIcon;
+    const finalEndIcon = endIcon || passwordIcon;
+
+    return (
+      <div
+        className={cn(
+          styles.wrapper,
+          fullWidth && styles['full-width'],
+          className,
+        )}
+      >
+        {label && (
+          <LabelPrimitive.Root
+            htmlFor={inputId}
+            className={cn(styles.label, disabled && styles['label-disabled'])}
+          >
+            {label}
+          </LabelPrimitive.Root>
+        )}
+
+        <div className={styles['input-container']}>
+          {finalStartIcon && (
+            <div className={cn(styles.icon, styles['start-icon'])}>
+              {finalStartIcon}
+            </div>
+          )}
+
+          <input
+            ref={ref}
+            id={inputId}
+            className={cn(
+              styles.input,
+              error && styles['input-error'],
+              finalStartIcon && styles['has-start-icon'],
+              finalEndIcon && styles['has-end-icon'],
+              disabled && styles['input-disabled'],
+            )}
+            type={type}
+            disabled={disabled}
+            placeholder={placeholder}
+            aria-invalid={!!error}
+            aria-describedby={error ? `${inputId}-error` : undefined}
+            aria-disabled={disabled}
+            {...props}
+          />
+
+          {finalEndIcon && (
+            <div className={cn(styles.icon, styles['end-icon'])}>
+              {finalEndIcon}
+            </div>
+          )}
+        </div>
+
+        {error && (
+          <LabelPrimitive.Root
+            htmlFor={inputId}
+            className={styles['error-text']}
+            id={`${inputId}-error`}
+            aria-live="polite"
+          >
+            {error}
+          </LabelPrimitive.Root>
         )}
       </div>
-      {showError && (
-        <span className={classNames.errorText}>{errorMessage}</span>
-      )}
-    </div>
-  );
-};
+    );
+  },
+);
+
+TextField.displayName = 'TextField';
