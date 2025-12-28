@@ -3,14 +3,15 @@
 import { PropsWithChildren } from 'react';
 import s from '@/app/BaseLayout.module.scss';
 import { Header } from '@/widgets/header/ui';
-import { Sidebar } from '@/widgets/sidebar';
+import { Providers } from '@/app/Providers';
 
 export const BaseLayout = ({ children }: PropsWithChildren) => {
   return (
     <div className={s.layoutContainer}>
-      <Header />
-      <Sidebar />
-      {children}
+      <Providers>
+        <Header />
+        {children}
+      </Providers>
     </div>
   );
 };

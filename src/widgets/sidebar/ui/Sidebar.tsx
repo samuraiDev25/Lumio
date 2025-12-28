@@ -19,7 +19,7 @@ import {
   Heart,
   LogOutOutline,
 } from '@/shared/ui/icons';
-import { SidebarItem } from '@/widgets/sidebar';
+import { SidebarItem } from './SidebarItem';
 
 const mainItems: SidebarItemType[] = [
   {

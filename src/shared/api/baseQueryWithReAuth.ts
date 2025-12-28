@@ -1,18 +1,20 @@
-import type {
+import { Mutex } from 'async-mutex';
+import {
   BaseQueryFn,
   FetchArgs,
+  fetchBaseQuery,
   FetchBaseQueryError,
 } from '@reduxjs/toolkit/query';
-import { fetchBaseQuery } from '@reduxjs/toolkit/query';
-import { Mutex } from 'async-mutex';
 
 const mutex = new Mutex();
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
+  baseUrl: process.env.NEXT_PUBLIC_BASE_API_URL,
   prepareHeaders: (headers) => {
-    const token = localStorage.getItem('token');
-
-    headers.set('Authorization', `Bearer ${token}`);
+    const token = localStorage.getItem('accessToken');
+    // Без этой проверки при token = null отправлялось бы "Bearer null"
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
 
     return headers;
   },
@@ -36,7 +38,7 @@ export const baseQueryWithReauth: BaseQueryFn<
       try {
         const refreshResult = (await baseQuery(
           {
-            url: '/api/v1/auth/update-tokens',
+            url: '/api/v1/auth/refresh-token',
             method: 'POST',
           },
           api,
@@ -45,8 +47,9 @@ export const baseQueryWithReauth: BaseQueryFn<
         )) as any;
 
         if (refreshResult.data) {
-          localStorage.setItem('token', refreshResult.data.accessToken);
+          localStorage.setItem('accessToken', refreshResult.data.accessToken);
           // retry the initial query
+          console.log(refreshResult);
           result = await baseQuery(args, api, extraOptions);
         } else {
           return {

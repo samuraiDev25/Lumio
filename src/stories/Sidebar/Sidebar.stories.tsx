@@ -1,4 +1,4 @@
-import { Sidebar } from '@/widgets/sidebar/ui/Sidebar/Sidebar';
+import { Sidebar } from '@/widgets/sidebar/ui/Sidebar';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta<typeof Sidebar> = {
