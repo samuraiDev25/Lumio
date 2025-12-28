@@ -15,7 +15,7 @@ import { handleNetworkError } from '@/shared/lib';
 import {
   recoveryPasswordSchema,
   RecoveryPasswordType,
-} from '../../model/validation';
+} from '@/features/auth/model/validation';
 import { useAppDispatch } from '@/shared/lib/hooks';
 
 // const ReCAPTCHA = dynamic(() => import('react-google-recaptcha'), {
