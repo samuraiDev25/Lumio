@@ -2,7 +2,8 @@
 @use '../../../../shared/styles/_typography.scss';
 
 .signUpForm {
-  margin: 50px auto;
+  margin: 60px auto;
+  padding-bottom: 24px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -96,14 +97,6 @@
   }
 }
 
-//Modal after signUp
-.modalText {
-  @include typography.uik-regular-text-16;
 
-}
-.buttonModal {
-  float: right;
-  margin-bottom: 2.25rem;
-}
 
 

@@ -1,45 +1,18 @@
 'use client';
 
-import s from './SignUpForm.module.scss';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Button, Checkbox, TextField } from '@/shared/ui';
 import Link from 'next/link';
-import SvgYandex from './YandexSvg';
+import SvgYandex from '../../../../shared/ui/icons/YandexSvg';
 import { useState } from 'react';
-import { Modal } from '@/shared/ui/modal/Modal';
-
-// Zod
-const signUpSchema = z
-  .object({
-    username: z
-      .string()
-      .min(6, 'Minimum number of characters 6')
-      .max(30, 'Maximum number of characters 30')
-      .regex(
-        /^[0-9A-Za-z_-]+$/,
-        'Only letters, numbers, underscore and hyphen are allowed',
-      ),
-    email: z.email('The email must match the format example@example.com'),
-    password: z
-      .string()
-      .min(6, 'Minimum number of characters 6')
-      .max(20, 'Maximum number of characters 20')
-      .regex(
-        /^(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])[0-9A-Za-z!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]+$/,
-        'Password must contain a-z, A-Z,  ! " # $ % & \' ( ) * + , - . / : ; < = > ? @ [ \\ ] ^ _` { | } ~',
-      ),
-    passwordConfirmation: z.string().min(1, 'The passwords must match'),
-    agreeToTerms: z.boolean().refine((val) => val === true, {
-      message: 'You must agree to the terms',
-    }),
-  })
-  .refine((data) => data.password === data.passwordConfirmation, {
-    message: 'Passwords do not match',
-    path: ['passwordConfirmation'],
-  });
-type SignUpFormData = z.infer<typeof signUpSchema>;
+import { useRegistrationMutation } from '@/features/auth/api/authApi';
+import { signUpSchema, SignUpType } from '@/features/auth/model/validation';
+import { toast } from 'react-toastify';
+import s from './SignUpForm.module.scss';
+import { ServerErrorRegistration } from '@/features/auth/api/authApi.types';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { EmailSentModal } from '@/features/auth/ui/sighUpForm/emailSentModal/EmailSentModal';
 
 export const SignUpForm = () => {
   const {
@@ -49,72 +22,77 @@ export const SignUpForm = () => {
     control,
     setError,
     formState: { errors, isValid, isDirty },
-  } = useForm<SignUpFormData>({
+  } = useForm<SignUpType>({
     resolver: zodResolver(signUpSchema),
     mode: 'onChange',
     defaultValues: {
-      username: '',
+      name: '',
       email: '',
       password: '',
       passwordConfirmation: '',
-      agreeToTerms: true,
+      isAgree: true,
     },
   });
   const [submittedEmail, setSubmittedEmail] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const onSubmit = async (data: SignUpFormData) => {
-    console.log('Form submitted:', data);
+
+  const [registration] = useRegistrationMutation();
+  const onSubmit = async (data: SignUpType) => {
     try {
-      const response = await fetch(
-        'https://lumio.su/api/v1/auth/registration',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: data.username,
-            email: data.email,
-            password: data.password,
-          }),
-        },
-      );
-      if (response.status === 204 || response.ok) {
-        setSubmittedEmail(data.email);
-        setIsModalOpen(true);
-        reset();
-      } else if (response.status === 400) {
-        const errorData = await response.json();
-        if (Array.isArray(errorData.errorsMessages)) {
-          errorData.errorsMessages.forEach(
-            (err: { field: keyof SignUpFormData; message: string }) => {
-              setError(err.field, { type: 'server', message: err.message });
-            },
-          );
-        }
-      } else {
-        console.error('Unexpected error');
+      await registration({
+        username: data.name,
+        email: data.email,
+        password: data.password,
+      }).unwrap();
+      setSubmittedEmail(data.email);
+      setIsModalOpen(true);
+      reset();
+      console.error('User successfully registered');
+    } catch (err) {
+      const error = err as FetchBaseQueryError;
+
+      if (error.status === 400) {
+        const data = error.data as ServerErrorRegistration;
+        data.errorsMessages.forEach((err) => {
+          if (err.field) {
+            console.error('Error 400:', err.message);
+            setError(err.field as keyof SignUpType, {
+              type: 'server',
+              message: err.message,
+            });
+          }
+        });
+      } else if (error.status === 429) {
+        const data = error.data as ServerErrorRegistration;
+        const msg = data.errorsMessages?.[0]?.message;
+        console.error('Error 429:', msg);
+        toast.error(msg);
       }
-    } catch (error) {
-      console.error('Network error:', error);
+      if (error.status === 500) {
+        toast.error('Internal server error.');
+        return;
+      }
     }
   };
 
   const handleYandexSignUp = () => {
-    console.log('Yandex Sign Up');
-    setTimeout(() => {
-      fetch('https://lumio.su/api/v1/testing/all-data', { method: 'DELETE' })
-        .then((response) => {
-          if (response.status === 204) {
-            console.log('Данные успешно удалены');
-          } else {
-            console.error('Ошибка при удалении:', response.status);
-          }
-        })
-        .catch((error) => {
-          console.error('Сетевая ошибка:', error);
-        });
-    }, 2000);
+    // setTimeout(() => {
+    //   fetch('https://lumio.su/api/v1/testing/all-data', { method: 'DELETE' })
+    //     .then((response) => {
+    //       if (response.status === 204) {
+    //         console.log('Данные успешно удалены');
+    //       } else {
+    //         console.error('Ошибка при удалении:', response.status);
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       console.error('Сетевая ошибка:', error);
+    //     });
+    // }, 2000);
   };
-
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)} className={s.signUpForm}>
@@ -133,8 +111,8 @@ export const SignUpForm = () => {
             variant={'default'}
             placeholder={'Epam11'}
             fullWidth={true}
-            error={errors.username?.message}
-            {...register('username')}
+            error={errors.name?.message}
+            {...register('name')}
           />
           <TextField
             label={'Email'}
@@ -163,14 +141,14 @@ export const SignUpForm = () => {
         </div>
         <div className={s.checkBoxWrapper}>
           <Controller
-            name="agreeToTerms"
+            name="isAgree"
             control={control}
             render={({ field }) => (
               <Checkbox
                 checked={field.value}
                 onChange={field.onChange}
                 className={s.checkBox}
-                errorMessage={errors.agreeToTerms?.message}
+                errorMessage={errors.isAgree?.message}
                 label={
                   <span className={s.label}>
                     I agree to the{' '}
@@ -205,28 +183,12 @@ export const SignUpForm = () => {
           </Link>
         </div>
       </form>
-      {/* Modal */}
-      <Modal
+      {/* Modal after registration*/}
+      <EmailSentModal
         open={isModalOpen}
-        showCloseButton={true}
-        title={'Email sent'}
-        size={'sm'}
-        onClose={() => setIsModalOpen(false)}
-      >
-        <p className={s.modalText}>
-          {' '}
-          We have sent a link to confirm your email to{' '}
-          <strong>{submittedEmail}</strong>
-        </p>
-        <Button
-          className={s.buttonModal}
-          variant={'primary'}
-          size={'sm'}
-          onClick={() => setIsModalOpen(false)}
-        >
-          OK
-        </Button>
-      </Modal>
+        email={submittedEmail}
+        onCloseAction={handleCloseModal}
+      />
     </>
   );
 };

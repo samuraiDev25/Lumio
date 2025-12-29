@@ -1,57 +1,46 @@
 'use client';
 
-import { Button, TextField } from '@/shared/ui';
+import { Button } from '@/shared/ui';
 import Image from 'next/image';
-import congratulation from '../../../../../../public/congratulation.png';
-import emailExpired from '../../../../../../public/linkExpired.png';
-import { useEffect, useState } from 'react';
+import congratulation from '../../../../../public/congratulation.png';
+import emailExpired from '../../../../../public/linkExpired.png';
+import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import s from './ConfirmEmail.module.scss';
+import { useConfirmEmailMutation } from '@/features/auth/api/authApi';
+import { toast } from 'react-toastify';
+import { RegistrationConfirmationErrorResponse } from '@/features/auth/api/authApi.types';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { Loading } from '@/shared/ui/loading/Loading';
 
 export function ConfirmEmail() {
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [isExpired, setIsExpired] = useState(false);
-  const [email, setEmail] = useState('');
+  //const [email, setEmail] = useState('');
   const searchParams = useSearchParams();
   const router = useRouter();
 
   const code = searchParams.get('code');
-  console.log(code);
+  const [confirmEmail, { isError, isLoading, isSuccess }] =
+    useConfirmEmailMutation();
+
   useEffect(() => {
     if (!code) return;
-    const confirmEmail = async () => {
-      try {
-        const response = await fetch(
-          'https://lumio.su/api/v1/auth/registration-confirmation',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ confirmCode: code }),
-          },
-        );
-        console.log('Response status:', response.status);
-        // 204 = успех
-        if (response.status === 204) {
-          setIsSuccess(true);
-          console.log('Email successfully confirmed');
+    confirmEmail({ confirmCode: code })
+      .unwrap()
+      .catch((err) => {
+        const baseError = err as FetchBaseQueryError;
+        const data = baseError.data as RegistrationConfirmationErrorResponse;
+        if (baseError.status === 400) {
+          const message = data?.errorsMessages?.[0]?.message;
+          toast.error(message);
+          console.error('Error 400', message);
+        } else if (baseError.status === 500) {
+          toast.error('Internal server error.');
+          console.error('Error 500 Internal server error.');
+        } else {
+          toast.error('Unexpected error occurred.');
         }
-        // 400 = невалидный/истекший код
-        if (response.status === 400) {
-          const errorData = await response.json();
-          setIsExpired(true);
-          const message = errorData.errorsMessages?.[0]?.message;
-          console.error('Error 400:', message);
-        }
-      } catch (error) {
-        console.error('Network error:', error);
-        setIsExpired(true);
-      }
-    };
-
-    confirmEmail();
-  }, [code]);
+      });
+  }, [code, confirmEmail]);
 
   const handleSignIn = () => {
     router.push('/auth/sign-in');
@@ -62,7 +51,8 @@ export function ConfirmEmail() {
   return (
     <div className={s.container}>
       <div className={s.content}>
-        {isSuccess ? (
+        {isLoading && <Loading />}
+        {isSuccess && (
           <>
             <h1 className={s.title}>Congratulations!</h1>
             <div className={s.subtitle}>
@@ -87,33 +77,34 @@ export function ConfirmEmail() {
               />
             </div>
           </>
-        ) : (
+        )}
+
+        {isError && (
           <>
             <h1 className={s.title}>Email verification link expired</h1>
             <div className={s.subtitle}>
               <p>
-                Looks like the verification link has expired. Not to worry, we
-                can send the link again
+                Looks like the verification link has expired. Please register
+                again.
               </p>
             </div>
-            <div className={s.formWrapper}>
-              <TextField
-                label="Email"
-                variant="default"
-                placeholder="Epam@epam.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
+            {/*<div className={s.formWrapper}>*/}
+            {/*  <TextField*/}
+            {/*    label="Email"*/}
+            {/*    variant="default"*/}
+            {/*    placeholder="Epam@epam.com"*/}
+            {/*    value={email}*/}
+            {/*    onChange={(e) => setEmail(e.target.value)}*/}
+            {/*  />*/}
+            {/*</div>*/}
 
             <Button
               variant="primary"
               size="lg"
               onClick={handleResendLink}
               className={s.smallText}
-              disabled={!email}
             >
-              Resend verification link
+              Return to registration
             </Button>
 
             <div className={s.illustration}>

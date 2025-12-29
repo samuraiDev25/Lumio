@@ -4,6 +4,8 @@ import {
   LoginRequest,
   MeResponse,
   RefreshTokenResponse,
+  InputRegistrationDto,
+  RegistrationConfirmationInputDto,
 } from '@/features/auth/api/authApi.types';
 
 export const authApi = baseApi.injectEndpoints({
@@ -25,8 +27,27 @@ export const authApi = baseApi.injectEndpoints({
         method: 'POST',
       }),
     }),
+    registration: builder.mutation<void, InputRegistrationDto>({
+      query: (data) => ({
+        url: '/api/v1/auth/registration',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    confirmEmail: builder.mutation<void, RegistrationConfirmationInputDto>({
+      query: (data) => ({
+        url: '/api/v1/auth/registration-confirmation',
+        method: 'POST',
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useMeQuery, useRefreshTokenMutation } =
-  authApi;
+export const {
+  useLoginMutation,
+  useMeQuery,
+  useRefreshTokenMutation,
+  useRegistrationMutation,
+  useConfirmEmailMutation,
+} = authApi;
