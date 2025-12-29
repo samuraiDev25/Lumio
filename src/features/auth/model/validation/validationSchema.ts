@@ -1,4 +1,4 @@
-import * as z from 'zod';
+import { z } from 'zod';
 
 const nameSchema = z
   .string()
@@ -33,7 +33,7 @@ export const signUpSchema = z
     isAgree: z.boolean(),
   })
   .refine((data) => data.password === data.passwordConfirmation, {
-    message: 'Passwords do not match',
+    message: 'Passwords must match',
     path: ['passwordConfirmation'],
   })
   .refine((data) => data.isAgree, {
@@ -63,6 +63,7 @@ export const recoveryPasswordSchema = z.object({
 export const expiredLinkSchema = z.object({
   email: emailSchema,
 });
+
 export type SignInType = z.infer<typeof signInSchema>;
 export type SignUpType = z.infer<typeof signUpSchema>;
 export type NewPasswordType = z.infer<typeof newPasswordSchema>;
