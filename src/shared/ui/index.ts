@@ -11,3 +11,5 @@ export { Radio } from './radio/Radio';
 export { Tab } from './tab/Tab';
 export { Typography } from './typography/Typography';
 export { Card } from './card/Card';
+export { Modal } from './modal/Modal';
+export { Dialog } from './dialog/Dialog';
