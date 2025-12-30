@@ -8,7 +8,6 @@ import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { changeError } from '@/shared/api/base-slice';
 import { useRecoveryPasswordMutation } from '@/entities/auth/api/authApi';
 // import dynamic from 'next/dynamic';
 import { handleNetworkError } from '@/shared/lib';
@@ -16,7 +15,8 @@ import {
   recoveryPasswordSchema,
   RecoveryPasswordType,
 } from '@/features/auth/model/validation';
-import { useAppDispatch } from '@/shared/lib/hooks';
+import { changeError } from '@/shared/api/baseSlice';
+import { useAppDispatch } from '@/shared/hooks';
 
 // const ReCAPTCHA = dynamic(() => import('react-google-recaptcha'), {
 //   ssr: false,

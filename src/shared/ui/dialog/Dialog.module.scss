@@ -1,0 +1,22 @@
+@use '../../styles/screen' as s;
+
+.buttonsBox {
+  display: flex;
+  justify-content: flex-end;
+
+  @include s.md-down {
+    flex-direction: column;
+  }
+}
+
+.button {
+  min-width: 96px;
+
+  @include s.md-down {
+    width: 100%;
+  }
+}
+
+.hasCancelButton {
+  gap: 24px;
+}
