@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const nameSchema = z
   .string()
-  .min(2, { message: 'Minimum number of characters 2' })
+  .min(6, { message: 'Minimum number of characters 6' })
   .max(30, { message: 'Maximum number of characters 30' })
   .regex(/^[a-zA-Z0-9_-]+$/, {
     message: 'Only letters, numbers, underscore, and hyphen are allowed',
@@ -22,10 +22,6 @@ const passwordSchema = z
   })
   .regex(/[a-z]/, {
     message: 'Must contain at least one lowercase letter (a-z)',
-  })
-  .regex(/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_{|}~]/, {
-    message:
-      'Must contain at least one special character: ! " # $ % & \' ( ) * + , - . / : ; < = > ? @ [ \\ ] ^ _ { | } ~',
   });
 
 export const signUpSchema = z
