@@ -10,3 +10,4 @@ export { DatePicker } from './datePicker/DatePicker';
 export { Radio } from './radio/Radio';
 export { Tab } from './tab/Tab';
 export { Typography } from './typography/Typography';
+export { Card } from './card/Card';
