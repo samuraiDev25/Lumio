@@ -4,7 +4,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Checkbox, TextField } from '@/shared/ui';
 import Link from 'next/link';
-import SvgYandex from '../../../../shared/ui/icons/YandexSvg';
+import SvgYandex from '@/shared/ui/icons/YandexSvg';
 import { useState } from 'react';
 import { useRegistrationMutation } from '@/features/auth/api/authApi';
 import { signUpSchema, SignUpType } from '@/features/auth/model/validation';
@@ -13,6 +13,8 @@ import s from './SignUpForm.module.scss';
 import { ServerErrorRegistration } from '@/features/auth/api/authApi.types';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { EmailSentModal } from '@/features/auth/ui/sighUpForm/emailSentModal/EmailSentModal';
+import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
+import { useRouter } from 'next/navigation';
 
 export const SignUpForm = () => {
   const {
@@ -35,7 +37,9 @@ export const SignUpForm = () => {
   });
   const [submittedEmail, setSubmittedEmail] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router = useRouter();
   const [registration] = useRegistrationMutation();
   const onSubmit = async (data: SignUpType) => {
     try {
@@ -75,24 +79,8 @@ export const SignUpForm = () => {
     }
   };
 
-  const handleYandexSignUp = () => {
-    // setTimeout(() => {
-    //   fetch('https://lumio.su/api/v1/testing/all-data', { method: 'DELETE' })
-    //     .then((response) => {
-    //       if (response.status === 204) {
-    //         console.log('Данные успешно удалены');
-    //       } else {
-    //         console.error('Ошибка при удалении:', response.status);
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       console.error('Сетевая ошибка:', error);
-    //     });
-    // }, 2000);
-  };
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  const handleYandexSignUp = () => router.push('/auth/oauth-success');
+  const handleCloseModal = () => setIsModalOpen(false);
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)} className={s.signUpForm}>
@@ -107,35 +95,45 @@ export const SignUpForm = () => {
         </Button>
         <div className={s.formWrapper}>
           <TextField
+            type={'textarea'}
             label={'Username'}
-            variant={'default'}
             placeholder={'Epam11'}
-            fullWidth={true}
-            error={errors.name?.message}
+            disabled={false}
+            errorMessage={errors.name?.message}
             {...register('name')}
           />
           <TextField
+            type={'email'}
             label={'Email'}
-            variant={'default'}
             placeholder={'Epam@epam.com'}
-            fullWidth={true}
-            error={errors.email?.message}
+            autoComplete={'email'}
+            errorMessage={errors.email?.message}
             {...register('email')}
           />
           <TextField
+            type={showPassword ? 'text' : 'password'}
             label={'Password'}
-            variant={'password'}
             placeholder={'*********'}
-            fullWidth={true}
-            error={errors.password?.message}
+            iconEnd={
+              <span className={s.customIconEnd}>
+                {showPassword ? <EyeOutline /> : <EyeOffOutline />}
+              </span>
+            }
+            onEndIconClick={() => setShowPassword((prev) => !prev)}
+            errorMessage={errors.password?.message}
             {...register('password')}
           />
           <TextField
+            type={showConfirmPassword ? 'text' : 'password'}
             label={'Password confirmation'}
-            variant={'password'}
             placeholder={'*********'}
-            fullWidth={true}
-            error={errors.passwordConfirmation?.message}
+            iconEnd={
+              <span className={s.customIconEnd}>
+                {showConfirmPassword ? <EyeOutline /> : <EyeOffOutline />}
+              </span>
+            }
+            onEndIconClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            errorMessage={errors.passwordConfirmation?.message}
             {...register('passwordConfirmation')}
           />
         </div>

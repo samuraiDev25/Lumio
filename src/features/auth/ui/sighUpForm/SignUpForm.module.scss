@@ -28,6 +28,13 @@
   width: 330px;
 }
 
+.customIconEnd {
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
 .buttonLink {
   padding: 0;
   background: none;
@@ -70,9 +77,11 @@
   text-align: center;
   width: 330px;
 }
+
 .titleButton {
   @include typography.uik-h3-typography;
 }
+
 // Sign In
 .signInWrapper {
   text-align: center;
@@ -92,11 +101,8 @@
   text-decoration: none;
   transition: color 0.2s ease;
   display: inline-block;
+
   &:hover {
     color: var(--color-accent-100);
   }
 }
-
-
-
-

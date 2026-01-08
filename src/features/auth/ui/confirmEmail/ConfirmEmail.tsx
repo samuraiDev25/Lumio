@@ -1,20 +1,15 @@
 'use client';
 
-import { Button } from '@/shared/ui';
-import Image from 'next/image';
-import congratulation from '../../../../../public/congratulation.png';
-import emailExpired from '../../../../../public/linkExpired.png';
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import s from './ConfirmEmail.module.scss';
 import { useConfirmEmailMutation } from '@/features/auth/api/authApi';
 import { toast } from 'react-toastify';
 import { RegistrationConfirmationErrorResponse } from '@/features/auth/api/authApi.types';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { Loading } from '@/shared/ui/loading/Loading';
+import { ResultConfirmation } from '@/features/auth/ui/confirmEmail/resultConfirmation/ResultConfirmation';
 
 export function ConfirmEmail() {
-  //const [email, setEmail] = useState('');
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -42,84 +37,30 @@ export function ConfirmEmail() {
       });
   }, [code, confirmEmail]);
 
-  const handleSignIn = () => {
-    router.push('/auth/sign-in');
-  };
-  const handleResendLink = () => {
-    router.push('/auth/sign-up');
-  };
-  return (
-    <div className={s.container}>
-      <div className={s.content}>
-        {isLoading && <Loading />}
-        {isSuccess && (
-          <>
-            <h1 className={s.title}>Congratulations!</h1>
-            <div className={s.subtitle}>
-              <p>Your email has been confirmed</p>
-            </div>
-            <Button
-              variant="primary"
-              size="md"
-              onClick={handleSignIn}
-              className={s.button}
-            >
-              Sign In
-            </Button>
-            <div className={s.illustration}>
-              <Image
-                src={congratulation}
-                alt="Email confirmed illustration"
-                width={500}
-                height={400}
-                priority
-                className={s.illustrationImage}
-              />
-            </div>
-          </>
-        )}
-
-        {isError && (
-          <>
-            <h1 className={s.title}>Email verification link expired</h1>
-            <div className={s.subtitle}>
-              <p>
-                Looks like the verification link has expired. Please register
-                again.
-              </p>
-            </div>
-            {/*<div className={s.formWrapper}>*/}
-            {/*  <TextField*/}
-            {/*    label="Email"*/}
-            {/*    variant="default"*/}
-            {/*    placeholder="Epam@epam.com"*/}
-            {/*    value={email}*/}
-            {/*    onChange={(e) => setEmail(e.target.value)}*/}
-            {/*  />*/}
-            {/*</div>*/}
-
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={handleResendLink}
-              className={s.smallText}
-            >
-              Return to registration
-            </Button>
-
-            <div className={s.illustration}>
-              <Image
-                src={emailExpired}
-                alt="Email verification expired"
-                width={400}
-                height={350}
-                priority
-                className={s.illustrationImage}
-              />
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  );
+  const handleSignIn = () => router.push('/auth/sign-in');
+  const handleResendLink = () => router.push('/auth/sign-up');
+  if (isLoading) return <Loading />;
+  if (isSuccess)
+    return (
+      <ResultConfirmation
+        title="Congratulations!"
+        subtitle="Your email has been confirmed"
+        buttonText="Sign In"
+        onClickAction={handleSignIn}
+        imageSrc="/congratulation.png"
+        imageAlt="Email confirmed illustration"
+      />
+    );
+  if (isError)
+    return (
+      <ResultConfirmation
+        title="Email verification link expired"
+        subtitle="Looks like the verification link has expired. Please register again."
+        buttonText="Return to registration"
+        onClickAction={handleResendLink}
+        imageSrc="/linkExpired.png"
+        imageAlt="Email verification expired"
+      />
+    );
+  return null;
 }

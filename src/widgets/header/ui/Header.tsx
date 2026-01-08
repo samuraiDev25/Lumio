@@ -13,7 +13,7 @@ export const Header = () => {
         <div className={s.headerWrapper}>
           <Link href={'/'}>
             <Typography variant={'large'} as={'span'}>
-              Instagram
+              Inctagram
             </Typography>
           </Link>
           <div className={s.selectBox}>
