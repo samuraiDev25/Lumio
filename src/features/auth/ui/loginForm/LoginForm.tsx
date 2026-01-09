@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, TextField } from '@/shared/ui';
 import Link from 'next/link';
-import SvgYandex from '@/features/auth/ui/sighUpForm/YandexSvg';
+import SvgYandex from '@/shared/ui/icons/YandexSvg';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useLoginMutation } from '@/features/auth/api/authApi';

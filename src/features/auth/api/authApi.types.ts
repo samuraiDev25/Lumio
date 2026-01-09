@@ -15,3 +15,20 @@ export type MeResponse = {
 export type RefreshTokenResponse = {
   accessToken: string;
 };
+export type InputRegistrationDto = {
+  username: string;
+  email: string;
+  password: string;
+};
+
+export type ServerErrorRegistration = {
+  errorsMessages: {
+    message: string;
+    field?: string;
+  }[];
+};
+
+export type RegistrationConfirmationInputDto = { confirmCode: string };
+export type RegistrationConfirmationErrorResponse = {
+  errorsMessages: { message: string; field?: string }[];
+};

@@ -1,0 +1,28 @@
+@use '../../../../shared/styles/colors';
+@use '../../../../shared/styles/typography';
+
+.fullscreenPage {
+  max-width: 1280px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding-top: 24px;
+  color: var(--color-light-100);
+  @include typography.uik-regular-text-14;;
+}
+
+.backLink {
+  text-decoration: none;
+  text-align: start;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+.title {
+  text-align: center;
+  padding-bottom: 20px;
+  @include typography.uik-h1-typography
+}
+.content {
+  text-align: center;
+}
+

@@ -1,6 +1,6 @@
 'use client';
 
-import TermsOfService from '@/features/auth/ui/termsOfService/TermsOfService';
+import TermsOfService from '@/features/auth/ui/legalLinks/TermsOfService';
 
 export default function Terms() {
   return (
