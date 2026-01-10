@@ -14,7 +14,6 @@ import { ServerErrorRegistration } from '@/features/auth/api/authApi.types';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { EmailSentModal } from '@/features/auth/ui/sighUpForm/emailSentModal/EmailSentModal';
 import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
-import { useRouter } from 'next/navigation';
 
 export const SignUpForm = () => {
   const {
@@ -39,7 +38,6 @@ export const SignUpForm = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const router = useRouter();
   const [registration] = useRegistrationMutation();
   const onSubmit = async (data: SignUpType) => {
     try {
@@ -79,19 +77,15 @@ export const SignUpForm = () => {
     }
   };
 
-  const handleYandexSignUp = () => router.push('/auth/oauth-success');
   const handleCloseModal = () => setIsModalOpen(false);
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)} className={s.signUpForm}>
         <h1 className={s.title}>Sign Up</h1>
-        <Button
-          variant="link"
-          size={'lg'}
-          fullWidth
-          onClick={handleYandexSignUp}
-        >
-          <SvgYandex />
+        <Button type="button" variant="link" size="lg" fullWidth asChild>
+          <a href="/api/v1/auth/yandex">
+            <SvgYandex />
+          </a>
         </Button>
         <div className={s.formWrapper}>
           <TextField

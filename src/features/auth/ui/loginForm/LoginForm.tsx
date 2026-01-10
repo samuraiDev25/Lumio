@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useLoginMutation } from '@/features/auth/api/authApi';
 import { useAppDispatch } from '@/shared/hooks/useAppDispatch';
 import { setCredentials } from '@/features/auth/model/authSlice';
+import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
 
 const loginSchema = z.object({
   email: z
@@ -56,6 +57,8 @@ export const LoginForm = () => {
     },
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const onSubmit = async (data: LoginFormData) => {
     try {
       setServerError('');
@@ -90,46 +93,41 @@ export const LoginForm = () => {
     }
   };
 
-  const handleYandexLogin = () => {
-    // код для YandexLogin
-  };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={s['login-form']}>
       {/* Форма содержит Email, Password, кнопку [Sign In] */}
       <h1 className={s.title}>Sign In</h1>
 
       {/* Кнопка Yandex OAuth */}
-      <Button
-        variant="link"
-        size={'lg'}
-        fullWidth
-        onClick={handleYandexLogin}
-        disabled={isLoading}
-        style={{ marginBottom: '24px' }}
-      >
-        <SvgYandex />
+      <Button type="button" variant="link" size="lg" fullWidth asChild>
+        <a href="/api/v1/auth/yandex">
+          <SvgYandex />
+        </a>
       </Button>
-
       <div className={s['form-wrapper']}>
         {/* Поле Email */}
         <TextField
+          type={'email'}
           label={'Email'}
-          variant={'default'}
           placeholder={'Epam@epam.com'}
-          fullWidth={true}
-          error={errors.email?.message}
+          autoComplete={'email'}
+          errorMessage={errors.email?.message}
           disabled={isLoading}
           {...register('email')}
         />
 
         {/* Поле Password */}
         <TextField
+          type={showPassword ? 'text' : 'password'}
           label={'Password'}
-          variant={'password'}
           placeholder={'**********'}
-          fullWidth={true}
-          error={errors.password?.message}
+          iconEnd={
+            <span className={s.customIconEnd}>
+              {showPassword ? <EyeOutline /> : <EyeOffOutline />}
+            </span>
+          }
+          onEndIconClick={() => setShowPassword((prev) => !prev)}
+          errorMessage={errors.password?.message}
           disabled={isLoading}
           {...register('password')}
         />
