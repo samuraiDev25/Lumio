@@ -1,11 +1,12 @@
 'use client';
 
 import { ConfirmEmail } from '@/features/auth/ui/confirmEmail/ConfirmEmail';
+import { Suspense } from 'react';
 
 export default function ConfirmEmailPage() {
   return (
-    <div>
+    <Suspense fallback={<div>Загрузка...</div>}>
       <ConfirmEmail />
-    </div>
+    </Suspense>
   );
 }
