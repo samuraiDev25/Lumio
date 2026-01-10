@@ -196,3 +196,10 @@
     color: var(--primary-700, #1e5fd8);
   }
 }
+
+.customIconEnd {
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
