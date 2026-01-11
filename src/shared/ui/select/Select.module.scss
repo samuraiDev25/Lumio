@@ -1,0 +1,232 @@
+@use '../../styles/typography' as t;
+
+.trigger {
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 8px 12px;
+  border: 1px solid var(--color-dark-100);
+
+  background: transparent;
+
+  transition:
+    color 0.15s,
+    box-shadow 0.15s;
+
+  @include t.uik-regular-text-16;
+}
+
+.trigger:hover {
+  background-color: var(--color-dark-500);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--color-accent-500);
+}
+
+.trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.trigger:active {
+  border: 1px solid var(--color-light-100);
+}
+
+.triggerDefault {
+  height: 36px;
+}
+
+.triggerSm {
+  height: 2rem;
+}
+
+.triggerPlaceholder {
+  color: var(--color-danger-900);
+}
+
+.triggerIcon {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  opacity: 0.5;
+}
+
+/* Content */
+.content {
+  position: relative;
+  z-index: 50;
+
+  overflow: hidden auto;
+
+  border: 1px solid var(--color-dark-100);
+
+  color: inherit;
+
+  background: transparent;
+  box-shadow:
+    0 1px 3px 0 rgb(0 0 0 / 10%),
+    0 1px 2px 0 rgb(0 0 0 / 6%);
+}
+
+.contentOpen {
+  animation:
+    fade-in 0.2s ease-out,
+    zoom-in 0.2s ease-out;
+}
+
+.contentClosed {
+  animation:
+    fade-out 0.2s ease-in,
+    zoom-out 0.2s ease-in;
+}
+
+.viewportPopper {
+  scroll-margin: 0.25rem;
+  width: 100%;
+  min-width: var(--radix-select-trigger-width);
+  height: var(--color-danger-900);
+}
+
+/* Item */
+.item {
+  cursor: pointer;
+  user-select: none;
+
+  display: flex;
+  align-items: center;
+
+  padding: 6px 12px;
+
+  outline: none;
+
+  @include t.uik-regular-text-16;
+}
+
+.item:focus {
+  color: hsl(var(--accent-foreground));
+  background: var(--color-dark-500);
+}
+
+.item:hover {
+  color: var(--color-accent-500);
+}
+
+.itemDisabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.itemIndicator {
+  position: absolute;
+  right: 0.5rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.itemIcon {
+  pointer-events: none;
+
+  flex-shrink: 0;
+
+  width: 1rem;
+  height: 1rem;
+
+  color: hsl(var(--muted-foreground));
+}
+
+/* Label */
+.label {
+  padding: 0.375rem 0.5rem;
+  font-size: 0.75rem;
+  color: var(--color-light-100);
+}
+
+/* Separator */
+.separator {
+  pointer-events: none;
+  height: 1px;
+  background: var(--color-dark-100);
+}
+
+/* Scroll buttons */
+.scrollButton {
+  cursor: default;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0.25rem;
+}
+
+.scrollButtonIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes zoom-in {
+  from {
+    transform: scale(0.95);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes zoom-out {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(0.95);
+  }
+}
+
+/* Popper positioning */
+.popperBottom {
+  transform: translateY(0.25rem);
+}
+
+.popperLeft {
+  transform: translateX(-0.25rem);
+}
+
+.popperRight {
+  transform: translateX(0.25rem);
+}
+
+.popperTop {
+  transform: translateY(-0.25rem);
+}

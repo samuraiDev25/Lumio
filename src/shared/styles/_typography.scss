@@ -1,18 +1,87 @@
+
 :root {
-  // line heights
-  --line-height-s: 16px;
-  --line-height-m: 24px;
-  --line-height-l: 36px;
+  // Font sizes
+  --font-size-12: 0.75rem; // 12px
+  --font-size-14: 0.875rem; // 14px
+  --font-size-16: 1rem; // 16px
+  --font-size-18: 1.125rem; // 18px
+  --font-size-20: 1.25rem; // 20px
+  --font-size-22: 1.375rem; // 22px
+  --font-size-26: 1.625rem; // 26px
+  --font-size-28: 1.75rem; // 28px
 
-  // font sizes
-  --font-size-xs: 0.75rem;
-  --font-size-s: 0.875rem;
-  --font-size-m: 1rem;
-  --font-size-l: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-xxl: 1.625rem;
+  // Line heights
+  --line-height-100: 1; // 100%
+  --line-height-20: 1.25rem; // 20px
+  --line-height-24: 1.5rem; // 24px
+  --line-height-25: 1.5625rem; // 25px
+  --line-height-35: 2.1875rem; // 35px
+  --line-height-36: 2.25rem; // 36px
 
-  // font weights
+  // Font weights
+  --font-weight-light: 300;
   --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
   --font-weight-bold: 700;
+}
+
+@mixin typography($fontSize, $fontWeight, $lineHeight, $color: var(--color-light-100)) {
+  font-size: $fontSize;
+  font-weight: $fontWeight;
+  line-height: $lineHeight;
+  color: $color;
+}
+
+@mixin uik-large {
+  @include typography(var(--font-size-26), var(--font-weight-semibold), var(--line-height-36));
+}
+
+@mixin uik-h1-typography {
+  @include typography(var(--font-size-20), var(--font-weight-bold), var(--line-height-36));
+}
+
+@mixin uik-h2-typography {
+  @include typography(var(--font-size-18), var(--font-weight-bold), var(--line-height-24));
+}
+
+@mixin uik-h3-typography {
+  @include typography(var(--font-size-16), var(--font-weight-semibold), var(--line-height-16));
+}
+
+@mixin uik-regular-text-16 {
+  @include typography(var(--font-size-16), var(--font-weight-regular), var(--line-height-24));
+}
+
+@mixin uik-bold-text-16 {
+  @include typography(var(--font-size-16), var(--font-weight-bold), var(--line-height-24));
+}
+
+@mixin uik-regular-text-14 {
+  @include typography(var(--font-size-14), var(--font-weight-regular), var(--line-height-24));
+}
+
+@mixin uik-medium-text-14 {
+  @include typography(var(--font-size-14), var(--font-weight-medium), var(--line-height-24));
+}
+
+@mixin uik-bold-text-14 {
+  @include typography(var(--font-size-14), var(--font-weight-bold), var(--line-height-24));
+}
+
+@mixin uik-small-text {
+  @include typography(var(--font-size-12), var(--font-weight-regular), var(--line-height-16));
+}
+
+@mixin uik-semi-bold-small-text {
+  @include typography(var(--font-size-12), var(--font-weight-semibold), var(--line-height-16));
+}
+
+@mixin uik-typography-error {
+  @include typography(
+      var(--font-size-14),
+      var(--font-weight-regular),
+      var(--line-height-24),
+      var(--color-danger-500)
+  );
 }

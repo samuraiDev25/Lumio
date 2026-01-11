@@ -1,0 +1,58 @@
+@use '../../styles/_colors.scss';
+@use '../../styles/_typography.scss';
+
+.wrapper {
+  padding: 1rem;
+  border-radius: 2px;
+  min-width: 158px;
+}
+.label {
+  color: var(--color-light-900);
+  font-size: var(--font-size-14);
+}
+.controls {
+  display: flex;
+
+  margin-bottom: 1rem;
+}
+
+.input {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-dark-500);
+  color: var(--color-light-100);
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--color-dark-300);
+  cursor: pointer;
+  &:hover {
+    background-color: var(--color-dark-400);
+  }
+  &:focus {
+    border: 1px solid var(--color-accent-700);
+  }
+}
+
+.icon {
+  margin-left: 12px;
+}
+
+.weekend {
+  color: var(--color-danger-300);
+}
+
+.errorInput {
+  border-color: var(--color-danger-500);
+  color: var(--color-danger-500);
+}
+
+.errorText {
+  color: var(--color-danger-500);
+}
+
+
+
+
+
+
