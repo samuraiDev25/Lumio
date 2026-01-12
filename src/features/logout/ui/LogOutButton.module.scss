@@ -10,3 +10,14 @@
   flex-shrink: 0;
 }
 
+.message {
+  margin-bottom: 16px;
+  color: var(--color-light-900);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
