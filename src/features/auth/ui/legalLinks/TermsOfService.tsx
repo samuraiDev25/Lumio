@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import s from './TermsOfService.module.scss';
+import s from './LegalLinks.module.scss';
 
 export default function TermsOfService() {
   return (
@@ -9,8 +9,8 @@ export default function TermsOfService() {
       <Link href="/auth/sign-up" className={s.backLink}>
         ← Back to Sign Up
       </Link>
-      <h1>Terms of service</h1>
-      <div className="content">
+      <h1 className={s.title}>Terms of service</h1>
+      <div className={s.content}>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
         tempor incididunt ut labore et dolore magna aliqua. Fames ac turpis
         egestas integer eget aliquet nibh. Amet consectetur adipiscing elit ut

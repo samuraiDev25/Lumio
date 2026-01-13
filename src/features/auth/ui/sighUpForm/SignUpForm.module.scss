@@ -2,7 +2,8 @@
 @use '../../../../shared/styles/_typography.scss';
 
 .signUpForm {
-  margin: 50px auto;
+  margin: 60px auto;
+  padding-bottom: 24px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -25,6 +26,13 @@
   justify-content: center;
   gap: 24px;
   width: 330px;
+}
+
+.customIconEnd {
+  svg {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .buttonLink {
@@ -69,9 +77,11 @@
   text-align: center;
   width: 330px;
 }
+
 .titleButton {
   @include typography.uik-h3-typography;
 }
+
 // Sign In
 .signInWrapper {
   text-align: center;
@@ -91,9 +101,8 @@
   text-decoration: none;
   transition: color 0.2s ease;
   display: inline-block;
+
   &:hover {
     color: var(--color-accent-100);
   }
 }
-
-
