@@ -20,6 +20,7 @@ import {
   LogOutOutline,
 } from '@/shared/ui/icons';
 import { SidebarItem } from './SidebarItem';
+import { LogOutButton } from '@/features/auth/ui/logout';
 
 const mainItems: SidebarItemType[] = [
   {
@@ -129,18 +130,27 @@ export const Sidebar = ({
 
           {/* Log Out */}
           <div className={s['logout-section']}>
-            <SidebarItem
-              item={{
-                id: 'logout',
-                label: 'Log Out',
-                iconOutline: LogOutOutline,
-              }}
-              isActive={activeItem === 'logout'}
-              isDisabled={isDisabled}
-              isLogout={true}
-              onClickAction={handleLogout}
-              className={s['logout-item']}
-            />
+            <NavigationMenu.Item>
+              <NavigationMenu.Link asChild>
+                <LogOutButton
+                  variant="link"
+                  onLogout={() => {
+                    if (!isDisabled) {
+                      if (!externalActiveItem) {
+                        setInternalActiveItem('logout');
+                      }
+                      onLogoutAction?.();
+                    }
+                  }}
+                  className={`${s['nav-link']} ${activeItem === 'logout' ? s.active : ''} ${isDisabled ? s.disabled : ''} ${s.logout}`}
+                >
+                  <div className={s['icon-container']}>
+                    <LogOutOutline className={s.icon} />
+                  </div>
+                  <span className={s['text-container']}>Log Out</span>
+                </LogOutButton>
+              </NavigationMenu.Link>
+            </NavigationMenu.Item>
           </div>
         </nav>
       </NavigationMenu.Root>
