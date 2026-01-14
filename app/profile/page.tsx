@@ -1,6 +1,6 @@
 'use client';
 
-import { LogOutButton } from '@/features/logout/ui';
+import { LogOutButton } from '@/features/auth/ui/logout';
 
 export default function Profile() {
   const handleLogout = () => {
