@@ -3,7 +3,7 @@
 export default function RecoveryPassword() {
   return (
     <div>
-      <h1>RECOVERY PASSWORD</h1>
+      <h1>PasswordRecovery</h1>
     </div>
   );
 }

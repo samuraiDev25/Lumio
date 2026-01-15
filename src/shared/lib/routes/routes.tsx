@@ -7,7 +7,7 @@ export const APP_ROUTES = {
 export const AUTH_ROUTES = {
   SIGN_IN: `${APP_ROUTES.AUTH}/sign-in`,
   SIGN_UP: `${APP_ROUTES.AUTH}/sign-up`,
-  RECOVERY: `${APP_ROUTES.AUTH}/recovery`,
+  RECOVERY: `${APP_ROUTES.AUTH}/forgot-password`,
   CREATE_PASSWORD: `${APP_ROUTES.AUTH}/recovery/create-password`,
   EXPIRED_LINK: `${APP_ROUTES.AUTH}/expired-link`,
   CONFIRMED_EMAIL: `${APP_ROUTES.AUTH}/confirmed-email`,
