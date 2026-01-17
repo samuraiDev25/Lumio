@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/shared/ui';
 import { Modal } from '@/shared/ui/modal/Modal';
-import { logoutUser, clearAuthData, getUserEmail } from '@/features/logout/api';
+import { useLogoutMutation } from '@/features/auth/api/authApi';
+import { clearAuthData, getUserEmail } from '@/features/auth/api/authUtils';
 import clsx from 'clsx';
 import s from './LogOutButton.module.scss';
 
@@ -33,9 +34,9 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
   ...props
 }) => {
   const router = useRouter();
+  const [logout, { isLoading, error }] = useLogoutMutation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -65,13 +66,11 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
       return;
     }
 
-    setIsLoading(true);
     setApiError(null);
 
-    // Используем API функцию из api слоя
-    const result = await logoutUser();
+    try {
+      await logout().unwrap();
 
-    if (result.success) {
       // Успешный выход - очищаем все данные авторизации
       clearAuthData();
 
@@ -89,12 +88,18 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
           window.location.href = '/auth/sign-in';
         }
       }
-    } else {
-      // Показываем ошибку
-      setApiError(result.error || 'An error occurred during logout');
+    } catch (err: any) {
+      // Обработка ошибок RTK Query
+      if (err?.data?.errorMessages && Array.isArray(err.data.errorMessages) && err.data.errorMessages.length > 0) {
+        setApiError(err.data.errorMessages[0].message);
+      } else if (err?.data?.message) {
+        setApiError(err.data.message);
+      } else if (err?.message) {
+        setApiError(err.message);
+      } else {
+        setApiError('An error occurred during logout');
+      }
     }
-
-    setIsLoading(false);
   };
 
   const handleCancel = () => {
@@ -112,7 +117,6 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
     setIsModalOpen(false);
     setShowErrorMessage(false);
     setApiError(null);
-    setIsLoading(false);
   };
 
   return (
@@ -122,6 +126,7 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
         size={size}
         onClick={handleClick}
         className={clsx(s.logOutButton, className)}
+        style={{ width: '100%', justifyContent: 'flex-start', textAlign: 'left' }}
         {...props}
       >
         {children}

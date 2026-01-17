@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Card, Dialog, TextField } from '@/shared/ui';
-import s from './RecoveryPassword.module.scss';
+import s from './PasswordRecovery.module.scss';
 import Link from 'next/link';
 import { AUTH_ROUTES } from '@/shared/lib/routes';
 import { useState } from 'react';
@@ -9,7 +9,6 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRecoveryPasswordMutation } from '@/entities/auth/api/authApi';
-// import dynamic from 'next/dynamic';
 import { handleNetworkError } from '@/shared/lib';
 import {
   recoveryPasswordSchema,
@@ -17,14 +16,14 @@ import {
 } from '@/features/auth/model/validation';
 import { changeError } from '@/shared/api/baseSlice';
 import { useAppDispatch } from '@/shared/hooks';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
-// const ReCAPTCHA = dynamic(() => import('react-google-recaptcha'), {
-//   ssr: false,
-// });
-
-export const RecoveryPassword = () => {
+export const PasswordRecovery = () => {
   const [modalOpen, setModalOpen] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(
+    '6LdkyzAsAAAAADf4b4ya5t_tz63-eo4DVdUehbKR',
+  );
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const [recoveryPassword] = useRecoveryPasswordMutation();
   const dispatch = useAppDispatch();
 
@@ -46,21 +45,32 @@ export const RecoveryPassword = () => {
   const handleFormSubmit: SubmitHandler<RecoveryPasswordType> = async (
     data,
   ) => {
-    if (!recaptchaToken) {
+    if (!executeRecaptcha) {
       dispatch(
-        changeError({ error: 'Пожалуйста, подтвердите что вы не робот' }),
+        changeError({
+          error: 'reCAPTCHA ещё не инициализировалась, попробуйте позже',
+        }),
       );
-
       return;
     }
 
-    const obj = {
-      email: data.email,
-      recaptcha: recaptchaToken,
-      baseUrl: `${process.env.NEXT_PUBLIC_DOMAIN}/auth/recovery/create-password`,
-    };
-
     try {
+      const token = await executeRecaptcha('password_recovery');
+      setRecaptchaToken(token);
+
+      if (!token) {
+        dispatch(
+          changeError({ error: 'Пожалуйста, подтвердите что вы не робот' }),
+        );
+        return;
+      }
+
+      const obj = {
+        email: data.email,
+        recaptcha: token,
+        baseUrl: `${process.env.NEXT_PUBLIC_DOMAIN}/auth/recovery/create-password`,
+      };
+
       await recoveryPassword(obj).unwrap();
       setModalOpen(true);
     } catch (error: unknown) {
@@ -71,6 +81,7 @@ export const RecoveryPassword = () => {
   const closeHandler = () => {
     setModalOpen(false);
     reset();
+    setRecaptchaToken(null);
   };
 
   return (
@@ -103,19 +114,23 @@ export const RecoveryPassword = () => {
             Enter your email address and we will send you further
             instructions{' '}
           </p>
+          <p className={s.introText}>
+            The link has been sent by email.
+            <br /> If you don’t receive an email send link again
+          </p>
           <div className={s.buttonBox}>
             <Button
               disabled={!!errors.email || !recaptchaToken}
               type={'submit'}
-              fullWidth
+              className={s.btnLink1}
             >
               Send Link
             </Button>
-            <Button variant={'secondary'} fullWidth asChild>
+            <Button variant={'link'} asChild className={s.btnLink2}>
               <Link href={AUTH_ROUTES.SIGN_IN}>Back to Sign In</Link>
             </Button>
           </div>
-          <div data-theme={'dark'}></div>
+          {/*<div data-theme={'dark'}></div>*/}
         </form>
       </Card>
     </div>
