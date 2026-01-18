@@ -6,6 +6,8 @@ import {
   RefreshTokenResponse,
   InputRegistrationDto,
   RegistrationConfirmationInputDto,
+  RecoveryPasswordRequest,
+  CreateNewPasswordRequest,
 } from '@/features/auth/api/authApi.types';
 
 export const authApi = baseApi.injectEndpoints({
@@ -41,6 +43,26 @@ export const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+    logout: builder.mutation<void, void>({
+      query: () => ({
+        url: '/api/v1/auth/logout',
+        method: 'POST',
+      }),
+    }),
+    recoveryPassword: builder.mutation<void, RecoveryPasswordRequest>({
+      query: (data) => ({
+        url: '/api/v1/auth/password-recovery',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    createNewPassword: builder.mutation<void, CreateNewPasswordRequest>({
+      query: (body) => ({
+        url: '/api/v1/auth/new-password',
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
@@ -50,4 +72,6 @@ export const {
   useRefreshTokenMutation,
   useRegistrationMutation,
   useConfirmEmailMutation,
+  useLogoutMutation,
+  useRecoveryPasswordMutation,
 } = authApi;
