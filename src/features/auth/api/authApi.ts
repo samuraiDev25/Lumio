@@ -74,4 +74,5 @@ export const {
   useConfirmEmailMutation,
   useLogoutMutation,
   useRecoveryPasswordMutation,
+  useCreateNewPasswordMutation,
 } = authApi;
