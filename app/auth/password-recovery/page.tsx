@@ -1,9 +1,9 @@
 'use client';
 
 import { PasswordRecovery } from '@/features/auth/ui/passwordRecovery/PasswordRecovery';
-import { RecaptchaProvider } from '../../providers/recaptcha-provider';
+import { RecaptchaProvider } from '@/features/providers/recaptcha-provider';
 
-export default function ForgotPassword() {
+export default function RecoveryPassword() {
   return (
     <div>
       <RecaptchaProvider>

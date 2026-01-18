@@ -13,6 +13,7 @@ import { useLoginMutation } from '@/features/auth/api/authApi';
 import { useAppDispatch } from '@/shared/hooks/useAppDispatch';
 import { setCredentials } from '@/features/auth/model/authSlice';
 import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
+import { AUTH_ROUTES } from '@/shared/lib/routes';
 
 const loginSchema = z.object({
   email: z
@@ -140,7 +141,7 @@ export const LoginForm = () => {
         {/* Ссылки Forgot Password и Sign Up */}
         <div className={s['forgot-password-wrapper']}>
           <Link
-            href="/auth/forgot-password"
+            href={AUTH_ROUTES.RECOVERY}
             className={s['forgot-password-wrapper-class']}
             onClick={(e) => isLoading && e.preventDefault()}
           >

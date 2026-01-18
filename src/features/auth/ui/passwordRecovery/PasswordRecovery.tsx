@@ -8,7 +8,6 @@ import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRecoveryPasswordMutation } from '@/entities/auth/api/authApi';
 import { handleNetworkError } from '@/shared/lib';
 import {
   recoveryPasswordSchema,
@@ -17,12 +16,11 @@ import {
 import { changeError } from '@/shared/api/baseSlice';
 import { useAppDispatch } from '@/shared/hooks';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { useRecoveryPasswordMutation } from '@/features/auth/api/authApi';
 
 export const PasswordRecovery = () => {
   const [modalOpen, setModalOpen] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(
-    '6LdkyzAsAAAAADf4b4ya5t_tz63-eo4DVdUehbKR',
-  );
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [recoveryPassword] = useRecoveryPasswordMutation();
   const dispatch = useAppDispatch();
@@ -38,7 +36,7 @@ export const PasswordRecovery = () => {
       email: '',
     },
     resolver: zodResolver(recoveryPasswordSchema),
-    mode: 'onBlur',
+    mode: 'onChange',
   });
   const value = watch().email;
 
@@ -55,7 +53,7 @@ export const PasswordRecovery = () => {
     }
 
     try {
-      const token = await executeRecaptcha('password_recovery');
+      const token = await executeRecaptcha();
       setRecaptchaToken(token);
 
       if (!token) {
@@ -67,10 +65,9 @@ export const PasswordRecovery = () => {
 
       const obj = {
         email: data.email,
-        recaptcha: token,
-        baseUrl: `${process.env.NEXT_PUBLIC_DOMAIN}/auth/recovery/create-password`,
+        recaptchaToken: token,
+        baseUrl: `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/auth/new-password`,
       };
-
       await recoveryPassword(obj).unwrap();
       setModalOpen(true);
     } catch (error: unknown) {
@@ -120,7 +117,7 @@ export const PasswordRecovery = () => {
           </p>
           <div className={s.buttonBox}>
             <Button
-              disabled={!!errors.email || !recaptchaToken}
+              disabled={!!errors.email}
               type={'submit'}
               className={s.btnLink1}
             >
@@ -130,7 +127,6 @@ export const PasswordRecovery = () => {
               <Link href={AUTH_ROUTES.SIGN_IN}>Back to Sign In</Link>
             </Button>
           </div>
-          {/*<div data-theme={'dark'}></div>*/}
         </form>
       </Card>
     </div>
