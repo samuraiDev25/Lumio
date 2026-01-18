@@ -28,6 +28,17 @@ export type ServerErrorRegistration = {
   }[];
 };
 
+export type RecoveryPasswordRequest = {
+  email: string;
+  recaptchaToken: string;
+  baseUrl: string;
+};
+
+export type CreateNewPasswordRequest = {
+  newPassword: string;
+  recoveryCode: string;
+};
+
 export type RegistrationConfirmationInputDto = { confirmCode: string };
 export type RegistrationConfirmationErrorResponse = {
   errorsMessages: { message: string; field?: string }[];
