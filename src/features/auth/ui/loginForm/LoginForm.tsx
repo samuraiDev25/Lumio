@@ -3,7 +3,6 @@
 import s from './LoginForm.module.scss';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Button, TextField } from '@/shared/ui';
 import Link from 'next/link';
 import SvgYandex from '@/shared/ui/icons/YandexSvg';
@@ -13,22 +12,8 @@ import { useLoginMutation } from '@/features/auth/api/authApi';
 import { useAppDispatch } from '@/shared/hooks/useAppDispatch';
 import { setCredentials } from '@/features/auth/model/authSlice';
 import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
-import { AUTH_ROUTES } from '@/shared/lib/routes';
-
-const loginSchema = z.object({
-  email: z
-    .email({
-      message: 'The email must match the format example@example.com',
-    })
-    .min(1, 'Email is required'),
-  password: z
-    .string()
-    .min(1, 'Password is required')
-    .min(6, 'Minimum number of characters 6')
-    .max(20, 'Maximum number of characters 20'),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
+import { APP_ROUTES, AUTH_ROUTES } from '@/shared/lib/routes';
+import { signInSchema, SignInType } from '@/features/auth/model/validation';
 
 type RTKQueryError = {
   status?: number;
@@ -49,8 +34,8 @@ export const LoginForm = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<SignInType>({
+    resolver: zodResolver(signInSchema),
     mode: 'onBlur',
     defaultValues: {
       email: '',
@@ -60,7 +45,7 @@ export const LoginForm = () => {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: SignInType) => {
     try {
       setServerError('');
 
@@ -69,7 +54,7 @@ export const LoginForm = () => {
       // Сохраняем токен через Redux action (автоматически сохраняет и в localStorage)
       dispatch(setCredentials({ accessToken: response.accessToken }));
 
-      router.push('/');
+      router.push(APP_ROUTES.ROOT);
       router.refresh();
     } catch (error: unknown) {
       // Отображение ошибки
