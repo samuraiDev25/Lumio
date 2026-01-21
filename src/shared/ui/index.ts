@@ -14,3 +14,4 @@ export { Card } from './card/Card';
 export { Modal } from './modal/Modal';
 export { Dialog } from './dialog/Dialog';
 export { Label } from './label/Label';
+export { PopUp } from './popUp/PopUp';
