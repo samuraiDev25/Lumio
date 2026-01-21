@@ -1,8 +1,18 @@
 'use client';
-import { PropsWithChildren } from 'react';
-import { Provider } from 'react-redux';
-import { store } from '@/app/store';
+
+import React, { PropsWithChildren } from 'react';
+import { PopUp } from '@/shared/ui';
+import { StoreProvider } from '@/app/StoreProvider';
+import { AppLoader } from '@/shared/composed/loader';
 
 export const Providers = ({ children }: PropsWithChildren) => {
-  return <Provider store={store}>{children}</Provider>;
+  return (
+    <>
+      <StoreProvider>
+        {children}
+        <PopUp />
+        <AppLoader />
+      </StoreProvider>
+    </>
+  );
 };
