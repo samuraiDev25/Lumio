@@ -1,4 +1,4 @@
-import s from '@/widgets/sidebar/ui/Sidebar/Sidebar.module.scss';
+import s from '@/widgets/sidebar/Sidebar/Sidebar.module.scss';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ReactNode } from 'react';

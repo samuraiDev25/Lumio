@@ -1,2 +1,2 @@
-export { Sidebar } from './ui/Sidebar/Sidebar';
-export { SidebarItem } from './ui/Sidebar/SidebarItem/SidebarItem';
+export { Sidebar } from '@/widgets/sidebar/Sidebar/Sidebar';
+export { SidebarItem } from '@/widgets/sidebar/Sidebar/SidebarItem/SidebarItem';

@@ -1,4 +1,4 @@
-@use '@/shared/styles/typography' as t;
+@use '../../../shared/styles/typography' as t;
 
 .sidebar {
   display: flex;
@@ -7,7 +7,7 @@
   z-index: var(--z-index-sidebar);
 
   width: var(--sidebar-width);
-  min-height: 92vh;
+  min-height: 95vh;
   padding: 72px 60px 110px 60px;
   border-right: 1px solid var(--color-dark-100);
 }
