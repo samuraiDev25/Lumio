@@ -15,6 +15,19 @@ export const Header = () => {
             <Typography variant={'large'} as={'span'}>
               Inctagram
             </Typography>
+            <button
+              onClick={() => {
+                fetch('https://lumio.su/api/v1/testing/all-data', {
+                  method: 'DELETE',
+                }).then((responce) => {
+                  if (responce.status === 204) {
+                    console.log('Данные успешно удалены');
+                  }
+                });
+              }}
+            >
+              Clean BD
+            </button>
           </Link>
           <div className={s.selectBox}>
             <HeaderSelect />

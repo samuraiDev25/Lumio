@@ -14,6 +14,7 @@ import { ServerErrorRegistration } from '@/features/auth/api/authApi.types';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { EmailSentModal } from '@/features/auth/ui/sighUpForm/emailSentModal/EmailSentModal';
 import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
+import { AUTH_ROUTES } from '@/shared/lib/routes';
 
 export const SignUpForm = () => {
   const {
@@ -138,17 +139,20 @@ export const SignUpForm = () => {
             render={({ field }) => (
               <Checkbox
                 checked={field.value}
-                onChange={field.onChange}
+                onChangeAction={field.onChange}
                 className={s.checkBox}
                 errorMessage={errors.isAgree?.message}
                 label={
                   <span className={s.label}>
                     I agree to the{' '}
-                    <Link className={s.link} href="/auth/terms-of-service">
+                    <Link
+                      className={s.link}
+                      href={AUTH_ROUTES.TERMS_OF_SERVICE}
+                    >
                       Terms of Service
                     </Link>{' '}
                     and{' '}
-                    <Link className={s.link} href="/auth/privacy-policy">
+                    <Link className={s.link} href={AUTH_ROUTES.PRIVACY_POLICY}>
                       Privacy Policy
                     </Link>
                   </span>
@@ -170,7 +174,7 @@ export const SignUpForm = () => {
         </div>
         <div className={s.signInWrapper}>
           <p className={s.signInText}>Do you have an account?</p>
-          <Link href="/auth/sign-in" className={s.signInLink}>
+          <Link href={AUTH_ROUTES.SIGN_IN} className={s.signInLink}>
             <h3>Sign In</h3>
           </Link>
         </div>

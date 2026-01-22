@@ -15,7 +15,7 @@ export type CheckboxProps = {
   disabled?: boolean;
   id?: string;
   label?: ReactNode;
-  onChange: (checked: boolean) => void;
+  onChangeAction: (checked: boolean) => void;
   required?: boolean;
   tight?: boolean;
   errorMessage?: string;
@@ -27,7 +27,7 @@ export const Checkbox: FC<CheckboxProps> = ({
   disabled,
   id,
   label,
-  onChange,
+  onChangeAction,
   required,
   errorMessage,
   tight = false,
@@ -58,7 +58,7 @@ export const Checkbox: FC<CheckboxProps> = ({
               className={classNames.root}
               disabled={disabled}
               id={id}
-              onCheckedChange={onChange}
+              onCheckedChange={onChangeAction}
               required={required}
             >
               <AnimatePresence initial={false}>
