@@ -8,7 +8,6 @@ import { RegistrationConfirmationErrorResponse } from '@/features/auth/api/authA
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { Loading } from '@/shared/ui/loading/Loading';
 import { ResultConfirmation } from '@/features/auth/ui/confirmEmail/resultConfirmation/ResultConfirmation';
-import { AUTH_ROUTES } from '@/shared/lib/routes';
 
 export function ConfirmEmail() {
   const searchParams = useSearchParams();
@@ -38,8 +37,8 @@ export function ConfirmEmail() {
       });
   }, [code, confirmEmail]);
 
-  const handleSignIn = () => router.push(AUTH_ROUTES.SIGN_IN);
-  const handleResendLink = () => router.push(AUTH_ROUTES.SIGN_UP);
+  const handleSignIn = () => router.push('/auth/sign-in');
+  const handleResendLink = () => router.push('/auth/sign-up');
   if (isLoading) return <Loading />;
   if (isSuccess)
     return (
