@@ -24,10 +24,8 @@ export const CreateNewPassword = () => {
   const searchParams = useSearchParams();
 
   const {
-    watch,
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<NewPasswordType>({
     defaultValues: {
@@ -46,7 +44,7 @@ export const CreateNewPassword = () => {
 
   const handleFormSubmit: SubmitHandler<NewPasswordType> = useCallback(
     async (data) => {
-      alert('New paswword is created');
+      alert('New password is created');
 
       const obj = {
         newPassword: data.password,

@@ -13,7 +13,7 @@ import { useLoginMutation } from '@/features/auth/api/authApi';
 import { useAppDispatch } from '@/shared/hooks/useAppDispatch';
 import { setCredentials } from '@/features/auth/model/authSlice';
 import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
-import { AUTH_ROUTES } from '@/shared/lib/routes';
+import { APP_ROUTES, AUTH_ROUTES } from '@/shared/lib/routes';
 
 const loginSchema = z.object({
   email: z
@@ -69,7 +69,7 @@ export const LoginForm = () => {
       // Сохраняем токен через Redux action (автоматически сохраняет и в localStorage)
       dispatch(setCredentials({ accessToken: response.accessToken }));
 
-      router.push('/');
+      router.push(APP_ROUTES.ROOT);
       router.refresh();
     } catch (error: unknown) {
       // Отображение ошибки
@@ -167,7 +167,7 @@ export const LoginForm = () => {
         <div className={s['sign-in-wrapper']}>
           <p className={s['sign-in-text']}>Don&apos;t have an account?</p>
           <Link
-            href="/auth/sign-up"
+            href={AUTH_ROUTES.SIGN_UP}
             className={s['sign-up-link-focus']}
             onClick={(e) => isLoading && e.preventDefault()}
           >

@@ -8,6 +8,7 @@ import { useLogoutMutation } from '@/features/auth/api/authApi';
 import { clearAuthData, getUserEmail } from '@/features/auth/api/authUtils';
 import clsx from 'clsx';
 import s from './LogOutButton.module.scss';
+import { AUTH_ROUTES } from '@/shared/lib/routes';
 
 export type LogOutButtonProps = {
   /** Колбэк при нажатии на кнопку выхода */
@@ -34,7 +35,7 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
   ...props
 }) => {
   const router = useRouter();
-  const [logout, { isLoading, error }] = useLogoutMutation();
+  const [logout, { isLoading }] = useLogoutMutation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string>('');
   const [showErrorMessage, setShowErrorMessage] = useState(false);
@@ -80,17 +81,21 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
 
       // Редирект с обработкой возможных ошибок
       try {
-        router.push('/auth/sign-in');
+        router.push(AUTH_ROUTES.SIGN_IN);
       } catch (routerError) {
         console.error('Router error:', routerError);
         // Fallback на window.location если router не работает
         if (typeof window !== 'undefined') {
-          window.location.href = '/auth/sign-in';
+          window.location.href = AUTH_ROUTES.SIGN_IN;
         }
       }
     } catch (err: any) {
       // Обработка ошибок RTK Query
-      if (err?.data?.errorMessages && Array.isArray(err.data.errorMessages) && err.data.errorMessages.length > 0) {
+      if (
+        err?.data?.errorMessages &&
+        Array.isArray(err.data.errorMessages) &&
+        err.data.errorMessages.length > 0
+      ) {
         setApiError(err.data.errorMessages[0].message);
       } else if (err?.data?.message) {
         setApiError(err.data.message);
@@ -126,7 +131,11 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
         size={size}
         onClick={handleClick}
         className={clsx(s.logOutButton, className)}
-        style={{ width: '100%', justifyContent: 'flex-start', textAlign: 'left' }}
+        style={{
+          width: '100%',
+          justifyContent: 'flex-start',
+          textAlign: 'left',
+        }}
         {...props}
       >
         {children}
@@ -152,9 +161,7 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
           </>
         ) : apiError ? (
           <>
-            <div className={s.message}>
-              {apiError}
-            </div>
+            <div className={s.message}>{apiError}</div>
             <div className={s.actions}>
               <Button variant={'primary'} size={'sm'} onClick={closeModal}>
                 Close
@@ -175,7 +182,12 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
               >
                 {isLoading ? 'Loading...' : 'Yes'}
               </Button>
-              <Button variant={'outline'} size={'sm'} onClick={handleCancel} disabled={isLoading}>
+              <Button
+                variant={'outline'}
+                size={'sm'}
+                onClick={handleCancel}
+                disabled={isLoading}
+              >
                 No
               </Button>
             </div>
@@ -185,4 +197,3 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
     </>
   );
 };
-

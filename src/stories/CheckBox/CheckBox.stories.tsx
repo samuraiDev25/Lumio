@@ -19,7 +19,7 @@ export const Default: Story = {
   render: function Render(args) {
     const [checked, setChecked] = useState(args.checked);
 
-    return <Checkbox {...args} checked={checked} onChange={setChecked} />;
+    return <Checkbox {...args} checked={checked} onChangeAction={setChecked} />;
   },
 };
 
@@ -31,7 +31,7 @@ export const Checked: Story = {
   render: function Render(args) {
     const [checked, setChecked] = useState(args.checked);
 
-    return <Checkbox {...args} checked={checked} onChange={setChecked} />;
+    return <Checkbox {...args} checked={checked} onChangeAction={setChecked} />;
   },
 };
 
@@ -60,7 +60,7 @@ export const WithError: Story = {
   render: function Render(args) {
     const [checked, setChecked] = useState(args.checked);
 
-    return <Checkbox {...args} checked={checked} onChange={setChecked} />;
+    return <Checkbox {...args} checked={checked} onChangeAction={setChecked} />;
   },
 };
 
@@ -81,18 +81,18 @@ export const CheckboxGroup: Story = {
         <Checkbox
           checked={values.option1}
           label="Опция 1"
-          onChange={handleChange('option1')}
+          onChangeAction={handleChange('option1')}
         />
         <Checkbox
           checked={values.option2}
           label="Опция 2"
-          onChange={handleChange('option2')}
+          onChangeAction={handleChange('option2')}
         />
         <Checkbox
           checked={values.option3}
           disabled
           label="Опция 3 (disabled)"
-          onChange={handleChange('option3')}
+          onChangeAction={handleChange('option3')}
         />
       </div>
     );
