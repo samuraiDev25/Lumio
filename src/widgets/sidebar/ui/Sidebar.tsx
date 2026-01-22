@@ -131,25 +131,23 @@ export const Sidebar = ({
           {/* Log Out */}
           <div className={s['logout-section']}>
             <NavigationMenu.Item>
-              <NavigationMenu.Link asChild>
-                <LogOutButton
-                  variant="link"
-                  onLogout={() => {
-                    if (!isDisabled) {
-                      if (!externalActiveItem) {
-                        setInternalActiveItem('logout');
-                      }
-                      onLogoutAction?.();
+              <LogOutButton
+                variant="link"
+                onLogout={() => {
+                  if (!isDisabled) {
+                    if (!externalActiveItem) {
+                      setInternalActiveItem('logout');
                     }
-                  }}
-                  className={`${s['nav-link']} ${activeItem === 'logout' ? s.active : ''} ${isDisabled ? s.disabled : ''} ${s.logout}`}
-                >
-                  <div className={s['icon-container']}>
-                    <LogOutOutline className={s.icon} />
-                  </div>
-                  <span className={s['text-container']}>Log Out</span>
-                </LogOutButton>
-              </NavigationMenu.Link>
+                    onLogoutAction?.();
+                  }
+                }}
+                className={`${s['nav-link']} ${activeItem === 'logout' ? s.active : ''} ${isDisabled ? s.disabled : ''} ${s.logout}`}
+              >
+                <div className={s['icon-container']}>
+                  <LogOutOutline className={s.icon} />
+                </div>
+                <span className={s['text-container']}>Log Out</span>
+              </LogOutButton>
             </NavigationMenu.Item>
           </div>
         </nav>

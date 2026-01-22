@@ -300,6 +300,10 @@
 .nav-link.logout {
   --icon-color: var(--color-light-100);
 
+  font-family: var(--font-family-primary, 'Inter'), sans-serif;
+  font-size: var(--font-size-14, 0.875rem);
+  font-weight: var(--font-weight-medium, 500);
+  line-height: var(--line-height-24, 1.5rem);
   color: var(--color-light-100);
 
   /* Logout focus */

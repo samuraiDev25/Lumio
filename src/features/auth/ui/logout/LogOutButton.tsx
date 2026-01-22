@@ -79,14 +79,15 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
       onLogout?.();
       setIsModalOpen(false);
 
-      // Редирект с обработкой возможных ошибок
+      // Редирект на страницу логина
+      // Используем replace вместо push, чтобы нельзя было вернуться назад
       try {
-        router.push(AUTH_ROUTES.SIGN_IN);
+        router.replace(AUTH_ROUTES.SIGN_IN);
       } catch (routerError) {
         console.error('Router error:', routerError);
         // Fallback на window.location если router не работает
         if (typeof window !== 'undefined') {
-          window.location.href = AUTH_ROUTES.SIGN_IN;
+          window.location.replace(AUTH_ROUTES.SIGN_IN);
         }
       }
     } catch (err: any) {
