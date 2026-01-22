@@ -16,7 +16,7 @@ export default function Profile() {
   return (
     <div>
       <h1>Profile</h1>
-      <LogOutButton onLogout={handleLogout} />
+      {/*<LogOutButton onLogout={handleLogout} />*/}
     </div>
   );
 }
