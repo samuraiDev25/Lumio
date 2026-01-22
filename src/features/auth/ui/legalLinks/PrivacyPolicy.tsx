@@ -2,12 +2,11 @@
 
 import Link from 'next/link';
 import s from './LegalLinks.module.scss';
-import { AUTH_ROUTES } from '@/shared/lib/routes';
 
 export default function PrivacyPolicy() {
   return (
     <div className={s.fullscreenPage}>
-      <Link href={AUTH_ROUTES.SIGN_UP} className={s.backLink}>
+      <Link href="/auth/sign-up" className={s.backLink}>
         ← Back to Sign Up
       </Link>
       <h1 className={s.title}>Privacy Policy</h1>

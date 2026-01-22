@@ -3,7 +3,6 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { Loader } from './ui/Loader';
-import { APP_ROUTES, AUTH_ROUTES } from '@/shared/lib/routes';
 
 export function OauthCallback() {
   const searchParams = useSearchParams();
@@ -14,9 +13,9 @@ export function OauthCallback() {
 
     if (token) {
       localStorage.setItem('accessToken', token);
-      router.replace(APP_ROUTES.ROOT);
+      router.replace('/');
     } else {
-      router.replace(AUTH_ROUTES.SIGN_IN);
+      router.replace('/auth/sign-in');
     }
   }, [searchParams, router]);
 
