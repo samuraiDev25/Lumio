@@ -5,8 +5,11 @@ import { Button, Container } from '@/shared/ui';
 import { HeaderSelect } from '@/widgets/header/ui/';
 import Link from 'next/link';
 import { Typography } from '@/shared/ui/';
+import { useLoginMutation } from '@/features/auth/api/authApi';
+import { AUTH_ROUTES } from '@/shared/lib/routes';
 
 export const Header = () => {
+  const [login] = useLoginMutation();
   return (
     <header className={s.header}>
       <Container>
@@ -31,14 +34,16 @@ export const Header = () => {
           </Link>
           <div className={s.selectBox}>
             <HeaderSelect />
-            <div className={s.buttonWrapper}>
-              <Button variant={'link'} asChild>
-                <Link href={'/auth/sign-in'}>Log in</Link>
-              </Button>
-              <Button variant={'primary'} asChild>
-                <Link href={'/auth/sign-up'}>Sign up</Link>
-              </Button>
-            </div>
+            {!login && (
+              <div className={s.buttonWrapper}>
+                <Button variant={'link'} asChild>
+                  <Link href={AUTH_ROUTES.SIGN_IN}>Log in</Link>
+                </Button>
+                <Button variant={'primary'} asChild>
+                  <Link href={AUTH_ROUTES.SIGN_UP}>Sign up</Link>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </Container>
