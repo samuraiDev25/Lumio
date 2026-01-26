@@ -3,17 +3,12 @@
 import { PropsWithChildren } from 'react';
 import s from '@/app/BaseLayout.module.scss';
 import { Header } from '@/widgets/header/ui';
-import { Providers } from '@/app/Providers';
-import { ToastContainer } from 'react-toastify';
 
 export const BaseLayout = ({ children }: PropsWithChildren) => {
   return (
     <div className={s.layoutContainer}>
-      <Providers>
-        <Header />
-        {children}
-        <ToastContainer position="bottom-right" autoClose={4000} />
-      </Providers>
+      <Header />
+      {children}
     </div>
   );
 };

@@ -1,8 +1,13 @@
 'use client';
 import { PropsWithChildren } from 'react';
-import { Provider } from 'react-redux';
-import { store } from '@/app/store';
+import { StoreProvider } from '@/app/StoreProvider';
+import { ToastContainer } from 'react-toastify';
 
 export const Providers = ({ children }: PropsWithChildren) => {
-  return <Provider store={store}>{children}</Provider>;
+  return (
+    <StoreProvider>
+      {children}
+      <ToastContainer position="bottom-right" autoClose={4000} />
+    </StoreProvider>
+  );
 };
