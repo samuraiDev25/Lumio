@@ -17,15 +17,16 @@ export const AUTH_ROUTES = {
 
 export const SIDEBAR_ROUTES = {
   FEED: `${APP_ROUTES.ROOT}feed`,
-  CREATE: `${APP_ROUTES.ROOT}create_publication`,
+  CREATE: `${APP_ROUTES.ROOT}create`,
+  PROFILE: `${APP_ROUTES.ROOT}profile`,
   MESSENGER: `${APP_ROUTES.ROOT}messenger`,
   SEARCH: `${APP_ROUTES.ROOT}search`,
   STATISTICS: `${APP_ROUTES.ROOT}statistics`,
-  FAVORITE: `${APP_ROUTES.ROOT}favorites`,
+  FAVORITES: `${APP_ROUTES.ROOT}favorites`,
 };
 
 export const PROFILE_ROUTES = {
-  SETTINGS: `${APP_ROUTES.PROFILE}/settings`,
+  SETTINGS: `${SIDEBAR_ROUTES.PROFILE}/settings`,
 };
 
 // example

@@ -13,7 +13,7 @@ import { useLoginMutation } from '@/features/auth/api/authApi';
 import { useAppDispatch } from '@/shared/hooks/useAppDispatch';
 import { setCredentials } from '@/features/auth/model/authSlice';
 import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
-import { APP_ROUTES, AUTH_ROUTES } from '@/shared/lib/routes';
+import { APP_ROUTES, AUTH_ROUTES, SIDEBAR_ROUTES } from '@/shared/lib/routes';
 
 const loginSchema = z.object({
   email: z
@@ -68,7 +68,7 @@ export const LoginForm = () => {
 
       // Сохраняем токен через Redux action (автоматически сохраняет и в localStorage)
       dispatch(setCredentials({ accessToken: response.accessToken }));
-
+      //router.push(SIDEBAR_ROUTES.FEED);
       router.push(APP_ROUTES.ROOT);
       router.refresh();
     } catch (error: unknown) {

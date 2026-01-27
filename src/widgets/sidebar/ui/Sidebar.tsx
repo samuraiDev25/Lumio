@@ -1,26 +1,26 @@
 'use client';
-
-import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import s from './Sidebar.module.scss';
-import { SidebarProps, SidebarItemType } from './types';
+import { SidebarItemType, SidebarProps } from './types';
 import {
-  HomeOutline,
+  Heart,
+  HeartOutline,
   Home,
-  PlusCircleOutline,
-  PlusCircle,
-  PersonOutline,
-  Person,
-  MessageCircleOutline,
+  HomeOutline,
+  LogOutOutline,
   MessageCircle,
+  MessageCircleOutline,
+  Person,
+  PersonOutline,
+  PlusCircle,
+  PlusCircleOutline,
   SearchOutline,
   TrendingUpOutline,
-  HeartOutline,
-  Heart,
-  LogOutOutline,
 } from '@/shared/ui/icons';
 import { SidebarItem } from './SidebarItem';
 import { LogOutButton } from '@/features/auth/ui/logout';
+import { SIDEBAR_ROUTES } from '@/shared/lib/routes';
 
 const mainItems: SidebarItemType[] = [
   {
@@ -28,46 +28,47 @@ const mainItems: SidebarItemType[] = [
     label: 'Feed',
     iconOutline: HomeOutline,
     iconFilled: Home,
-    href: '/',
+    href: `${SIDEBAR_ROUTES.FEED}`,
   },
   {
     id: 'create',
     label: 'Create',
     iconOutline: PlusCircleOutline,
     iconFilled: PlusCircle,
+    href: `${SIDEBAR_ROUTES.CREATE}`,
   },
   {
     id: 'myProfile',
     label: 'My Profile',
     iconOutline: PersonOutline,
     iconFilled: Person,
-    href: '/profile',
+    href: `${SIDEBAR_ROUTES.PROFILE}`,
   },
   {
     id: 'messenger',
     label: 'Messenger',
     iconOutline: MessageCircleOutline,
     iconFilled: MessageCircle,
-    href: '/messenger',
+    href: `${SIDEBAR_ROUTES.MESSENGER}`,
   },
   {
     id: 'search',
     label: 'Search',
     iconOutline: SearchOutline,
-    href: '/search',
+    href: `${SIDEBAR_ROUTES.SEARCH}`,
   },
   {
     id: 'statistics',
     label: 'Statistics',
     iconOutline: TrendingUpOutline,
-    href: '/statistics',
+    href: `${SIDEBAR_ROUTES.STATISTICS}`,
   },
   {
     id: 'favorites',
     label: 'Favorites',
     iconOutline: HeartOutline,
     iconFilled: Heart,
-    href: '/favorites',
+    href: `${SIDEBAR_ROUTES.FAVORITES}`,
   },
 ];
 
@@ -79,38 +80,26 @@ export const Sidebar = ({
   className = '',
   style,
 }: SidebarProps) => {
-  const [internalActiveItem, setInternalActiveItem] = useState<string>('feed');
-  const activeItem = externalActiveItem || internalActiveItem;
+  const pathname = usePathname();
+  const activeItem =
+    externalActiveItem ||
+    mainItems.find((item) => pathname === item.href)?.id ||
+    '';
   const isDisabled = variant === 'disabled';
 
   const handleItemClick = (itemId: string) => {
-    if (!isDisabled) {
-      if (!externalActiveItem) {
-        setInternalActiveItem(itemId);
-      }
+    if (isDisabled) return;
 
-      const item = mainItems.find((i) => i.id === itemId);
+    const item = mainItems.find((i) => i.id === itemId);
 
-      if (item?.href) {
-        console.log(`Навигация на страницу: ${item.href}`);
-      } else if (itemId === 'create') {
-        console.log('Открыть модалку создания поста');
-      }
-
-      onItemClickAction?.(itemId);
+    if (item?.href) {
+      console.log(`Навигация на страницу: ${item.href}`);
+    } else if (itemId === 'create') {
+      console.log('Открыть модалку создания поста');
     }
+
+    onItemClickAction?.(itemId);
   };
-
-  const handleLogout = () => {
-    if (!isDisabled) {
-      if (!externalActiveItem) {
-        setInternalActiveItem('logout');
-      }
-
-      onLogoutAction?.();
-    }
-  };
-
   return (
     <aside className={`${s.sidebar} ${s[variant]} ${className}`} style={style}>
       <NavigationMenu.Root orientation="vertical">
@@ -135,9 +124,6 @@ export const Sidebar = ({
                 variant="link"
                 onLogout={() => {
                   if (!isDisabled) {
-                    if (!externalActiveItem) {
-                      setInternalActiveItem('logout');
-                    }
                     onLogoutAction?.();
                   }
                 }}
