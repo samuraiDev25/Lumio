@@ -35,7 +35,7 @@ export type RecoveryPasswordRequest = {
 };
 
 export type CreateNewPasswordRequest = {
-  newPassword: string;
+  password: string;
   recoveryCode: string;
 };
 

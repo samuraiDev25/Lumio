@@ -5,10 +5,8 @@ import { Suspense } from 'react';
 
 export default function CreatePassword() {
   return (
-    <div>
-      <Suspense fallback={<div>Создание пароля...</div>}>
-        <CreateNewPassword />
-      </Suspense>
-    </div>
+    <Suspense fallback={<div>Создание пароля...</div>}>
+      <CreateNewPassword />
+    </Suspense>
   );
 }

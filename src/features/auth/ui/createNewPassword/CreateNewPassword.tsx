@@ -36,7 +36,7 @@ export const CreateNewPassword = () => {
     mode: 'onChange',
   });
 
-  const code = searchParams?.get('code') || '';
+  const code = searchParams?.get('recoveryCode') || '';
 
   if (!code) {
     redirect(AUTH_ROUTES.EXPIRED_LINK);
@@ -45,9 +45,8 @@ export const CreateNewPassword = () => {
   const handleFormSubmit: SubmitHandler<NewPasswordType> = useCallback(
     async (data) => {
       alert('New password is created');
-
       const obj = {
-        newPassword: data.password,
+        password: data.password,
         recoveryCode: code,
       };
 
