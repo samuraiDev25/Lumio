@@ -26,7 +26,7 @@ const passwordSchema = z
 
 export const signUpSchema = z
   .object({
-    name: nameSchema,
+    username: nameSchema,
     email: emailSchema,
     password: passwordSchema,
     passwordConfirmation: passwordSchema,

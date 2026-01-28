@@ -12,6 +12,8 @@ export function handleNetworkError({
   handle400Error,
   handle429Error,
   handle401Error,
+  handle403Error,
+  handle500Error,
   handleUnknownError,
 }: {
   error: unknown;
@@ -19,6 +21,8 @@ export function handleNetworkError({
   handle400Error?: (error: BaseResponseError) => void;
   handle429Error?: () => void;
   handle401Error?: () => void;
+  handle403Error?: (error: BaseResponseError) => void;
+  handle500Error?: () => void;
   handleUnknownError?: (error: unknown) => void;
 }) {
   console.error('handleNetworkError', error);
@@ -27,31 +31,30 @@ export function handleNetworkError({
   if ('status' in fetchError) {
     if (fetchError.status === 400) {
       const baseResponseError = fetchError.data as BaseResponseError;
-
-      let message: string = defaultGlobalErrorMessage;
-
-      if (typeof baseResponseError.messages === 'string') {
-        message = baseResponseError.messages;
-      } else if (baseResponseError.messages.length > 0) {
-        message = baseResponseError.messages[0].message;
-      } else if (baseResponseError.error) {
-        message = baseResponseError.error;
-      }
-
-      message = message ?? defaultGlobalErrorMessage;
-
-      dispatch(changeError({ error: message }));
+      const firstMessage =
+        baseResponseError.errorsMessages?.[0]?.message ??
+        defaultGlobalErrorMessage;
+      dispatch(changeError({ error: firstMessage }));
       handle400Error?.(baseResponseError);
+      return;
     } else if (fetchError.status === 429) {
-      dispatch(
-        changeError({
-          error: 'More than 5 attempts from one IP-address during 10 seconds',
-        }),
-      );
+      const baseResponseError = fetchError.data as BaseResponseError;
+      const message =
+        baseResponseError.errorsMessages?.[0]?.message ?? 'Too many requests';
+      dispatch(changeError({ error: message }));
       handle429Error?.();
     } else if (fetchError.status === 401) {
       dispatch(changeError({ error: 'Unauthorized' }));
       handle401Error?.();
+    } else if (fetchError.status === 403) {
+      const baseResponseError = fetchError.data as BaseResponseError;
+      const message =
+        baseResponseError.errorsMessages?.[0]?.message ?? 'Forbidden access';
+      dispatch(changeError({ error: message }));
+      handle403Error?.(baseResponseError);
+    } else if (fetchError.status === 500) {
+      dispatch(changeError({ error: 'Internal server error' }));
+      handle500Error?.();
     } else {
       dispatch(
         changeError({
