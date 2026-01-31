@@ -4,7 +4,7 @@ import { baseQueryWithReauth } from '@/shared/api/baseQueryWithReAuth';
 export const baseApi = createApi({
   reducerPath: 'lumioApi',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['Me'],
+  tagTypes: ['Me', 'Posts', 'Profile'],
   endpoints: () => ({}),
 });
 

@@ -1,0 +1,2 @@
+export { PostGrid } from './PostGrid';
+
