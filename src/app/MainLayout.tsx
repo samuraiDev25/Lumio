@@ -5,9 +5,18 @@ import { useMeQuery } from '@/features/auth/api/authApi';
 import { AUTH_ROUTES } from '@/shared/lib/routes/routes';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/widgets/sidebar/ui';
-import s from './BaseLayout.module.scss';
 import { Loading } from '@/shared/ui/loading/Loading';
+import s from './MainLayout.module.scss';
 
+/**
+ * Основной лейаут для авторизованной зоны приложения.
+ *
+ * Функции:
+ * 1. Выступает в роли Auth Guard: если пользователь не авторизован (ошибка /me или отсутствие данных),
+ *    автоматически перенаправляет на страницу входа (SIGN_IN).
+ * 2. Обеспечивает отображение Sidebar для всех вложенных страниц.
+ * 3. Показывает полноэкранный Loader в процессе проверки сессии.
+ */
 export default function MainLayout({ children }: PropsWithChildren) {
   const router = useRouter();
   const { data: user, isLoading, isError } = useMeQuery();
@@ -27,9 +36,9 @@ export default function MainLayout({ children }: PropsWithChildren) {
   }
 
   return (
-    <div className={s.mainLayout}>
+    <div className={s['main-layout']}>
       <Sidebar />
-      <main style={{ flex: '1', padding: '2rem' }}>{children}</main>
+      <main className={s.content}>{children}</main>
     </div>
   );
 }
