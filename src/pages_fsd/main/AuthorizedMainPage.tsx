@@ -1,26 +1,43 @@
 'use client';
 
-import { useProtectedRoute } from '@/shared/hooks/useProtectedRoute';
+import { UsersCount } from '@/shared/ui/users-count/UsersCount';
+import { PostCard } from '@/features/posts/ui/PostCard';
+import MainLayout from '@/app/MainLayout';
+import styles from './AuthorizedMainPage.module.scss';
+import { Post } from '@/features/posts/api/postApi.types';
 
-export function AuthorizedMainPage() {
-  const { user, isLoading, isAuthorized } = useProtectedRoute();
+type AuthorizedMainPageProps = {
+  posts: Post[];
+  usersCount: number;
+};
 
-  if (isLoading) {
-    return <div>Загрузка...</div>;
-  }
-
-  if (!isAuthorized) {
-    return null;
-  }
-
+/**
+ * Компонент главной страницы для авторизованных пользователей.
+ * Использует MainLayout, который включает в себя Sidebar и Header авторизованного пользователя.
+ * Отображает ленту публичных постов и счетчик пользователей.
+ * Данные приходят пропсами от родительского MainPageClientWrapper.
+ */
+export function AuthorizedMainPage({
+  posts,
+  usersCount,
+}: AuthorizedMainPageProps) {
   return (
-    <div style={{ marginLeft: '15em' }}>
-      <h1>MAIN PAGE FOR AUTHORIZED USER</h1>
-      <div>
-        <div>Имя {user?.username}</div>
-        <div>id: {user?.userId}</div>
-        <div>email: {user?.email}</div>
+    <MainLayout>
+      <div className={styles.main}>
+        <div className={styles['users-count-wrapper']}>
+          <UsersCount count={usersCount} />
+        </div>
+
+        <div className={styles['posts-grid']}>
+          {posts.length > 0 ? (
+            posts.map((post) => <PostCard key={post.id} post={post} />)
+          ) : (
+            <div className={styles['no-posts']}>
+              Постов пока нет, но они скоро появятся!
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </MainLayout>
   );
 }

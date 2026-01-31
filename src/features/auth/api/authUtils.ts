@@ -18,8 +18,9 @@ export const clearAuthData = (): void => {
  */
 export const getUserEmail = (): string => {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('userEmail') || localStorage.getItem('email') || '';
+    return (
+      localStorage.getItem('userEmail') || localStorage.getItem('email') || ''
+    );
   }
   return '';
 };
-
