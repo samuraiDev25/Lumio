@@ -139,5 +139,5 @@ export const Sidebar = ({
         </nav>
       </NavigationMenu.Root>
     </aside>
-  );
+  )
 };
