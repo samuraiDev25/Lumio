@@ -1,0 +1,273 @@
+@use '@/shared/styles/typography' as *;
+
+.card {
+  cursor: pointer;
+  user-select: none;
+
+  position: relative;
+
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  width: 234px;
+  height: 391px;
+  padding: 0;
+  border-radius: 2px;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
+  background-color: var(--color-dark-300);
+}
+
+.image {
+  position: relative;
+
+  overflow: hidden;
+  display: flex;
+  flex-shrink: 0;
+
+  width: 100%;
+
+  background-color: var(--color-dark-300);
+
+  &:not(.expanded) {
+    height: 200px;
+  }
+
+  &.expanded {
+    height: 104px;
+  }
+}
+
+.nav-button {
+  cursor: pointer;
+
+  position: absolute;
+  z-index: 10;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 2px;
+
+  color: var(--color-light-100);
+
+  visibility: hidden;
+  opacity: 0;
+  background-color: rgb(51 51 51 / 10%);
+
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: rgb(51 51 51 / 10%);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent-500);
+  }
+}
+
+.left {
+  left: 12px;
+}
+
+.right {
+  right: 12px;
+}
+
+.image:hover .nav-button {
+  visibility: visible;
+  opacity: 1;
+}
+
+.image-content {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+}
+
+.pagination-container {
+  cursor: default;
+  user-select: none;
+
+  position: absolute;
+  z-index: 10;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+
+  width: 78px;
+  height: 12px;
+  border-radius: 2px;
+
+  visibility: hidden;
+  opacity: 0;
+  background-color: rgb(51 51 51 / 10%);
+
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+.image:hover .pagination-container:not(.hidden) {
+  visibility: visible;
+  opacity: 1;
+}
+
+.dot {
+  cursor: pointer;
+  user-select: none;
+
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+
+  background-color: var(--color-light-100);
+
+  transition: background-color 0.3s ease;
+}
+
+.active-dot {
+  background-color: var(--color-accent-500);
+}
+
+.image-element {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.content {
+  overflow: hidden;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  margin-top: 12px;
+}
+
+.user-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.avatar {
+  overflow: hidden;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+
+  @include uik-regular-text-14;
+
+  font-weight: var(--font-weight-bold);
+  color: var(--color-light-100);
+
+  background-color: var(--color-dark-300);
+}
+
+.user-name {
+  @include uik-regular-text-16;
+
+  font-weight: var(--font-weight-semibold);
+  line-height: 24px;
+  color: var(--color-light-100);
+}
+
+.time {
+  margin-top: 4px;
+
+  @include uik-small-text;
+
+  line-height: 16px;
+  color: var(--color-light-900);
+}
+
+.text-container {
+  will-change: height;
+  scrollbar-width: none;
+
+  display: block;
+
+  margin-top: 8px;
+
+  transition: height 0.3s ease;
+
+  &:not(.expanded) {
+    overflow: hidden;
+    height: 96px;
+  }
+
+  &.expanded {
+    overflow: hidden;
+    height: 196px;
+  }
+}
+
+.text {
+  display: inline;
+
+  @include uik-regular-text-14;
+
+  line-height: 24px;
+  overflow-wrap: break-word;
+  white-space: normal;
+  vertical-align: top;
+}
+
+.show-more {
+  display: inline;
+  margin-left: 4px;
+
+  @include uik-regular-text-14;
+
+  line-height: 24px;
+
+  cursor: pointer;
+  color: var(--color-accent-500);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-accent-500);
+  }
+}

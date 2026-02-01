@@ -8,7 +8,9 @@ import { useLogoutMutation } from '@/features/auth/api/authApi';
 import { clearAuthData, getUserEmail } from '@/features/auth/api/authUtils';
 import clsx from 'clsx';
 import s from './LogOutButton.module.scss';
+import { baseApi } from '@/shared/api';
 import { AUTH_ROUTES } from '@/shared/lib/routes';
+import { useAppDispatch } from '@/shared/hooks';
 
 export type LogOutButtonProps = {
   /** Колбэк при нажатии на кнопку выхода */
@@ -35,6 +37,7 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
   ...props
 }) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const [logout, { isLoading }] = useLogoutMutation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string>('');
@@ -74,6 +77,10 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
 
       // Успешный выход - очищаем все данные авторизации
       clearAuthData();
+
+      // Сбрасываем кэш RTK Query, чтобы мгновенно обнулить useMeQuery.
+      // Это форсирует переключение интерфейса с авторизованного на гостевой (Header/Sidebar).
+      dispatch(baseApi.util.resetApiState());
 
       // Вызываем колбэк перед закрытием модалки
       onLogout?.();

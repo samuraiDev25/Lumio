@@ -1,8 +1,6 @@
 .layoutContainer {
-  margin-inline: 15px;
+  margin-inline: auto;
+  max-width: 1200px;
   padding-top: var(--header-height);
-}
-
-.mainLayout {
-  display: flex;
+  width: 100%;
 }
