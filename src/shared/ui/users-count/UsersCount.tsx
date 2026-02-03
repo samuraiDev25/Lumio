@@ -8,15 +8,14 @@ type UsersCountProps = {
 };
 
 /**
- * Компонент счетчика зарегистрированных пользователей.
+ * Component for displaying the total count of registered users.
  *
- * Особенности:
- * 1. Форматирует число до 5 знаков, заполняя пустые разряды нулями (напр. "00042").
- * 2. Визуально разделяет каждую цифру вертикальной линией (divider).
- * 3. Используется на главной странице для отображения масштаба сообщества.
+ * Features:
+ * 1. Formatting: Pads the number with leading zeros up to 5 digits (e.g., "00042").
+ * 2. Visualization: Each digit is rendered in a separate cell, separated by a vertical divider.
+ * 3. Purpose: Used on the landing page to demonstrate the scale of the community.
  */
 export const UsersCount: FC<UsersCountProps> = ({ count }) => {
-  // Дополняем строку нулями слева до 5 символов
   const formattedCount = count.toString().padStart(5, '0');
 
   return (

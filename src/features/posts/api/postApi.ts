@@ -15,9 +15,14 @@ export const postApi = baseApi.injectEndpoints({
 export const { useGetMainPageDataQuery } = postApi;
 
 /**
- * Функция для серверного получения данных (ISR).
- * Используем чистый fetch, так как RTK Query на сервере в Next.js 13+
- * не поддерживает нативный кэш { next: { revalidate } } так эффективно, как fetch.
+ * Server-side function for data fetching (ISR).
+ *
+ * Note: We use native 'fetch' here because RTK Query in Next.js Server Components
+ * does not support the native cache configuration { next: { revalidate } }
+ * as effectively as the built-in fetch API.
+ *
+ * @param pageSize - Number of posts to fetch (default: 4).
+ * @returns Promise with MainPageResponse data.
  */
 export const fetchMainPageData = async (
   pageSize: number = 4,
@@ -25,7 +30,7 @@ export const fetchMainPageData = async (
   const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
 
   const res = await fetch(`${baseUrl}api/v1?pageSize=${pageSize}`, {
-    next: { revalidate: 60 }, // ISR: обновляем контент раз в минуту
+    next: { revalidate: 60 },
   });
 
   if (!res.ok) {
