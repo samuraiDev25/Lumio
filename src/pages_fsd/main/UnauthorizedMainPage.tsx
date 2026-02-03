@@ -12,9 +12,13 @@ type UnauthorizedMainPageProps = {
 };
 
 /**
- * Компонент главной страницы для неавторизованных пользователей (Landing Page).
- * Отображает общедоступный контент (счетчик пользователей и последние посты),
- * полученный с сервера через ISR. Оборачивается в BaseLayout без сайдбара.
+ * Main page component for unauthorized users (Landing Page).
+ *
+ * Logic:
+ * 1. Content: Displays public data including the user counter and the latest posts
+ *    fetched from the server via ISR.
+ * 2. Layout: Wrapped in 'BaseLayout', which provides a guest-friendly interface
+ *    without the sidebar.
  */
 export function UnauthorizedMainPage({
   posts,
