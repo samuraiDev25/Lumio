@@ -76,6 +76,7 @@
   width: 100%;
   text-align: right;
   text-decoration: none;
+  margin-top: 15px;
 }
 
 .forgot-password-text {
@@ -141,8 +142,7 @@
   align-items: center;
 
   width: 100%;
-  margin-top: 0;
-  padding-top: 24px;
+  margin-top: -5px;
 
   text-align: center;
 }
@@ -197,7 +197,7 @@
   }
 }
 
-.customIconEnd {
+.custom-icon-end {
   svg {
     width: 24px;
     height: 24px;

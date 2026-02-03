@@ -13,7 +13,7 @@ import { useLoginMutation } from '@/features/auth/api/authApi';
 import { useAppDispatch } from '@/shared/hooks/useAppDispatch';
 import { setCredentials } from '@/features/auth/model/authSlice';
 import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
-import { APP_ROUTES, AUTH_ROUTES, SIDEBAR_ROUTES } from '@/shared/lib/routes';
+import { APP_ROUTES, AUTH_ROUTES } from '@/shared/lib/routes';
 
 const loginSchema = z.object({
   email: z
@@ -66,16 +66,14 @@ export const LoginForm = () => {
 
       const response = await login(data).unwrap();
 
-      // Сохраняем токен через Redux action (автоматически сохраняет и в localStorage)
+      // Save token via Redux action (automatically persists to localStorage)
       dispatch(setCredentials({ accessToken: response.accessToken }));
       //router.push(SIDEBAR_ROUTES.FEED);
       router.push(APP_ROUTES.ROOT);
       router.refresh();
     } catch (error: unknown) {
-      // Отображение ошибки
       let errorMessage = 'Login failed. Please try again.';
 
-      // Обработка ошибок в соответствии с ТЗ
       const rtkError = error as RTKQueryError;
 
       if (rtkError?.status === 403) {
@@ -96,17 +94,14 @@ export const LoginForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={s['login-form']}>
-      {/* Форма содержит Email, Password, кнопку [Sign In] */}
       <h1 className={s.title}>Sign In</h1>
 
-      {/* Кнопка Yandex OAuth */}
       <Button type="button" variant="link" size="lg" fullWidth asChild>
         <a href="/api/v1/auth/yandex">
           <SvgYandex />
         </a>
       </Button>
       <div className={s['form-wrapper']}>
-        {/* Поле Email */}
         <TextField
           type={'email'}
           label={'Email'}
@@ -117,13 +112,12 @@ export const LoginForm = () => {
           {...register('email')}
         />
 
-        {/* Поле Password */}
         <TextField
           type={showPassword ? 'text' : 'password'}
           label={'Password'}
           placeholder={'**********'}
           iconEnd={
-            <span className={s.customIconEnd}>
+            <span className={s['custom-icon-end']}>
               {showPassword ? <EyeOutline /> : <EyeOffOutline />}
             </span>
           }
@@ -134,11 +128,9 @@ export const LoginForm = () => {
         />
       </div>
 
-      {/* Отображение серверных ошибок */}
       {serverError && <div className={s['server-error']}>{serverError}</div>}
 
       <div className={s['auth-actions-block']}>
-        {/* Ссылки Forgot Password и Sign Up */}
         <div className={s['forgot-password-wrapper']}>
           <Link
             href={AUTH_ROUTES.RECOVERY}
@@ -149,7 +141,6 @@ export const LoginForm = () => {
           </Link>
         </div>
 
-        {/* Кнопка [Sign In] */}
         <div className={s['submit-wrapper']}>
           <Button
             variant={'primary'}
