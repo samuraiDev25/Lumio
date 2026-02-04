@@ -3,7 +3,6 @@
 import s from './LoginForm.module.scss';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Button, TextField } from '@/shared/ui';
 import Link from 'next/link';
 import SvgYandex from '@/shared/ui/icons/YandexSvg';
@@ -14,43 +13,34 @@ import { useAppDispatch } from '@/shared/hooks/useAppDispatch';
 import { setCredentials } from '@/features/auth/model/authSlice';
 import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
 import { APP_ROUTES, AUTH_ROUTES } from '@/shared/lib/routes';
+import { signInSchema, SignInType } from '@/features/auth/model/validation';
+import { handleNetworkError } from '@/shared/lib';
 
-const loginSchema = z.object({
-  email: z
-    .email({
-      message: 'The email must match the format example@example.com',
-    })
-    .min(1, 'Email is required'),
-  password: z
-    .string()
-    .min(1, 'Password is required')
-    .min(6, 'Minimum number of characters 6')
-    .max(20, 'Maximum number of characters 20'),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
-
-type RTKQueryError = {
-  status?: number;
-  data?: {
-    errorsMessages?: Array<{ message: string; field?: string }>;
-    message?: string;
-    error?: string;
-  };
-};
-
+/**
+ * LoginForm component for user authentication.
+ *
+ * Features:
+ * - Validation: Implements centralized 'signInSchema' using react-hook-form and zod.
+ * - Error Handling: Integrated with a global network error handler to map server-side
+ *   validation errors directly to form fields or the form root.
+ * - State Management: Handles successful authentication by dispatching credentials
+ *   to Redux and managing session persistence.
+ * - UI/UX: Provides toggleable password visibility and prevents navigation during
+ *   active loading states.
+ */
 export const LoginForm = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [login, { isLoading }] = useLoginMutation();
-  const [serverError, setServerError] = useState<string>('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<SignInType>({
+    resolver: zodResolver(signInSchema),
     mode: 'onBlur',
     defaultValues: {
       email: '',
@@ -58,37 +48,37 @@ export const LoginForm = () => {
     },
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: SignInType) => {
     try {
-      setServerError('');
-
       const response = await login(data).unwrap();
-
       // Save token via Redux action (automatically persists to localStorage)
       dispatch(setCredentials({ accessToken: response.accessToken }));
       //router.push(SIDEBAR_ROUTES.FEED);
       router.push(APP_ROUTES.ROOT);
       router.refresh();
     } catch (error: unknown) {
-      let errorMessage = 'Login failed. Please try again.';
-
-      const rtkError = error as RTKQueryError;
-
-      if (rtkError?.status === 403) {
-        errorMessage = 'The email must match the format example@example.com';
-      } else if (rtkError?.status === 400) {
-        errorMessage = 'Validation error. Please check your input.';
-      } else if (rtkError?.status === 429) {
-        errorMessage = 'Too many requests. Please try again later.';
-      } else if (rtkError?.data?.errorsMessages?.[0]?.message) {
-        errorMessage = rtkError.data.errorsMessages[0].message;
-      } else if (typeof rtkError?.data?.message === 'string') {
-        errorMessage = rtkError.data.message;
-      }
-
-      setServerError(errorMessage);
+      handleNetworkError({
+        error,
+        dispatch,
+        handle400Error: (baseResponseError) => {
+          baseResponseError.errorsMessages?.forEach((err) => {
+            if (err.field) {
+              const fieldName = err.field as 'email' | 'password';
+              setError(fieldName, { message: err.message });
+            }
+          });
+        },
+        handle403Error: (baseResponseError) => {
+          baseResponseError.errorsMessages?.forEach((err) => {
+            if (err.field) {
+              const fieldName = err.field as 'email' | 'password';
+              setError(fieldName, { message: err.message });
+            } else {
+              setError('root', { message: err.message });
+            }
+          });
+        },
+      });
     }
   };
 
@@ -101,12 +91,13 @@ export const LoginForm = () => {
           <SvgYandex />
         </a>
       </Button>
+
       <div className={s['form-wrapper']}>
         <TextField
-          type={'email'}
-          label={'Email'}
-          placeholder={'Epam@epam.com'}
-          autoComplete={'email'}
+          type="email"
+          label="Email"
+          placeholder="Epam@epam.com"
+          autoComplete="email"
           errorMessage={errors.email?.message}
           disabled={isLoading}
           {...register('email')}
@@ -114,8 +105,8 @@ export const LoginForm = () => {
 
         <TextField
           type={showPassword ? 'text' : 'password'}
-          label={'Password'}
-          placeholder={'**********'}
+          label="Password"
+          placeholder="**********"
           iconEnd={
             <span className={s['custom-icon-end']}>
               {showPassword ? <EyeOutline /> : <EyeOffOutline />}
@@ -128,7 +119,9 @@ export const LoginForm = () => {
         />
       </div>
 
-      {serverError && <div className={s['server-error']}>{serverError}</div>}
+      {errors.root && (
+        <div className={s['server-error']}>{errors.root.message}</div>
+      )}
 
       <div className={s['auth-actions-block']}>
         <div className={s['forgot-password-wrapper']}>
@@ -143,9 +136,9 @@ export const LoginForm = () => {
 
         <div className={s['submit-wrapper']}>
           <Button
-            variant={'primary'}
-            size={'lg'}
-            fullWidth={true}
+            variant="primary"
+            size="lg"
+            fullWidth
             type="submit"
             disabled={isLoading}
           >
