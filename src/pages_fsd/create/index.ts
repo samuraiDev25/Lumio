@@ -1,1 +1,1 @@
-export { Create } from './ui/Create/Create';
+export { Create } from './Create';
