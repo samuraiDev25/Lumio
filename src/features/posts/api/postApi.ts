@@ -1,4 +1,9 @@
-import { MainPageResponse } from '@/features/posts/api/postApi.types';
+import {
+  GetMyPostsRequest,
+  GetMyPostsResponse,
+  MainPageResponse,
+  Post,
+} from '@/features/posts/api/postApi.types';
 import { baseApi } from '@/shared/api';
 
 export const postApi = baseApi.injectEndpoints({
@@ -9,10 +14,46 @@ export const postApi = baseApi.injectEndpoints({
         params: { pageSize },
       }),
     }),
+    updatePostUser: builder.mutation<
+      Post,
+      { postId: number; description: string }
+    >({
+      query: ({ postId, description }) => ({
+        url: `/api/v1/posts/${postId}`,
+        method: 'PUT',
+        body: { description },
+      }),
+      invalidatesTags: ['Posts'],
+    }),
+    getMyPosts: builder.query<GetMyPostsResponse, GetMyPostsRequest | void>({
+      query: (params) => {
+        const {
+          pageNumber = 1,
+          pageSize = 8,
+          sortBy,
+          sortDirection,
+        } = params || {};
+
+        return {
+          url: `/api/v1/posts/my`,
+          params: {
+            pageNumber,
+            pageSize,
+            ...(sortBy && { sortBy }),
+            ...(sortDirection && { sortDirection }),
+          },
+        };
+      },
+      providesTags: () => [{ type: 'Posts', id: 'MY' }],
+    }),
   }),
 });
 
-export const { useGetMainPageDataQuery } = postApi;
+export const {
+  useGetMainPageDataQuery,
+  useUpdatePostUserMutation,
+  useGetMyPostsQuery,
+} = postApi;
 
 /**
  * Server-side function for data fetching (ISR).

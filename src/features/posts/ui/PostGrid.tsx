@@ -1,6 +1,6 @@
 'use client';
 
-import { Post } from '@/features/posts/api/postsApi.types';
+import { Post } from '@/features/posts/api/postApi.types';
 import s from './PostGrid.module.scss';
 import Image from 'next/image';
 
@@ -34,4 +34,3 @@ export function PostGrid({ posts }: PostGridProps) {
     </div>
   );
 }
-

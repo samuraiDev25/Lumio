@@ -6,6 +6,7 @@ import { ArrowIosBackOutline, ArrowIosForwardOutline } from '@/shared/ui/icons';
 import { Post } from '@/features/posts/api/postApi.types';
 import { getRelativeTime } from '@/shared/lib';
 import s from './PostCard.module.scss';
+import { useRouter } from 'next/navigation';
 
 type PostCardProps = {
   post: Post;
@@ -33,6 +34,7 @@ export const PostCard = ({ post }: PostCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const [isImageHovered, setIsImageHovered] = useState(false);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const router = useRouter();
 
   const images = post.postFiles || [];
   const description = post.description || '';
@@ -66,7 +68,6 @@ export const PostCard = ({ post }: PostCardProps) => {
       );
     }
   };
-
   return (
     <div className={s.card}>
       <div
@@ -78,12 +79,9 @@ export const PostCard = ({ post }: PostCardProps) => {
           {images.length > 0 && images[currentSlideIndex]?.url ? (
             <img
               src={images[currentSlideIndex].url}
-              alt={
-                description
-                  ? `Post: ${description.substring(0, 20)}...`
-                  : 'User post image'
-              }
+              alt={'User posts image'}
               className={s['image-element']}
+              onClick={() => router.push(`/posts/${post.id}`)}
             />
           ) : (
             <div className={s.placeholder} aria-label="No image available">

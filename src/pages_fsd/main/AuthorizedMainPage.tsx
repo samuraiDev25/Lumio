@@ -5,6 +5,7 @@ import { PostCard } from '@/features/posts/ui/PostCard';
 import MainLayout from '@/app/MainLayout';
 import styles from './AuthorizedMainPage.module.scss';
 import { Post } from '@/features/posts/api/postApi.types';
+import Link from 'next/link';
 
 type AuthorizedMainPageProps = {
   posts: Post[];
@@ -32,7 +33,16 @@ export function AuthorizedMainPage({
 
         <div className={styles['posts-grid']}>
           {posts.length > 0 ? (
-            posts.map((post) => <PostCard key={post.id} post={post} />)
+            posts.map((post) => (
+              <Link
+                key={post.id}
+                href={`/posts/${post.id}`}
+                scroll={false}
+                style={{ textDecoration: 'none' }}
+              >
+                <PostCard post={post} />
+              </Link>
+            ))
           ) : (
             <div className={styles['no-posts']}>
               Постов пока нет, но они скоро появятся!

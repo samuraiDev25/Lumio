@@ -44,7 +44,6 @@ export function MainPageClientWrapper({
       handleNetworkError({ error, dispatch });
     }
   }, [isError, error, dispatch]);
-
   if (isLoading || !user) {
     return (
       <UnauthorizedMainPage posts={serverPosts} usersCount={serverUsersCount} />
