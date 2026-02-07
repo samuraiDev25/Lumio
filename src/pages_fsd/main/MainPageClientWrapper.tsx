@@ -15,13 +15,17 @@ type MainPageClientWrapperProps = {
 };
 
 /**
- * Клиентский wrapper-компонент для главной страницы.
+ * Client-side wrapper component for the Home Page.
  *
- * Логика работы:
- * 1. Проверяет статус авторизации через useMeQuery.
- * 2. Пока идет загрузка или если пользователь не авторизован — рендерит UnauthorizedMainPage.
- * 3. Если авторизация подтверждена — рендерит AuthorizedMainPage.
- * 4. Реализует "тихую" обработку сетевых ошибок (игнорирует 401 статус для гостей).
+ * Logic:
+ * 1. Auth Status: Checks authorization via 'useMeQuery'.
+ * 2. Rendering: While loading or if unauthenticated, renders 'UnauthorizedMainPage'.
+ *    Once authenticated, switches to 'AuthorizedMainPage'.
+ * 3. Silent Auth: Implements silent error handling for guests by ignoring 401 statuses.
+ *
+ * Note: We manage the auth check here instead of using the generic 'useProtectedRoute' hook
+ * to ensure that unauthenticated guests can still view the public landing page
+ * content without being redirected to the Sign-In page.
  */
 export function MainPageClientWrapper({
   serverPosts,
@@ -31,16 +35,13 @@ export function MainPageClientWrapper({
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    // Проверяем, является ли ошибка объектом с полем status
     const fetchError = error as FetchBaseQueryError;
 
-    // "Тихий режим" для гостей: 401 статус не является ошибкой в контексте Landing Page.
-    // Обрабатываем только реальные сбои (500, 429 и т.д.) через глобальный хендлер.
-    if (isError && fetchError && fetchError.status !== 401) {
-      handleNetworkError({
-        error,
-        dispatch,
-      });
+    if (isError && fetchError?.status === 401) {
+      return;
+    }
+    if (isError && error) {
+      handleNetworkError({ error, dispatch });
     }
   }, [isError, error, dispatch]);
   if (isLoading || !user) {

@@ -2,20 +2,27 @@
 
 import { PropsWithChildren, useEffect } from 'react';
 import { useMeQuery } from '@/features/auth/api/authApi';
-import { APP_ROUTES, AUTH_ROUTES } from '@/shared/lib/routes/routes';
+import { APP_ROUTES } from '@/shared/lib/routes/routes';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/widgets/sidebar/ui';
 import { Loading } from '@/shared/ui/loading/Loading';
 import s from './MainLayout.module.scss';
 
 /**
- * Основной лейаут для авторизованной зоны приложения.
+ * Layout for authorized application zones.
  *
- * Функции:
- * 1. Выступает в роли Auth Guard: если пользователь не авторизован (ошибка /me или отсутствие данных),
- *    автоматически перенаправляет на страницу входа (SIGN_IN).
- * 2. Обеспечивает отображение Sidebar для всех вложенных страниц.
- * 3. Показывает полноэкранный Loader в процессе проверки сессии.
+ * Implementation Details:
+ * 1. Performance & UX: The full-page Loader is intentionally omitted to prevent
+ *    overlapping pre-rendered server content (ISR). This ensures immediate post visibility
+ *    and eliminates layout shifts during hydration.
+ *
+ * 2. Auth Guard Logic: Manages client-side session validation.
+ *    Note: This component uses inline logic instead of the generic 'useProtectedRoute'
+ *    hook to implement "Silent Auth" — ignoring 401 statuses to support
+ *    a seamless guest mode experience on the landing page.
+ *
+ * 3. Layout Stability: Uses a flex-container to preserve the Sidebar and Content
+ *    structure while the session data is being fetched.
  */
 export default function MainLayout({ children }: PropsWithChildren) {
   const router = useRouter();

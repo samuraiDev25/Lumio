@@ -3,7 +3,6 @@
 import s from './LoginForm.module.scss';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Button, TextField } from '@/shared/ui';
 import Link from 'next/link';
 import SvgYandex from '@/shared/ui/icons/YandexSvg';
@@ -16,31 +15,31 @@ import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
 import { APP_ROUTES, AUTH_ROUTES } from '@/shared/lib/routes';
 import { signInSchema, SignInType } from '@/features/auth/model/validation';
 import { handleNetworkError } from '@/shared/lib';
-import { toast } from 'react-toastify';
 
-type LoginFormData = z.infer<typeof signInSchema>;
-
-// type RTKQueryError = {
-//   status?: number;
-//   data?: {
-//     errorsMessages?: Array<{ message: string; field?: string }>;
-//     message?: string;
-//     error?: string;
-//   };
-// };
-
+/**
+ * LoginForm component for user authentication.
+ *
+ * Features:
+ * - Validation: Implements centralized 'signInSchema' using react-hook-form and zod.
+ * - Error Handling: Integrated with a global network error handler to map server-side
+ *   validation errors directly to form fields or the form root.
+ * - State Management: Handles successful authentication by dispatching credentials
+ *   to Redux and managing session persistence.
+ * - UI/UX: Provides toggleable password visibility and prevents navigation during
+ *   active loading states.
+ */
 export const LoginForm = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [login, { isLoading }] = useLoginMutation();
-  const [serverError, setServerError] = useState<string>('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
     setError,
     formState: { errors },
-  } = useForm<LoginFormData>({
+  } = useForm<SignInType>({
     resolver: zodResolver(signInSchema),
     mode: 'onBlur',
     defaultValues: {
@@ -49,68 +48,35 @@ export const LoginForm = () => {
     },
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: SignInType) => {
     try {
-      setServerError('');
-
       const response = await login(data).unwrap();
-
-      // Сохраняем токен через Redux action (автоматически сохраняет и в localStorage)
+      // Save token via Redux action (automatically persists to localStorage)
       dispatch(setCredentials({ accessToken: response.accessToken }));
       //router.push(SIDEBAR_ROUTES.FEED);
       router.push(APP_ROUTES.ROOT);
       router.refresh();
-    } catch (error) {
-      // // Отображение ошибки
-      // let errorMessage = 'Login failed. Please try again.';
-      //
-      // // Обработка ошибок в соответствии с ТЗ
-      // const rtkError = error as RTKQueryError;
-      //
-      // if (rtkError?.status === 403) {
-      //   errorMessage = 'The email must match the format example@example.com';
-      // } else if (rtkError?.status === 400) {
-      //   errorMessage = 'Validation error. Please check your input.';
-      // } else if (rtkError?.status === 429) {
-      //   errorMessage = 'Too many requests. Please try again later.';
-      // } else if (rtkError?.data?.errorsMessages?.[0]?.message) {
-      //   errorMessage = rtkError.data.errorsMessages[0].message;
-      // } else if (typeof rtkError?.data?.message === 'string') {
-      //   errorMessage = rtkError.data.message;
-      // }
+    } catch (error: unknown) {
       handleNetworkError({
         error,
         dispatch,
-        handle400Error: (error) => {
-          error.errorsMessages?.forEach((m) => {
-            if (m.field) {
-              setError(m.field as keyof SignInType, {
-                type: 'server',
-                message: m.message,
-              });
+        handle400Error: (baseResponseError) => {
+          baseResponseError.errorsMessages?.forEach((err) => {
+            if (err.field) {
+              const fieldName = err.field as 'email' | 'password';
+              setError(fieldName, { message: err.message });
             }
           });
         },
-        handle403Error: (error) => {
-          error.errorsMessages?.forEach((m) => {
-            if (m.field) {
-              setError(m.field as keyof SignInType, {
-                type: 'server',
-                message: m.message,
-              });
+        handle403Error: (baseResponseError) => {
+          baseResponseError.errorsMessages?.forEach((err) => {
+            if (err.field) {
+              const fieldName = err.field as 'email' | 'password';
+              setError(fieldName, { message: err.message });
+            } else {
+              setError('root', { message: err.message });
             }
           });
-        },
-        handle429Error: () => {
-          toast.error('Too many requests. Try again later.');
-        },
-        handle500Error: () => {
-          toast.error('Internal server error');
-        },
-        handleUnknownError: () => {
-          toast.error('Unexpected error');
         },
       });
     }
@@ -118,34 +84,31 @@ export const LoginForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={s['login-form']}>
-      {/* Форма содержит Email, Password, кнопку [Sign In] */}
       <h1 className={s.title}>Sign In</h1>
 
-      {/* Кнопка Yandex OAuth */}
       <Button type="button" variant="link" size="lg" fullWidth asChild>
         <a href="/api/v1/auth/yandex">
           <SvgYandex />
         </a>
       </Button>
+
       <div className={s['form-wrapper']}>
-        {/* Поле Email */}
         <TextField
-          type={'email'}
-          label={'Email'}
-          placeholder={'Epam@epam.com'}
-          autoComplete={'email'}
+          type="email"
+          label="Email"
+          placeholder="Epam@epam.com"
+          autoComplete="email"
           errorMessage={errors.email?.message}
           disabled={isLoading}
           {...register('email')}
         />
 
-        {/* Поле Password */}
         <TextField
           type={showPassword ? 'text' : 'password'}
-          label={'Password'}
-          placeholder={'**********'}
+          label="Password"
+          placeholder="**********"
           iconEnd={
-            <span className={s.customIconEnd}>
+            <span className={s['custom-icon-end']}>
               {showPassword ? <EyeOutline /> : <EyeOffOutline />}
             </span>
           }
@@ -156,11 +119,11 @@ export const LoginForm = () => {
         />
       </div>
 
-      {/* Отображение серверных ошибок */}
-      {serverError && <div className={s['server-error']}>{serverError}</div>}
+      {errors.root && (
+        <div className={s['server-error']}>{errors.root.message}</div>
+      )}
 
       <div className={s['auth-actions-block']}>
-        {/* Ссылки Forgot Password и Sign Up */}
         <div className={s['forgot-password-wrapper']}>
           <Link
             href={AUTH_ROUTES.RECOVERY}
@@ -171,12 +134,11 @@ export const LoginForm = () => {
           </Link>
         </div>
 
-        {/* Кнопка [Sign In] */}
         <div className={s['submit-wrapper']}>
           <Button
-            variant={'primary'}
-            size={'lg'}
-            fullWidth={true}
+            variant="primary"
+            size="lg"
+            fullWidth
             type="submit"
             disabled={isLoading}
           >

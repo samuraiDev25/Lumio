@@ -1,9 +1,5 @@
-'use client';
+import { CreateNewPost } from '@/entities/post/ui/CreateNewPost/CreateNewPost';
 
-export function Create() {
-  return (
-    <>
-      <h1 style={{ marginLeft: '15rem' }}>Create PBL</h1>
-    </>
-  );
-}
+export const Create = () => {
+  return <CreateNewPost />;
+};

@@ -12,23 +12,23 @@ type PostCardProps = {
   post: Post;
 };
 
-// Лимиты подобраны для Pixel Perfect верстки:
-// TRUNCATE_LENGTH (95) заполняет ровно 4 строки (высота 96px)
-// EXPANDED_TRUNCATE_LENGTH (175) заполняет 8 строк (высота 196px) при уменьшенном фото
+// Truncation limits optimized for Pixel Perfect layout:
+// TRUNCATE_LENGTH (95) fills exactly 4 lines (96px height)
+// EXPANDED_TRUNCATE_LENGTH (175) fills 8 lines (196px height) when image is shrunk
 const TRUNCATE_LENGTH = 95;
 const EXPANDED_TRUNCATE_LENGTH = 175;
 const MIN_CONTENT_LENGTH_FOR_TOGGLE = 96;
 
 /**
- * Компонент карточки поста.
+ * Post card component.
  *
- * Особенности:
- * 1. Интерактивный слайдер изображений с навигацией при ховере.
- * 2. Умное сокращение текста:
- *    - В обычном виде: 4 строки (Pixel Perfect под высоту 391px).
- *    - В развернутом виде: до 8 строк с автоматическим уменьшением высоты фото.
- * 3. Динамический расчет времени (Relative Time).
- * 4. Предусмотрен placeholder для постов без изображений.
+ * Features:
+ * 1. Interactive Image Slider: Navigation arrows appear on hover.
+ * 2. Smart Text Truncation:
+ *    - Default view: 4 lines (Pixel Perfect for 391px height).
+ *    - Expanded view: Up to 8 lines with automatic image height reduction.
+ * 3. Dynamic Relative Time: Uses getRelativeTime utility.
+ * 4. Fallback State: Includes a placeholder for posts without images.
  */
 export const PostCard = ({ post }: PostCardProps) => {
   const [expanded, setExpanded] = useState(false);
@@ -76,7 +76,7 @@ export const PostCard = ({ post }: PostCardProps) => {
         onMouseLeave={() => setIsImageHovered(false)}
       >
         <div className={s['image-content']}>
-          {images.length > 0 ? (
+          {images.length > 0 && images[currentSlideIndex]?.url ? (
             <img
               src={images[currentSlideIndex].url}
               alt={'User posts image'}
@@ -84,7 +84,9 @@ export const PostCard = ({ post }: PostCardProps) => {
               onClick={() => router.push(`/posts/${post.id}`)}
             />
           ) : (
-            <div className={s.placeholder} aria-label="No image available" />
+            <div className={s.placeholder} aria-label="No image available">
+              {/* Empty div rendered with background color from CSS */}
+            </div>
           )}
 
           {hasMultipleImages && isImageHovered && (

@@ -13,10 +13,12 @@ type AuthorizedMainPageProps = {
 };
 
 /**
- * Компонент главной страницы для авторизованных пользователей.
- * Использует MainLayout, который включает в себя Sidebar и Header авторизованного пользователя.
- * Отображает ленту публичных постов и счетчик пользователей.
- * Данные приходят пропсами от родительского MainPageClientWrapper.
+ * Home page component for authorized users.
+ *
+ * Features:
+ * 1. Layout: Wrapped in 'MainLayout', which includes the Sidebar and authorized Header.
+ * 2. Content: Displays a feed of public posts and the community user counter.
+ * 3. Data Flow: Receives pre-fetched data via props from the parent 'MainPageClientWrapper'.
  */
 export function AuthorizedMainPage({
   posts,
