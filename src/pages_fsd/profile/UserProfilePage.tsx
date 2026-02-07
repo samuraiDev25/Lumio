@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useGetUserProfileQuery } from '@/features/profile/api/profileApi';
-import { useGetMyPostsQuery } from '@/features/posts/api/postsApi';
+
 import { useMeQuery } from '@/features/auth/api/authApi';
 import { Button, Typography } from '@/shared/ui';
 import { PROFILE_ROUTES } from '@/shared/lib/routes';
@@ -10,7 +10,8 @@ import { useRouter } from 'next/navigation';
 import s from './UserProfilePage.module.scss';
 import { PostGrid } from '@/features/posts/ui/PostGrid';
 import { Loading } from '@/shared/ui/loading/Loading';
-import { Post } from '@/features/posts/api/postsApi.types';
+import { Post } from '@/features/posts/api/postApi.types';
+import { useGetMyPostsQuery } from '@/features/posts/api/postApi';
 
 type UserProfilePageProps = {
   userId: string;
@@ -19,13 +20,14 @@ type UserProfilePageProps = {
 export function UserProfilePage({ userId }: UserProfilePageProps) {
   const router = useRouter();
   const { data: currentUser } = useMeQuery();
-  const { data: profile, isLoading: isProfileLoading } = useGetUserProfileQuery(userId);
+  const { data: profile, isLoading: isProfileLoading } =
+    useGetUserProfileQuery(userId);
   const [page, setPage] = useState(1);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const pageSize = 8;
-  
+
   const isOwnProfile = currentUser?.userId === userId;
-  
+
   const {
     data: postsData,
     isLoading: isPostsLoading,
@@ -39,7 +41,7 @@ export function UserProfilePage({ userId }: UserProfilePageProps) {
           sortDirection: 'desc',
         }
       : undefined,
-    { skip: !isOwnProfile }
+    { skip: !isOwnProfile },
   );
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -70,7 +72,7 @@ export function UserProfilePage({ userId }: UserProfilePageProps) {
           setPage((prev) => prev + 1);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     observer.observe(currentRef);
@@ -104,7 +106,9 @@ export function UserProfilePage({ userId }: UserProfilePageProps) {
             <img src={avatarUrl} alt={profile.username} className={s.avatar} />
           ) : (
             <div className={s.avatarPlaceholder}>
-              <Typography variant="h1">{profile.username[0]?.toUpperCase()}</Typography>
+              <Typography variant="h1">
+                {profile.username[0]?.toUpperCase()}
+              </Typography>
             </div>
           )}
         </div>
@@ -157,4 +161,3 @@ export function UserProfilePage({ userId }: UserProfilePageProps) {
     </div>
   );
 }
-

@@ -20,7 +20,7 @@ export function handleNetworkError({
   dispatch: AppDispatch;
   handle400Error?: (error: BaseResponseError) => void;
   handle429Error?: () => void;
-  handle401Error?: () => void;
+  handle401Error?: (error: BaseResponseError) => void;
   handle403Error?: (error: BaseResponseError) => void;
   handle500Error?: () => void;
   handleUnknownError?: (error: unknown) => void;
@@ -44,8 +44,11 @@ export function handleNetworkError({
       dispatch(changeError({ error: message }));
       handle429Error?.();
     } else if (fetchError.status === 401) {
-      dispatch(changeError({ error: 'Unauthorized' }));
-      handle401Error?.();
+      const baseResponseError = fetchError.data as BaseResponseError;
+      const message =
+        baseResponseError.errorsMessages?.[0]?.message ?? 'Unauthorized';
+      dispatch(changeError({ error: message }));
+      handle401Error?.(baseResponseError);
     } else if (fetchError.status === 403) {
       const baseResponseError = fetchError.data as BaseResponseError;
       const message =

@@ -9,6 +9,8 @@ export type Post = {
   description: string;
   createdAt: string;
   userId: number;
+  userName?: string;
+  avatarUrl?: string;
   postFiles: PostFile[];
 };
 
@@ -21,4 +23,18 @@ export type MainPageResponse = {
     items: Post[];
   };
   allRegisteredUsersCount: number;
+};
+export type GetMyPostsRequest = {
+  pageNumber?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+};
+
+export type GetMyPostsResponse = {
+  pagesCount: number;
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  items: Post[];
 };

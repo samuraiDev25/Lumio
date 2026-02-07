@@ -3,7 +3,7 @@
 export function Post() {
   return (
     <>
-      <h1 style={{ marginLeft: '15rem' }}>Post</h1>
+      <h1>Post</h1>
     </>
   );
 }

@@ -2,7 +2,7 @@
 
 import { PropsWithChildren, useEffect } from 'react';
 import { useMeQuery } from '@/features/auth/api/authApi';
-import { AUTH_ROUTES } from '@/shared/lib/routes/routes';
+import { APP_ROUTES, AUTH_ROUTES } from '@/shared/lib/routes/routes';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/widgets/sidebar/ui';
 import { Loading } from '@/shared/ui/loading/Loading';
@@ -22,8 +22,8 @@ export default function MainLayout({ children }: PropsWithChildren) {
   const { data: user, isLoading, isError } = useMeQuery();
 
   useEffect(() => {
-    if (!isLoading && (isError || !user)) {
-      router.replace(AUTH_ROUTES.SIGN_IN);
+    if (!isLoading && false && (isError || !user)) {
+      router.replace(APP_ROUTES.ROOT);
     }
   }, [isLoading, isError, user, router]);
 
@@ -31,13 +31,9 @@ export default function MainLayout({ children }: PropsWithChildren) {
     return <Loading />;
   }
 
-  if (!user) {
-    return null;
-  }
-
   return (
     <div className={s['main-layout']}>
-      <Sidebar />
+      {user ? <Sidebar /> : null}
       <main className={s.content}>{children}</main>
     </div>
   );

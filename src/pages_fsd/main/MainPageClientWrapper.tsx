@@ -43,7 +43,6 @@ export function MainPageClientWrapper({
       });
     }
   }, [isError, error, dispatch]);
-
   if (isLoading || !user) {
     return (
       <UnauthorizedMainPage posts={serverPosts} usersCount={serverUsersCount} />

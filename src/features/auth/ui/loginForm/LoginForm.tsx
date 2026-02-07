@@ -13,31 +13,21 @@ import { useLoginMutation } from '@/features/auth/api/authApi';
 import { useAppDispatch } from '@/shared/hooks/useAppDispatch';
 import { setCredentials } from '@/features/auth/model/authSlice';
 import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
-import { APP_ROUTES, AUTH_ROUTES, SIDEBAR_ROUTES } from '@/shared/lib/routes';
+import { APP_ROUTES, AUTH_ROUTES } from '@/shared/lib/routes';
+import { signInSchema, SignInType } from '@/features/auth/model/validation';
+import { handleNetworkError } from '@/shared/lib';
+import { toast } from 'react-toastify';
 
-const loginSchema = z.object({
-  email: z
-    .email({
-      message: 'The email must match the format example@example.com',
-    })
-    .min(1, 'Email is required'),
-  password: z
-    .string()
-    .min(1, 'Password is required')
-    .min(6, 'Minimum number of characters 6')
-    .max(20, 'Maximum number of characters 20'),
-});
+type LoginFormData = z.infer<typeof signInSchema>;
 
-type LoginFormData = z.infer<typeof loginSchema>;
-
-type RTKQueryError = {
-  status?: number;
-  data?: {
-    errorsMessages?: Array<{ message: string; field?: string }>;
-    message?: string;
-    error?: string;
-  };
-};
+// type RTKQueryError = {
+//   status?: number;
+//   data?: {
+//     errorsMessages?: Array<{ message: string; field?: string }>;
+//     message?: string;
+//     error?: string;
+//   };
+// };
 
 export const LoginForm = () => {
   const router = useRouter();
@@ -48,9 +38,10 @@ export const LoginForm = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(signInSchema),
     mode: 'onBlur',
     defaultValues: {
       email: '',
@@ -71,26 +62,57 @@ export const LoginForm = () => {
       //router.push(SIDEBAR_ROUTES.FEED);
       router.push(APP_ROUTES.ROOT);
       router.refresh();
-    } catch (error: unknown) {
-      // Отображение ошибки
-      let errorMessage = 'Login failed. Please try again.';
-
-      // Обработка ошибок в соответствии с ТЗ
-      const rtkError = error as RTKQueryError;
-
-      if (rtkError?.status === 403) {
-        errorMessage = 'The email must match the format example@example.com';
-      } else if (rtkError?.status === 400) {
-        errorMessage = 'Validation error. Please check your input.';
-      } else if (rtkError?.status === 429) {
-        errorMessage = 'Too many requests. Please try again later.';
-      } else if (rtkError?.data?.errorsMessages?.[0]?.message) {
-        errorMessage = rtkError.data.errorsMessages[0].message;
-      } else if (typeof rtkError?.data?.message === 'string') {
-        errorMessage = rtkError.data.message;
-      }
-
-      setServerError(errorMessage);
+    } catch (error) {
+      // // Отображение ошибки
+      // let errorMessage = 'Login failed. Please try again.';
+      //
+      // // Обработка ошибок в соответствии с ТЗ
+      // const rtkError = error as RTKQueryError;
+      //
+      // if (rtkError?.status === 403) {
+      //   errorMessage = 'The email must match the format example@example.com';
+      // } else if (rtkError?.status === 400) {
+      //   errorMessage = 'Validation error. Please check your input.';
+      // } else if (rtkError?.status === 429) {
+      //   errorMessage = 'Too many requests. Please try again later.';
+      // } else if (rtkError?.data?.errorsMessages?.[0]?.message) {
+      //   errorMessage = rtkError.data.errorsMessages[0].message;
+      // } else if (typeof rtkError?.data?.message === 'string') {
+      //   errorMessage = rtkError.data.message;
+      // }
+      handleNetworkError({
+        error,
+        dispatch,
+        handle400Error: (error) => {
+          error.errorsMessages?.forEach((m) => {
+            if (m.field) {
+              setError(m.field as keyof SignInType, {
+                type: 'server',
+                message: m.message,
+              });
+            }
+          });
+        },
+        handle403Error: (error) => {
+          error.errorsMessages?.forEach((m) => {
+            if (m.field) {
+              setError(m.field as keyof SignInType, {
+                type: 'server',
+                message: m.message,
+              });
+            }
+          });
+        },
+        handle429Error: () => {
+          toast.error('Too many requests. Try again later.');
+        },
+        handle500Error: () => {
+          toast.error('Internal server error');
+        },
+        handleUnknownError: () => {
+          toast.error('Unexpected error');
+        },
+      });
     }
   };
 
