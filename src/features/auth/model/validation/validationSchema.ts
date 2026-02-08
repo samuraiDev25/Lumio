@@ -2,6 +2,9 @@ import { z } from 'zod';
 
 const nameSchema = z
   .string()
+  .refine((value) => !/[а-яА-ЯёЁ]/.test(value), {
+    message: 'Username must not contain Cyrillic characters',
+  })
   .min(6, { message: 'Minimum number of characters 6' })
   .max(30, { message: 'Maximum number of characters 30' })
   .regex(/^[a-zA-Z0-9_-]+$/, {

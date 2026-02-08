@@ -7,8 +7,8 @@ import s from './SignUpForm.module.scss';
 import { EmailSentModal } from '@/features/auth/ui/sighUpForm/components/emailSentModal/EmailSentModal';
 import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
 import { AUTH_ROUTES } from '@/shared/lib/routes';
-import { YandexAuthButton } from '@/features/auth/ui/sighUpForm/components/yandexauthbutton/Yandexauthbutton';
-import { TermsCheckbox } from '@/features/auth/ui/sighUpForm/components/termscheckbox/Termscheckbox';
+import { YandexAuthButton } from '@/features/auth/ui/sighUpForm/components/yandexAuthButton/Yandexauthbutton';
+import { TermsCheckbox } from '@/features/auth/ui/sighUpForm/components/termsCheckBox/Termscheckbox';
 import { useSignUpForm } from '@/features/auth/ui/sighUpForm/hooks/useSignUpForm';
 
 export const SignUpForm = () => {
