@@ -6,8 +6,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  width: 100%;
+  margin-left: 220px;
+  width: calc(100% - 230px);
   margin-top: 30px;
 }
 
@@ -21,7 +21,7 @@
 
 .posts-grid {
   display: grid;
-  grid-template-columns: repeat(4, 234px);
+  grid-template-columns: repeat(auto-fill, minmax(234px, 1fr));
 
   width: 100%;
   max-width: 972px;
