@@ -1,2 +1,2 @@
-export * from './postsApi';
-export * from './postsApi.types';
+export * from './postApi';
+export * from './postApi.types';
