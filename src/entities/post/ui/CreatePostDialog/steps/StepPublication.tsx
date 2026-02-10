@@ -179,7 +179,7 @@ export const StepPublication = ({
 
           <div className={s.divider} />
 
-          {/* Location по ТЗ не реализуем */}
+          {/* Еще пока что не понял как реализовать корректно добавление локации */}
           <div style={{ opacity: 0.45 }}>
             <div className={s.sectionLabel}>Add location</div>
             <div

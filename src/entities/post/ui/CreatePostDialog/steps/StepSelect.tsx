@@ -17,7 +17,7 @@ type Props = {
   images: ImageListType;
   setImages: (list: ImageListType) => void;
   onNext: () => void;
-  onRequestClose: () => void;
+  onRequestClose?: () => void;
 };
 
 export const StepSelect = ({
@@ -27,7 +27,6 @@ export const StepSelect = ({
   onRequestClose,
 }: Props) => {
   const onChange = (imageList: ImageListType) => {
-    // валидация
     for (const item of imageList) {
       if (item.file) {
         const ok = validateImageFile(
@@ -48,22 +47,6 @@ export const StepSelect = ({
   return (
     <>
       <div className={s.headerBar}>
-        <button
-          className={s.iconTopBtn}
-          type="button"
-          onClick={onRequestClose}
-          aria-label="Back"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M15 18l-6-6 6-6"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
-
         <div className={s.headerTitle}>Add Photo</div>
 
         <button
