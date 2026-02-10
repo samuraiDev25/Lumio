@@ -12,6 +12,11 @@ const nextConfig: NextConfig = {
         hostname: 'test-bucket-lumio.storage.yandexcloud.net',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'lumio-files-photo.storage.yandexcloud.net',
+        pathname: '/**',
+      },
     ],
   },
 };
