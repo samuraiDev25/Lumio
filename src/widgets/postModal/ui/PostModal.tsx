@@ -5,8 +5,6 @@ import * as Dialog from '@radix-ui/react-dialog';
 import Image from 'next/image';
 import s from './PostModal.module.scss';
 import {
-  ArrowIosBack,
-  ArrowIosForward,
   BookmarkOutline,
   CloseOutline,
   Edit2Outline,
@@ -27,7 +25,6 @@ import { useProtectedRoute } from '@/shared/hooks/useProtectedRoute';
 import { formatDate, formatDateFull } from '@/entities/post/lib/formatDate';
 import { useImageNavigation } from '@/widgets/postModal/model/useImageNavigation';
 import { PostImage } from '@/entities/post/ui/PostImage/PostImage';
-import { usePostModal } from '@/widgets/postModal/model/usePostModal';
 
 type Props = {
   children?: ReactNode;
