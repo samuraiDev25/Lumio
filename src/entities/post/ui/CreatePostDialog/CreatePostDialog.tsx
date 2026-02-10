@@ -19,6 +19,10 @@ import {
   CreatePostStep,
   ImageEditsMap,
 } from '@/entities/post/model/types/types';
+import { router } from 'next/client';
+import { SIDEBAR_ROUTES } from '@/shared/lib/routes';
+import { handleNetworkError } from '@/shared/lib';
+import { useAppDispatch } from '@/shared/hooks';
 
 type Props = {
   open: boolean;
@@ -36,7 +40,8 @@ export const CreatePostDialog = ({ open, onOpenChange }: Props) => {
   const [description, setDescription] = useState('');
   const [confirmClose, setConfirmClose] = useState(false);
 
-  const [createPost, { isLoading }] = useCreateNewPostMutation();
+  const dispatch = useAppDispatch();
+  const [createNewPost, { isLoading }] = useCreateNewPostMutation();
 
   const hasChanges = images.length > 0 || description.trim().length > 0;
 
@@ -83,44 +88,45 @@ export const CreatePostDialog = ({ open, onOpenChange }: Props) => {
 
     const formData = new FormData();
 
-    try {
-      const filtersArr: string[] = [];
+    const filtersArr: string[] = [];
 
-      for (const item of images) {
-        if (!item.file) continue;
-        const key = fileKey(item.file);
-        const edit = edits[key];
+    for (const item of images) {
+      if (!item.file) continue;
+      const key = fileKey(item.file);
+      const edit = edits[key];
 
-        filtersArr.push(edit?.filter ?? 'none');
+      filtersArr.push(edit?.filter ?? 'none');
 
-        // crop if present
-        let blob: Blob;
-        if (edit?.croppedAreaPixels && item.data_url) {
-          blob = await getCroppedImageBlob(
-            item.data_url,
-            edit.croppedAreaPixels,
-            item.file.type,
-          );
-        } else {
-          blob = item.file;
-        }
-
-        const outFile = new File([blob], item.file.name, {
-          type: item.file.type,
-        });
-        formData.append('files', outFile);
+      let blob: Blob;
+      if (edit?.croppedAreaPixels && item.data_url) {
+        blob = await getCroppedImageBlob(
+          item.data_url,
+          edit.croppedAreaPixels,
+          item.file.type,
+        );
+      } else {
+        blob = item.file;
       }
 
-      formData.append('description', description);
-      formData.append('filters', JSON.stringify(filtersArr));
+      const outFile = new File([blob], item.file.name, {
+        type: item.file.type,
+      });
+      formData.append('files', outFile);
+    }
 
-      await createPost(formData).unwrap();
+    formData.append('description', description);
+    formData.append('filters', JSON.stringify(filtersArr));
+    console.log(119);
+    try {
+      await createNewPost(formData).unwrap();
+      console.log(122);
 
       toast.success('Post created');
       resetAll();
       onOpenChange(false);
-    } catch (e) {
-      console.error(e);
+      await router.push(SIDEBAR_ROUTES.PROFILE);
+    } catch (error: unknown) {
+      handleNetworkError({ error, dispatch });
       toast.error('Upload error');
     }
   };

@@ -10,10 +10,11 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 920px;
+  min-width: 492px;
   max-width: calc(100vw - 24px);
-  background: #333;
-  color: #fff;
+  min-height: 564px;
+  background: var(--color-dark-100);
+  color: var(--color-light-100);
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: 2px;
   overflow: hidden;
@@ -22,11 +23,10 @@
 
 .headerBar {
   height: 56px;
-  display: grid;
-  grid-template-columns: 56px 1fr 80px;
+  display: flex;
   align-items: center;
-  padding: 0 8px;
-  background: #333;
+  justify-content: space-between;
+  padding: 0 24px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
@@ -57,16 +57,18 @@
   padding: 10px 12px;
 }
 
+/* ========================================== Select ========================================== */
+
 .body {
-  background: #2f2f2f;
+  background: var(--color-dark-100);
 }
 
-/* Select */
 .selectBody {
-  padding: 32px 0 28px;
-  display: grid;
-  gap: 22px;
-  justify-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 72px 0 48px 0;
+  gap: 60px;
 }
 
 .placeholderBox {
@@ -88,7 +90,7 @@
 .selectActions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 24px;
 }
 
 .confirmActionsBtn {
@@ -96,7 +98,8 @@
   width: 100% !important;
 }
 
-/* Stage */
+/* ========================================== Stage ========================================== */
+
 .stageWrap {
   position: relative;
 }
@@ -309,7 +312,8 @@
   cursor: not-allowed;
 }
 
-/* Filters */
+/* ========================================== Filters ========================================== */
+
 .filtersLayout {
   display: grid;
   grid-template-columns: 1fr 420px;
@@ -351,7 +355,8 @@
   color: rgba(255,255,255,0.85);
 }
 
-/* Publication */
+/* ========================================== Publication ========================================== */
+
 .publicationLayout {
   display: grid;
   grid-template-columns: 1fr 520px;
@@ -394,7 +399,8 @@
   background: rgba(255,255,255,0.08);
 }
 
-/* Confirm close */
+/* ========================================== Confirm close ========================================== */
+
 .confirmOverlay {
   position: fixed;
   inset: 0;
@@ -434,3 +440,4 @@
   justify-content: space-between;
   gap: 12px;
 }
+
