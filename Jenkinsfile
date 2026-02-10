@@ -4,7 +4,7 @@ pipeline {
     agent any
     environment {
         ENV_TYPE = "production"
-        PORT = 4099
+        PORT = 4178
         NAMESPACE = "lumio-su"
         REGISTRY_HOSTNAME = "senorian3"
         REGISTRY = "registry.hub.docker.com"
