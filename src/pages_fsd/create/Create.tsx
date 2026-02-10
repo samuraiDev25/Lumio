@@ -1,5 +1,9 @@
-import { CreateNewPost } from '@/entities/post/ui/CreateNewPost/CreateNewPost';
+'use client';
+
+import { useState } from 'react';
+import { CreatePostDialog } from '@/entities/post/ui/CreatePostDialog';
 
 export const Create = () => {
-  return <CreateNewPost />;
+  const [open, setOpen] = useState(true);
+  return <CreatePostDialog open={open} onOpenChange={setOpen} />;
 };
