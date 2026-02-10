@@ -7,6 +7,7 @@ import { Post } from '@/features/posts/api/postApi.types';
 import { getRelativeTime } from '@/shared/lib';
 import s from './PostCard.module.scss';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 type PostCardProps = {
   post: Post;
@@ -77,11 +78,15 @@ export const PostCard = ({ post }: PostCardProps) => {
       >
         <div className={s['image-content']}>
           {images.length > 0 && images[currentSlideIndex]?.url ? (
-            <img
+            <Image
               src={images[currentSlideIndex].url}
-              alt={'User posts image'}
+              alt="User posts image"
+              width={234}
+              height={200}
               className={s['image-element']}
               onClick={() => router.push(`/posts/${post.id}`)}
+              priority={true}
+              style={{ objectFit: 'cover' }}
             />
           ) : (
             <div className={s.placeholder} aria-label="No image available">
@@ -145,7 +150,11 @@ export const PostCard = ({ post }: PostCardProps) => {
           {shouldShowToggle && (
             <button
               className={s['show-more']}
-              onClick={() => setExpanded(!expanded)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setExpanded(!expanded);
+              }}
               aria-label={expanded ? 'Hide full text' : 'Show more text'}
               aria-expanded={expanded}
             >
