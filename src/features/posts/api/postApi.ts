@@ -13,6 +13,7 @@ export const postApi = baseApi.injectEndpoints({
         url: '/api/v1',
         params: { pageSize },
       }),
+      providesTags: () => [{ type: 'Posts', id: 'MAIN' }],
     }),
     updatePostUser: builder.mutation<
       Post,

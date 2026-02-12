@@ -9,7 +9,7 @@ export type Post = {
   description: string;
   createdAt: string;
   userId: number;
-  userName?: string;
+  userName: string;
   avatarUrl?: string;
   postFiles: PostFile[];
 };
