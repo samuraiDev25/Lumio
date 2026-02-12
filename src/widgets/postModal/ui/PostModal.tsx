@@ -25,6 +25,7 @@ import { useProtectedRoute } from '@/shared/hooks/useProtectedRoute';
 import { formatDate, formatDateFull } from '@/entities/post/lib/formatDate';
 import { useImageNavigation } from '@/widgets/postModal/model/useImageNavigation';
 import { PostImage } from '@/entities/post/ui/PostImage/PostImage';
+import { DeletePostModal } from '@/entities/post';
 
 type Props = {
   children?: ReactNode;
@@ -52,6 +53,9 @@ export const PostModal = ({
   const actualOpen = isControlled ? externalOpen : open;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
+  const [isDeletePost, setIsDeletePost] = useState(false);
+
   const [isClosePost, setIsClosePost] = useState(false);
   const [comments, setComments] = useState<string[]>([]);
   const [newComment, setNewComment] = useState('');
@@ -88,9 +92,11 @@ export const PostModal = ({
     setIsMenuOpen(false);
   };
 
-  const handleDeletePost = () => {
+  const onCloseOpenDeleteModal = () => {
     setIsMenuOpen(false);
+    setIsDeletePost(true);
   };
+
   const handleCountLikesPost = () => {
     setLikes((prev) => prev + 1);
     setIsLiked((prev) => !prev);
@@ -307,13 +313,15 @@ export const PostModal = ({
                                 <Edit2Outline />
                                 EditPost
                               </button>
+                              {/*=======================================================================================*/}
                               <button
-                                onClick={handleDeletePost}
+                                onClick={onCloseOpenDeleteModal}
                                 className={s.menuButton}
                               >
                                 <TrashOutline />
                                 Delete Post
                               </button>
+                              {/*=======================================================================================*/}
                             </div>
                           )}
                         </div>
@@ -473,6 +481,11 @@ export const PostModal = ({
         isOpen={isClosePost}
         onCloseAction={handleCancelClose}
         onConfirmAction={handleConfirmClose}
+      />
+      <DeletePostModal
+        postId={post.id}
+        isOpenModal={isDeletePost}
+        onCloseModal={() => setIsDeletePost(false)}
       />
     </Dialog.Root>
   );

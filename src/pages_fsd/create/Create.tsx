@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CreatePostDialog } from '@/entities/post/ui/CreatePostDialog';
+import { CreatePostDialog } from '@/entities/post';
 
 export const Create = () => {
   const [open, setOpen] = useState(true);

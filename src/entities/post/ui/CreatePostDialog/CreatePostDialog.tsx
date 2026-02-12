@@ -19,8 +19,8 @@ import {
   CreatePostStep,
   ImageEditsMap,
 } from '@/entities/post/model/types/types';
-import { router } from 'next/client';
-import { SIDEBAR_ROUTES } from '@/shared/lib/routes';
+import { useRouter } from 'next/navigation';
+import { APP_ROUTES } from '@/shared/lib/routes';
 import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
 
@@ -42,6 +42,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: Props) => {
 
   const dispatch = useAppDispatch();
   const [createNewPost, { isLoading }] = useCreateNewPostMutation();
+  const router = useRouter();
 
   const hasChanges = images.length > 0 || description.trim().length > 0;
 
@@ -116,15 +117,13 @@ export const CreatePostDialog = ({ open, onOpenChange }: Props) => {
 
     formData.append('description', description);
     formData.append('filters', JSON.stringify(filtersArr));
-    console.log(119);
     try {
       await createNewPost(formData).unwrap();
-      console.log(122);
 
       toast.success('Post created');
       resetAll();
       onOpenChange(false);
-      await router.push(SIDEBAR_ROUTES.PROFILE);
+      router.push(APP_ROUTES.ROOT);
     } catch (error: unknown) {
       handleNetworkError({ error, dispatch });
       toast.error('Upload error');
