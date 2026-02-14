@@ -5,12 +5,6 @@ import React from 'react';
 
 export default function Layout({
   children,
-  modal,
-}: Readonly<{ children: React.ReactNode; modal: React.ReactNode }>) {
-  return (
-    <MainLayout>
-      {children}
-      {modal}
-    </MainLayout>
-  );
+}: Readonly<{ children: React.ReactNode }>) {
+  return <MainLayout>{children}</MainLayout>;
 }

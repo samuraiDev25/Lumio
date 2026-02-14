@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { InterceptedPostModalClient } from './InterceptedPostModalClient';
-import { fetchMainPageData } from '@/features/posts/api/postApi';
+import { fetchMainPageData } from '@/entities/post/api/postApi';
 
 type Props = {
   params: Promise<{ postId: string }>;
@@ -10,10 +10,7 @@ export default async function InterceptedPostModal({ params }: Props) {
   const resolvedParams = await params;
   const postId = resolvedParams.postId;
 
-  if (!postId) {
-    notFound();
-  }
-  const data = await fetchMainPageData(4);
+  const data = await fetchMainPageData(100);
 
   if (!Array.isArray(data?.posts?.items)) {
     notFound();
@@ -24,7 +21,7 @@ export default async function InterceptedPostModal({ params }: Props) {
   });
 
   if (!post) {
-    notFound();
+    return null;
   }
 
   return <InterceptedPostModalClient post={post} />;

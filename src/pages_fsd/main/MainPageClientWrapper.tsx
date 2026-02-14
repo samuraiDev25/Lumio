@@ -3,7 +3,7 @@
 import { useMeQuery } from '@/features/auth/api/authApi';
 import { UnauthorizedMainPage } from './UnauthorizedMainPage';
 import { AuthorizedMainPage } from './AuthorizedMainPage';
-import { Post } from '@/features/posts/api/postApi.types';
+import { Post } from '@/entities/post/model/types/postApi.types';
 import { handleNetworkError } from '@/shared/lib';
 import { useEffect } from 'react';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';

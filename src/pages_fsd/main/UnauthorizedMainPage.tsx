@@ -4,7 +4,7 @@ import { UsersCount } from '@/shared/ui/users-count/UsersCount';
 import { PostCard } from '@/features/posts/ui/PostCard';
 import { BaseLayout } from '@/app/BaseLayout';
 import styles from './UnauthorizedMainPage.module.scss';
-import { Post } from '@/features/posts/api/postApi.types';
+import { Post } from '@/entities/post/model/types/postApi.types';
 import Link from 'next/link';
 
 type UnauthorizedMainPageProps = {

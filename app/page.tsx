@@ -1,5 +1,5 @@
-import { fetchMainPageData } from '@/features/posts/api/postApi';
 import { MainPageClientWrapper } from '@/pages_fsd/main/MainPageClientWrapper';
+import { fetchMainPageData } from '@/entities/post/api/postApi';
 
 export const revalidate = 60;
 
