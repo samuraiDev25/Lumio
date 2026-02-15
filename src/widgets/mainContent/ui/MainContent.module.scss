@@ -1,0 +1,58 @@
+@use '../../../shared/styles/colors';
+@use '../../../shared/styles/typography';
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  margin-top: -30px;
+}
+
+.users-count-wrapper {
+  display: flex;
+  justify-content: center;
+
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  width: 100%;
+  max-width: 972px;
+  //  justify-content: center;
+  gap: 36px 12px;
+}
+
+.no-posts {
+  display: flex;
+  justify-content: center;
+
+  grid-column: 1 / -1;
+
+  width: 100%;
+
+  padding: 60px 0;
+
+  color: var(--color-dark-100);
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+
+.container {
+  width: 100%;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  margin-top: 30px;
+}

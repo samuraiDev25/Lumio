@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { PostModal } from '@/widgets/postModal/ui/PostModal';
+import { PostModal } from '@/entities/post/ui/PostModal/PostModal';
 import { Post } from '@/entities/post/model/types/postApi.types';
 
 type Props = {

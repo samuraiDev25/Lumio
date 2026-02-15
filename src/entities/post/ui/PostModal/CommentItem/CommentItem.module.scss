@@ -1,0 +1,69 @@
+@use '../../../../../shared/styles/colors';
+@use '../../../../../shared/styles/typography';
+
+.commentsContainer {
+  flex: 1;
+  overflow-y: auto;
+}
+.captionWrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+}
+
+.commentAvatar {
+  align-self: flex-start;
+  border-radius: 50%;
+}
+
+.captionContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.commentUsername {
+  font-weight: 600;
+  margin-right: 6px;
+  .captionText {
+    margin-top: 4px;
+    @include typography.uik-regular-text-14;
+    overflow-wrap: break-word; /* современная альтернатива word-wrap */
+    word-break: break-word; /* разбивает очень длинные слова */
+  }
+}
+.textCaptionContent {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-right: 12px
+}
+.heartBeating {
+  cursor: pointer;
+  color: var(--color-light-900);
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--color-danger-500);
+  }
+
+  &.heartLiked {
+    color: var(--color-danger-500);
+
+    svg {
+      fill: currentColor;
+    }
+  }
+}
+
+.timestamp {
+  display: flex;
+  flex-direction: row;
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-light-900);
+  padding-left: 72px;
+  gap: 12px;
+}
