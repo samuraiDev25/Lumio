@@ -1,5 +1,5 @@
 import { baseApi } from '@/shared/api/baseApi';
-import { UserProfile } from '@/features/profile/api/profileApi.types';
+import { UserProfile } from '@/entities/profile/modal/types/profileApi.types';
 
 export const profileApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

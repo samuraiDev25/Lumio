@@ -2,8 +2,7 @@
 
 import { Post } from '@/entities/post/model/types/postApi.types';
 import { useRouter } from 'next/navigation';
-import { PostModal } from '@/widgets/postModal';
-
+import { PostModal } from '@/entities/post/ui/PostModal/PostModal';
 type Props = {
   post: Post;
 };

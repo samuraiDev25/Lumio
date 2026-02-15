@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useGetUserProfileQuery } from '@/features/profile/api/profileApi';
+import { useGetUserProfileQuery } from '@/entities/profile/api/profileApi';
 
 import { useMeQuery } from '@/features/auth/api/authApi';
 import { Button, Typography } from '@/shared/ui';
 import { PROFILE_ROUTES } from '@/shared/lib/routes';
 import { useRouter } from 'next/navigation';
 import s from './UserProfilePage.module.scss';
-import { PostGrid } from '@/features/posts/ui/PostGrid';
+import { PostGrid } from '@/entities/post/ui/PostGrid/PostGrid';
 import { Loading } from '@/shared/ui/loading/Loading';
 import { Post } from '@/entities/post/model/types/postApi.types';
 import { useGetMyPostsQuery } from '@/entities/post/api/postApi';

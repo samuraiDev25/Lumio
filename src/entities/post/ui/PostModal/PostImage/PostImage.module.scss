@@ -1,5 +1,5 @@
-@use '../../../../shared/styles/colors';
-@use '../../../../shared/styles/typography';
+@use '../../../../../shared/styles/colors';
+@use '../../../../../shared/styles/typography';
 
 .imageSection {
   flex: 0 0 clamp(240px, 45vw, 490px); /* ширина меняется от 240 до 490 */
