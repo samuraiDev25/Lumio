@@ -24,7 +24,6 @@ const isAuthUrl = (args: string | FetchArgs) => {
   const url = typeof args === 'string' ? args : args.url;
 
   return (
-    url.includes('/api/v1/auth/me') ||
     url.includes('/api/v1/auth/refresh-token') ||
     url.includes('/api/v1/auth/login') ||
     url.includes('/api/v1/auth/logout')
@@ -64,16 +63,16 @@ export const baseQueryWithReauth: BaseQueryFn<
           result = await baseQuery(args, api, extraOptions);
         }
 
-        // if (refreshResult.data) {
-        //   localStorage.setItem('accessToken', refreshResult.data.accessToken);
-        //   // retry the initial query
-        //   console.log(refreshResult);
-        //   result = await baseQuery(args, api, extraOptions);
-        // } else {
-        //   return {
-        //     error: { status: 401, data: { error: 'Refresh token failed' } },
-        //   };
-        // }
+        if (refreshResult.data) {
+          localStorage.setItem('accessToken', refreshResult.data.accessToken);
+          // retry the initial query
+          console.log(refreshResult);
+          result = await baseQuery(args, api, extraOptions);
+        } else {
+          return {
+            error: { status: 401, data: { error: 'Refresh token failed' } },
+          };
+        }
       } finally {
         release();
       }

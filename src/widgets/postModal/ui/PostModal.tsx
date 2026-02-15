@@ -13,9 +13,8 @@ import {
   PaperPlaneOutline,
   TrashOutline,
 } from '@/shared/ui/icons';
-import { Post } from '@/features/posts/api/postApi.types';
+import { Post } from '@/entities/post/model/types/postApi.types';
 import { Button } from '@/shared/ui';
-import { useUpdatePostUserMutation } from '@/features/posts/api/postApi';
 import { handleNetworkError } from '@/shared/lib';
 import { SignUpType } from '@/features/auth/model/validation';
 import { toast } from 'react-toastify';
@@ -26,6 +25,8 @@ import { formatDate, formatDateFull } from '@/entities/post/lib/formatDate';
 import { useImageNavigation } from '@/widgets/postModal/model/useImageNavigation';
 import { PostImage } from '@/entities/post/ui/PostImage/PostImage';
 import { DeletePostModal } from '@/entities/post';
+import { useMeQuery } from '@/features/auth/api/authApi';
+import { useUpdatePostUserMutation } from '@/entities/post/api/postApi';
 
 type Props = {
   children?: ReactNode;
@@ -67,6 +68,8 @@ export const PostModal = ({
   );
 
   const { isAuthorized } = useProtectedRoute({ redirect: false });
+  const { data: currentUser } = useMeQuery();
+  const isOwnPost = currentUser?.userId?.toString() === post.userId?.toString();
   const [updatePost] = useUpdatePostUserMutation();
   const images = post.postFiles || [];
   const handleRequestClose = () => {
@@ -156,7 +159,6 @@ export const PostModal = ({
     } else {
       // Если изменений нет, просто закрываем
       setIsEditing(false);
-      // setIsClosePost(false);
     }
   };
 
@@ -164,16 +166,14 @@ export const PostModal = ({
   const handleConfirmClose = () => {
     setIsEditing(false);
     setIsClosePost(false);
-    //setOpen(false);
-    // Сброс описания к исходному состоянию
     setPostDescription(post.description || '');
   };
 
   // Отмена закрытия
   const handleCancelClose = () => {
     setIsClosePost(false);
-    //setOpen(false);
   };
+
   return (
     <Dialog.Root
       open={actualOpen}
@@ -285,7 +285,7 @@ export const PostModal = ({
                     <div className={s.header}>
                       <div className={s.user}>
                         <Image
-                          src={avatarUrl}
+                          src={avatarUrl || '/User 01.jpg'}
                           alt={userName}
                           className={s.avatar}
                           width={32}
@@ -293,7 +293,7 @@ export const PostModal = ({
                         />
                         <span className={s.username}>{userName}</span>
                       </div>
-                      {isAuthorized && (
+                      {isAuthorized && isOwnPost && (
                         <div className={s.headerActions}>
                           <button
                             className={s.moreButton}
@@ -485,7 +485,14 @@ export const PostModal = ({
       <DeletePostModal
         postId={post.id}
         isOpenModal={isDeletePost}
-        onCloseModal={() => setIsDeletePost(false)}
+        onCloseModalAction={() => {
+          setIsDeletePost(false);
+          setIsClosePost(false);
+          setOpen(false);
+          if (externalOnClose) {
+            externalOnClose();
+          }
+        }}
       />
     </Dialog.Root>
   );

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { PostPageClient } from './PostPageClient';
-import { fetchMainPageData } from '@/features/posts/api/postApi';
+import { fetchMainPageData } from '@/entities/post/api/postApi';
 
 type Props = {
   params: Promise<{ postId: string }>;

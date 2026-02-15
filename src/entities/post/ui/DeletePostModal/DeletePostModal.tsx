@@ -11,14 +11,14 @@ import { APP_ROUTES } from '@/shared/lib/routes';
 
 type DeletePostModalProps = {
   isOpenModal: boolean;
-  onCloseModal: () => void;
+  onCloseModalAction: () => void;
   postId: number;
 };
 
 export const DeletePostModal = ({
   postId,
   isOpenModal,
-  onCloseModal,
+  onCloseModalAction,
 }: DeletePostModalProps) => {
   const dispatch = useAppDispatch();
   const [deletePost] = useDeletePostMutation();
@@ -27,7 +27,7 @@ export const DeletePostModal = ({
   const handleDeletePost = async () => {
     try {
       await deletePost(postId).unwrap();
-      onCloseModal();
+      onCloseModalAction();
       toast.success('Post deleted');
       router.push(APP_ROUTES.ROOT);
     } catch (error: unknown) {
@@ -35,13 +35,12 @@ export const DeletePostModal = ({
       toast.error('Something went wrong while deleting post');
     }
   };
-
   return (
     <Modal
       open={isOpenModal}
       title={'Delete Post'}
       size={'sm'}
-      onClose={onCloseModal}
+      onClose={onCloseModalAction}
     >
       <div className={s.closeMainWrapper}>
         <div className={s.closeMainTitle}>
@@ -55,7 +54,7 @@ export const DeletePostModal = ({
           >
             Yes
           </Button>
-          <Button onClick={onCloseModal} className={s.deleteBtn}>
+          <Button onClick={onCloseModalAction} className={s.deleteBtn}>
             No
           </Button>
         </div>

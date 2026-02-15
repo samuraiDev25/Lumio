@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import clsx from 'clsx';
 import { ArrowIosBackOutline, ArrowIosForwardOutline } from '@/shared/ui/icons';
-import { Post } from '@/features/posts/api/postApi.types';
+import { Post } from '@/entities/post/model/types/postApi.types';
 import { getRelativeTime } from '@/shared/lib';
 import s from './PostCard.module.scss';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 
 type PostCardProps = {
   post: Post;
@@ -78,16 +79,23 @@ export const PostCard = ({ post }: PostCardProps) => {
       >
         <div className={s['image-content']}>
           {images.length > 0 && images[currentSlideIndex]?.url ? (
-            <Image
-              src={images[currentSlideIndex].url}
-              alt="User posts image"
-              width={234}
-              height={200}
-              className={s['image-element']}
-              onClick={() => router.push(`/posts/${post.id}`)}
-              priority={true}
-              style={{ objectFit: 'cover' }}
-            />
+            <Link
+              key={post.id}
+              href={`/posts/${post.id}`}
+              scroll={false}
+              style={{ textDecoration: 'none' }}
+            >
+              <Image
+                src={images[currentSlideIndex].url}
+                alt="User posts image"
+                width={234}
+                height={200}
+                className={s['image-element']}
+                onClick={() => router.push(`/posts/${post.id}`)}
+                priority={true}
+                style={{ objectFit: 'cover' }}
+              />
+            </Link>
           ) : (
             <div className={s.placeholder} aria-label="No image available">
               {/* Empty div rendered with background color from CSS */}
@@ -97,14 +105,22 @@ export const PostCard = ({ post }: PostCardProps) => {
           {hasMultipleImages && isImageHovered && (
             <>
               <button
-                onClick={prevSlide}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prevSlide();
+                }}
+                onPointerDown={(e) => e.stopPropagation()}
                 className={clsx(s['nav-button'], s.left)}
                 aria-label="Previous image"
               >
                 <ArrowIosBackOutline />
               </button>
               <button
-                onClick={nextSlide}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  nextSlide();
+                }}
+                onPointerDown={(e) => e.stopPropagation()}
                 className={clsx(s['nav-button'], s.right)}
                 aria-label="Next image"
               >

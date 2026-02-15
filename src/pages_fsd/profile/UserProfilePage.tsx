@@ -10,8 +10,8 @@ import { useRouter } from 'next/navigation';
 import s from './UserProfilePage.module.scss';
 import { PostGrid } from '@/features/posts/ui/PostGrid';
 import { Loading } from '@/shared/ui/loading/Loading';
-import { Post } from '@/features/posts/api/postApi.types';
-import { useGetMyPostsQuery } from '@/features/posts/api/postApi';
+import { Post } from '@/entities/post/model/types/postApi.types';
+import { useGetMyPostsQuery } from '@/entities/post/api/postApi';
 
 type UserProfilePageProps = {
   userId: string;
@@ -20,14 +20,14 @@ type UserProfilePageProps = {
 export function UserProfilePage({ userId }: UserProfilePageProps) {
   const router = useRouter();
   const { data: currentUser } = useMeQuery();
+
   const { data: profile, isLoading: isProfileLoading } =
     useGetUserProfileQuery(userId);
+
   const [page, setPage] = useState(1);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const pageSize = 8;
-
-  const isOwnProfile = currentUser?.userId === userId;
-
+  const isOwnProfile = currentUser?.userId?.toString() === userId;
   const {
     data: postsData,
     isLoading: isPostsLoading,
@@ -50,7 +50,7 @@ export function UserProfilePage({ userId }: UserProfilePageProps) {
   useEffect(() => {
     setPage(1);
     setAllPosts([]);
-  }, [userId]);
+  }, [userId, setPage]);
 
   useEffect(() => {
     if (postsData?.items) {
@@ -60,7 +60,7 @@ export function UserProfilePage({ userId }: UserProfilePageProps) {
         setAllPosts((prev) => [...prev, ...postsData.items]);
       }
     }
-  }, [postsData, page]);
+  }, [postsData, page, setAllPosts]);
 
   useEffect(() => {
     const currentRef = loadMoreRef.current;
@@ -87,8 +87,23 @@ export function UserProfilePage({ userId }: UserProfilePageProps) {
   if (isProfileLoading) {
     return <Loading />;
   }
-
-  if (!profile) {
+  // Это временно, для того пока пост не создан, что бы отображались данные юзера
+  const displayProfile =
+    profile ||
+    (isOwnProfile && currentUser
+      ? {
+          id: currentUser.userId,
+          username: currentUser.username,
+          firstName: null,
+          lastName: null,
+          dateOfBirth: null,
+          country: null,
+          city: null,
+          aboutMe: null,
+          avatarUrl: null,
+        }
+      : null);
+  if (!displayProfile) {
     return (
       <div className={s.error}>
         <Typography variant="h2">User not found</Typography>
@@ -96,49 +111,76 @@ export function UserProfilePage({ userId }: UserProfilePageProps) {
     );
   }
 
-  const avatarUrl = profile.avatarUrl || '';
+  const avatarUrl = displayProfile.avatarUrl || '';
 
   return (
     <div className={s.profilePage}>
       <div className={s.profileHeader}>
         <div className={s.avatarContainer}>
           {avatarUrl ? (
-            <img src={avatarUrl} alt={profile.username} className={s.avatar} />
+            <img
+              src={avatarUrl}
+              alt={displayProfile.username}
+              className={s.avatar}
+            />
           ) : (
             <div className={s.avatarPlaceholder}>
               <Typography variant="h1">
-                {profile.username[0]?.toUpperCase()}
+                {displayProfile.username[0]?.toUpperCase()}
               </Typography>
             </div>
           )}
         </div>
         <div className={s.profileInfo}>
-          <Typography variant="h1" className={s.username}>
-            {profile.username}
-          </Typography>
-          {profile.aboutMe && (
-            <Typography variant="regular_text_16" className={s.aboutMe}>
-              {profile.aboutMe}
+          <div className={s.profileHeaderSection}>
+            <Typography variant="h1" className={s.username}>
+              {displayProfile.username}
             </Typography>
-          )}
-          {isOwnProfile && (
-            <Button
-              variant="primary"
-              size="md"
-              onClick={() => router.push(PROFILE_ROUTES.SETTINGS)}
-              className={s.settingsButton}
-            >
-              Profile Setting
-            </Button>
-          )}
+            {displayProfile.aboutMe && (
+              <Typography variant="regular_text_16" className={s.aboutMe}>
+                {displayProfile.aboutMe}
+              </Typography>
+            )}
+
+            {isOwnProfile && (
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => router.push(PROFILE_ROUTES.SETTINGS)}
+                className={s.settingsButton}
+              >
+                Profile Setting
+              </Button>
+            )}
+          </div>
+          <div className={s.stats}>
+            <div className={s.statItem}>
+              <div className={s.statNumber}>Following</div>
+              <div className={s.statLabel}>Following</div>
+            </div>
+            <div className={s.statItem}>
+              <div className={s.statNumber}>Followers</div>
+              <div className={s.statLabel}>Followers</div>
+            </div>
+            <div className={s.statItem}>
+              <div className={s.statNumber}>Publications</div>
+              <div className={s.statLabel}>Publications</div>
+            </div>
+          </div>
+          <p className={s.text}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat.
+            <a className={s.textLink}>
+              laboris nisi ut aliquip ex ea commodo consequat.
+            </a>
+          </p>
         </div>
       </div>
 
       <div className={s.postsSection}>
-        <Typography variant="h2" className={s.postsTitle}>
-          Posts
-        </Typography>
-        {allPosts.length > 0 ? (
+        {allPosts?.length > 0 ? (
           <>
             <PostGrid posts={allPosts} />
             {isFetching && (

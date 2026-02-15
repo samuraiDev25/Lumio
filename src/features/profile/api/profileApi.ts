@@ -6,6 +6,7 @@ export const profileApi = baseApi.injectEndpoints({
     getUserProfile: builder.query<UserProfile, string>({
       query: (userId) => ({
         url: `/api/v1/profile/${userId}`,
+        method: 'GET',
       }),
       providesTags: (result, error, userId) => [
         { type: 'Profile', id: userId },
@@ -15,4 +16,3 @@ export const profileApi = baseApi.injectEndpoints({
 });
 
 export const { useGetUserProfileQuery } = profileApi;
-

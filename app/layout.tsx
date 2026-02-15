@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.scss';
 import { Providers } from '@/app/Providers';
 import { BaseLayout } from '@/app/BaseLayout';
+import { ReactNode } from 'react';
 
 const inter = Inter({
   subsets: ['latin', 'cyrillic'],
@@ -17,14 +18,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modal,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
+  modal: ReactNode;
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable}`}>
         <Providers>
-          <BaseLayout>{children}</BaseLayout>
+          <BaseLayout>
+            {children}
+            {modal}
+          </BaseLayout>
         </Providers>
       </body>
     </html>

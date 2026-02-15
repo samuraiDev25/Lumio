@@ -5,7 +5,7 @@
   flex: 0 0 clamp(240px, 45vw, 490px); /* ширина меняется от 240 до 490 */
   aspect-ratio: 490 / 562;             /* сохраняем пропорции */
   height: auto;                         /* высоту даём через aspect-ratio */
-  overflow: hidden;
+  position: relative;
 
 }
 
