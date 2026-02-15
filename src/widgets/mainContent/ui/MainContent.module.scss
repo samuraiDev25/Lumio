@@ -1,6 +1,5 @@
-.container {
-  width: 100%;
-}
+@use '../../../shared/styles/colors';
+@use '../../../shared/styles/typography';
 
 .main {
   display: flex;
@@ -8,7 +7,7 @@
   align-items: center;
 
   width: 100%;
-  margin-top: 30px;
+  margin-top: -30px;
 }
 
 .users-count-wrapper {
@@ -25,9 +24,8 @@
 
   width: 100%;
   max-width: 972px;
-
+  //  justify-content: center;
   gap: 36px 12px;
-  justify-content: center;
 }
 
 .no-posts {
@@ -40,7 +38,21 @@
 
   padding: 60px 0;
 
+  color: var(--color-dark-100);
   font-size: 1.2rem;
-  color: #808080;
   text-align: center;
+}
+
+
+.container {
+  width: 100%;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  margin-top: 30px;
 }
