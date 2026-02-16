@@ -17,6 +17,7 @@ import { changeError } from '@/shared/api/baseSlice';
 import { useAppDispatch } from '@/shared/hooks';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useRecoveryPasswordMutation } from '@/features/auth/api/authApi';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 export const PasswordRecovery = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -32,7 +33,7 @@ export const PasswordRecovery = () => {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<RecoveryPasswordType>({
     defaultValues: {
       email: '',
@@ -44,7 +45,7 @@ export const PasswordRecovery = () => {
 
   useEffect(() => {
     if (isForbidden) setIsForbidden(false);
-  }, [email, isForbidden]);
+  }, [email]);
 
   const handleFormSubmit: SubmitHandler<RecoveryPasswordType> = async (
     data,
@@ -74,10 +75,11 @@ export const PasswordRecovery = () => {
         recaptchaToken: token,
         baseUrl: `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/auth/new-password`,
       };
+
       await recoveryPassword(obj).unwrap();
       setModalOpen(true);
     } catch (error: unknown) {
-      const err = error as { status?: number };
+      const err = error as FetchBaseQueryError;
       if (err?.status === 403) {
         setIsForbidden(true);
       }
@@ -132,7 +134,7 @@ export const PasswordRecovery = () => {
           )}
           <div className={s.buttonBox}>
             <Button
-              disabled={!!errors.email || isLoading}
+              disabled={!isValid || isLoading}
               type={'submit'}
               className={s.btnLink1}
             >
