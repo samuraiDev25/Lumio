@@ -4,7 +4,7 @@ import { Button, Card, Dialog, TextField } from '@/shared/ui';
 import s from './PasswordRecovery.module.scss';
 import Link from 'next/link';
 import { AUTH_ROUTES } from '@/shared/lib/routes';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,12 +17,15 @@ import { changeError } from '@/shared/api/baseSlice';
 import { useAppDispatch } from '@/shared/hooks';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useRecoveryPasswordMutation } from '@/features/auth/api/authApi';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 export const PasswordRecovery = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [isForbidden, setIsForbidden] = useState<boolean>(false);
   const { executeRecaptcha } = useGoogleReCaptcha();
-  const [recoveryPassword] = useRecoveryPasswordMutation();
+  const [recoveryPassword, { isLoading, isSuccess }] =
+    useRecoveryPasswordMutation();
   const dispatch = useAppDispatch();
 
   const {
@@ -30,7 +33,7 @@ export const PasswordRecovery = () => {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<RecoveryPasswordType>({
     defaultValues: {
       email: '',
@@ -38,7 +41,11 @@ export const PasswordRecovery = () => {
     resolver: zodResolver(recoveryPasswordSchema),
     mode: 'onChange',
   });
-  const value = watch().email;
+  const email = watch('email');
+
+  useEffect(() => {
+    if (isForbidden) setIsForbidden(false);
+  }, [email]);
 
   const handleFormSubmit: SubmitHandler<RecoveryPasswordType> = async (
     data,
@@ -68,9 +75,14 @@ export const PasswordRecovery = () => {
         recaptchaToken: token,
         baseUrl: `${process.env.NEXT_PUBLIC_BASE_API_URL}api/v1/auth/new-password`,
       };
+
       await recoveryPassword(obj).unwrap();
       setModalOpen(true);
     } catch (error: unknown) {
+      const err = error as FetchBaseQueryError;
+      if (err?.status === 403) {
+        setIsForbidden(true);
+      }
       handleNetworkError({ error, dispatch });
     }
   };
@@ -88,7 +100,10 @@ export const PasswordRecovery = () => {
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <TextField
             {...register('email')}
-            errorMessage={errors.email && errors.email.message}
+            errorMessage={
+              (errors.email && errors.email.message) ||
+              (isForbidden ? "User with this email doesn't exist" : '')
+            }
             label={'Email'}
             placeholder={'Epam@epam.com'}
             type={'email'}
@@ -104,20 +119,22 @@ export const PasswordRecovery = () => {
             className={s.dialog}
           >
             <p className={s.modalText}>
-              We have sent a link to confirm your email to {value}
+              We have sent a link to confirm your email to {email}
             </p>
           </Dialog>
           <p className={s.text}>
             Enter your email address and we will send you further
             instructions{' '}
           </p>
-          <p className={s.introText}>
-            The link has been sent by email.
-            <br /> If you don’t receive an email send link again
-          </p>
+          {isSuccess && (
+            <p className={s.introText}>
+              The link has been sent by email.
+              <br /> If you don’t receive an email send link again
+            </p>
+          )}
           <div className={s.buttonBox}>
             <Button
-              disabled={!!errors.email}
+              disabled={!isValid || isLoading}
               type={'submit'}
               className={s.btnLink1}
             >
