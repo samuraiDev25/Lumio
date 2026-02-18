@@ -1,0 +1,15 @@
+.closeMainWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.closeDeleteBtnWrapper {
+  display: flex;
+  justify-content: end;
+  gap: 24px;
+}
+
+.deleteBtn {
+  width: 30% !important;
+}

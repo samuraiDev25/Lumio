@@ -1,0 +1,311 @@
+.container {
+  max-width: 100wh;
+  max-height: 100vh;
+  background: var(--color-dark-300);
+}
+
+.pageWrapper {
+  display: flex;
+  margin: 0 auto;
+  padding: 20px;
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: 12px;
+  }
+}
+@use '../../../shared/styles/colors';
+@use '../../../shared/styles/typography';
+
+.imageSection {
+  flex: 1;
+  max-width: 600px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.infoSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--color-light-100);
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.username {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.headerActions {
+  position: relative;
+}
+
+.moreButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-dark-300);
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.menuDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--color-dark-300);
+  border-radius: 2px;
+  z-index: 10;
+  min-width: 180px;
+}
+
+.menuButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #262626;
+  text-align: left;
+
+  &:hover {
+    background: #fafafa;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.description {
+  margin-bottom: 24px;
+}
+
+.descriptionHeader {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.commentAvatar {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.descriptionText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.commentUsername {
+  font-weight: 600;
+  font-size: 14px;
+  margin-right: 8px;
+}
+
+.captionText {
+  font-size: 14px;
+  color: #262626;
+}
+
+.timestamp {
+  font-size: 12px;
+  color: #8e8e8e;
+  margin-left: 48px;
+}
+
+.commentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.commentItem {
+  display: flex;
+  gap: 12px;
+}
+
+.commentContent {
+  flex: 1;
+}
+
+.commentText {
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+.commentMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #8e8e8e;
+}
+
+.likeCommentButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  color: #8e8e8e;
+}
+
+.footer {
+  padding: 16px;
+  border-top: 1px solid #efefef;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.actionsLeft {
+  display: flex;
+  gap: 16px;
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  color: #262626;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  &.liked {
+    color: var(--color-danger-500);
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.likes {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.postDate {
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+.commentInput {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  border: none;
+  padding: 8px 0;
+  font-size: 14px;
+  outline: none;
+}
+
+.editContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.closeEditButton {
+  background: none;
+  border: none;
+  color: var(--color-accent-500);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.editContent {
+  padding: 24px 16px;
+}
+
+.editTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.editTextarea {
+  width: 100%;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  resize: vertical;
+  outline: none;
+
+  &:focus {
+    border-color: #0095f6;
+  }
+}
+
+.charCounter {
+  text-align: right;
+  font-size: 12px;
+  color: #8e8e8e;
+  margin-top: 4px;
+}
+
+.editActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}

@@ -1,0 +1,81 @@
+@use '../../../../shared/styles/colors';
+@use '../../../../shared/styles/typography';
+
+
+.confirmationOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+  pointer-events: auto !important;
+}
+
+.confirmationModal {
+  background: var(--color-dark-300);
+  border: 2px solid var(--color-dark-100);
+  max-width: 486px;
+  width: 90%;
+  animation: slideIn 0.2s ease-out;
+
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.confirmationHeader {
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+  border-bottom: 1px solid var(--color-dark-100);
+  color: var(--color-light-100);
+}
+
+.confirmationTitle {
+  font-weight: 700;
+  line-height: 0.8;
+  font-size: 20px;
+
+}
+
+.confirmationContent {
+  padding: 30px 24px;
+  color: var(--color-light-100);
+  @include typography.uik-regular-text-16;
+}
+
+.confirmationActions {
+  display: flex;
+  gap: 24px;
+  justify-content: flex-end;
+  padding-bottom: 36px;
+  padding-right: 24px;
+}
+
+.confirmationButton {
+  max-width: 96px !important;
+  height: auto;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-16);
+}
+.closeEditPost {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}

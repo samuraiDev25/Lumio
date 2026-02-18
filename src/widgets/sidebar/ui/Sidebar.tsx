@@ -1,5 +1,5 @@
 'use client';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import s from './Sidebar.module.scss';
 import { SidebarItemType, SidebarProps } from './types';
@@ -21,6 +21,7 @@ import {
 import { SidebarItem } from './SidebarItem';
 import { LogOutButton } from '@/features/auth/ui/logout';
 import { SIDEBAR_ROUTES } from '@/shared/lib/routes';
+import { useMeQuery } from '@/features/auth/api/authApi';
 
 const mainItems: SidebarItemType[] = [
   {
@@ -81,19 +82,31 @@ export const Sidebar = ({
   style,
 }: SidebarProps) => {
   const pathname = usePathname();
+  const router = useRouter();
+  const { data: currentUser } = useMeQuery();
+  const items = mainItems.map((item) => {
+    if (item.id === 'myProfile' && currentUser?.userId) {
+      return {
+        ...item,
+        href: `${SIDEBAR_ROUTES.PROFILE}/${currentUser.userId}`,
+      };
+    }
+    return item;
+  });
   const activeItem =
     externalActiveItem ||
+    (pathname.startsWith('/profile') ? 'myProfile' : '') ||
     mainItems.find((item) => pathname === item.href)?.id ||
     '';
   const isDisabled = variant === 'disabled';
-
   const handleItemClick = (itemId: string) => {
     if (isDisabled) return;
 
-    const item = mainItems.find((i) => i.id === itemId);
+    const item = items.find((i) => i.id === itemId);
 
     if (item?.href) {
       console.log(`Навигация на страницу: ${item.href}`);
+      router.push(item.href);
     } else if (itemId === 'create') {
       console.log('Открыть модалку создания поста');
     }
@@ -105,7 +118,7 @@ export const Sidebar = ({
       <NavigationMenu.Root orientation="vertical">
         <nav className={s['nav-container']}>
           <NavigationMenu.List className={s['nav-list']}>
-            {mainItems.map((item) => (
+            {items.map((item) => (
               <SidebarItem
                 key={item.id}
                 item={item}
@@ -139,5 +152,5 @@ export const Sidebar = ({
         </nav>
       </NavigationMenu.Root>
     </aside>
-  )
+  );
 };

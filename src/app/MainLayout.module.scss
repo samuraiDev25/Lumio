@@ -1,12 +1,11 @@
 .main-layout {
   display: flex;
   width: 100%;
+  --sidebar-width: 220px;
 }
 
 .content {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
+  padding: 24px;
+  margin-left: var(--sidebar-width);
 }

@@ -1,2 +1,0 @@
-export { PostGrid } from './PostGrid';
-

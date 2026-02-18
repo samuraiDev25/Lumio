@@ -1,9 +1,9 @@
 'use client';
 
-export function Create() {
-  return (
-    <>
-      <h1 style={{ marginLeft: '15rem' }}>Create PBL</h1>
-    </>
-  );
-}
+import { useState } from 'react';
+import { CreatePostDialog } from '@/entities/post';
+
+export const Create = () => {
+  const [open, setOpen] = useState(true);
+  return <CreatePostDialog open={open} onOpenChange={setOpen} />;
+};
