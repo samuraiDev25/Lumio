@@ -222,7 +222,6 @@ export const CreatePostDialog = ({ open, onOpenChange }: Props) => {
               )}
             </div>
 
-            {/* Просто чтобы title фигурировал в дереве (можно убрать) */}
             <Dialog.Title style={{ display: 'none' }}>{title}</Dialog.Title>
           </Dialog.Content>
         </Dialog.Portal>
@@ -236,7 +235,6 @@ export const CreatePostDialog = ({ open, onOpenChange }: Props) => {
           onOpenChange(false);
         }}
         onSaveDraft={() => {
-          // MVP: просто закрыть как будто сохранили
           toast.info('Draft saved (stub)');
           resetAll();
           onOpenChange(false);
