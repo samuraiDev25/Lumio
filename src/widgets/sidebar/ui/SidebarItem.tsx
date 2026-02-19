@@ -1,69 +1,67 @@
 'use client';
 
-import * as NavigationMenu from '@radix-ui/react-navigation-menu';
+import React, { memo } from 'react';
+import Link from 'next/link';
 import { SidebarItemProps } from './types';
 import s from './Sidebar.module.scss';
-import React from 'react';
+import { clsx } from 'clsx';
 
-export const SidebarItem = ({
-  item: { iconOutline: IconOutline, iconFilled: IconFilled, label, href },
-  isActive = false,
-  isDisabled = false,
-  isLogout = false,
-  onClickAction,
-  className = '',
-}: SidebarItemProps) => {
-  const IconComponent = isActive && IconFilled ? IconFilled : IconOutline;
+export const SidebarItem = memo(
+  ({
+    item: { iconOutline: IconOutline, iconFilled: IconFilled, label, href, id },
+    isActive = false,
+    isDisabled = false,
+    isLogout = false,
+    onClickAction,
+    className = '',
+  }: SidebarItemProps) => {
+    const IconComponent = isActive && IconFilled ? IconFilled : IconOutline;
 
-  const handleClick = (e: React.MouseEvent) => {
-    if (isDisabled) {
-      e.preventDefault();
-      return;
-    }
-    if (href === '#') e.preventDefault();
-    onClickAction?.();
-  };
+    const isAction = id === 'create' || id === 'search';
 
-  const commonProps = {
-    className: `${s['nav-link']} ${isActive ? s.active : ''} ${isDisabled ? s.disabled : ''} ${isLogout ? s.logout : ''} ${className}`,
-    'aria-disabled': isDisabled,
-    tabIndex: isDisabled ? -1 : 0,
-  };
+    const classNames = clsx(
+      s['nav-link'],
+      isActive && s.active,
+      isDisabled && s.disabled,
+      isLogout && s.logout,
+      className,
+    );
 
-  const content = (
-    <>
-      <div className={s['icon-container']}>
-        {' '}
-        <IconComponent className={s.icon} />
-      </div>
-      <span className={s['text-container']}>{label}</span>
-    </>
-  );
+    const content = (
+      <>
+        <div className={s['icon-container']}>
+          <IconComponent className={s.icon} />
+        </div>
+        <span className={s['text-container']}>{label}</span>
+      </>
+    );
 
-  return (
-    <NavigationMenu.Item>
-      {href ? (
-        <NavigationMenu.Link asChild>
-          <a
+    return (
+      <li className={s['nav-item']}>
+        {href && !isAction ? (
+          <Link
             href={isDisabled ? '#' : href}
-            {...commonProps}
-            onClick={handleClick}
+            className={classNames}
+            onClick={() => onClickAction?.()}
           >
             {content}
-          </a>
-        </NavigationMenu.Link>
-      ) : (
-        <NavigationMenu.Link asChild>
+          </Link>
+        ) : (
           <button
             type="button"
             disabled={isDisabled}
-            {...commonProps}
-            onClick={handleClick}
+            className={classNames}
+            onClick={(e) => {
+              e.preventDefault();
+              onClickAction?.();
+            }}
           >
             {content}
           </button>
-        </NavigationMenu.Link>
-      )}
-    </NavigationMenu.Item>
-  );
-};
+        )}
+      </li>
+    );
+  },
+);
+
+SidebarItem.displayName = 'SidebarItem';
