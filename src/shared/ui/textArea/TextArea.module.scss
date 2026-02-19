@@ -2,8 +2,8 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  width: 284px;
-  height: 84px;
+  //width: 284px; Не надо задавать жесткие ограничения
+  //height: 84px; Не надо задавать жесткие ограничения
   font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
@@ -30,7 +30,7 @@
 .textAreaWrapper {
   position: relative;
   box-sizing: border-box;
-  width: 284px;
+  //width: 284px; Не надо задавать жесткие ограничения
   min-height: 84px;
   background: #171717;
   border: 1px solid #4C4C4C;

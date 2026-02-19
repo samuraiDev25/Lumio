@@ -25,7 +25,13 @@ export const Modal = ({
   ...rest
 }: ModalProps) => {
   return (
-    <Dialog.Root open={open} onOpenChange={onClose} {...rest}>
+    <Dialog.Root
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) onClose?.();
+      }}
+      {...rest}
+    >
       <Dialog.Portal>
         <Dialog.Overlay className={s.Overlay} />
         <Dialog.Content

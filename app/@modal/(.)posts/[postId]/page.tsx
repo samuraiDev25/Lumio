@@ -21,7 +21,7 @@ export default async function InterceptedPostModal({ params }: Props) {
   });
 
   if (!post) {
-    return null;
+    notFound();
   }
 
   return <InterceptedPostModalClient post={post} />;

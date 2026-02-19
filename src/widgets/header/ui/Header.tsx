@@ -36,25 +36,6 @@ export const Header = () => {
           >
             Clean BD
           </Button>
-          {/*<Button*/}
-          {/*  variant={'outline'}*/}
-          {/*  style={{ marginLeft: '15px' }}*/}
-          {/*  onClick={() => {*/}
-          {/*    fetch('https://lumio.su/api/v1/testing/create-users-with-posts', {*/}
-          {/*      method: 'POST',*/}
-          {/*      headers: {*/}
-          {/*        'Content-Type': 'application/json',*/}
-          {/*        Accept: 'application/json',*/}
-          {/*      },*/}
-          {/*    }).then((responce) => {*/}
-          {/*      if (responce.status === 204) {*/}
-          {/*        console.log('Users with posts created successfully');*/}
-          {/*      }*/}
-          {/*    });*/}
-          {/*  }}*/}
-          {/*>*/}
-          {/*  add test posts*/}
-          {/*</Button>*/}
           <div className={s.selectBox}>
             {data && (
               <div className={s.bell}>
@@ -72,6 +53,11 @@ export const Header = () => {
                     <Link href={AUTH_ROUTES.SIGN_UP}>Sign up</Link>
                   </Button>
                 </>
+              )}
+              {data?.email && (
+                <Link href="/posts/999999999" scroll={false}>
+                  Open missing post
+                </Link>
               )}
             </div>
           </div>
