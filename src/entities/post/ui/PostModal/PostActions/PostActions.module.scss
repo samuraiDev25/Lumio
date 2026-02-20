@@ -1,0 +1,36 @@
+@use '../../../../../shared/styles/colors';
+@use '../../../../../shared/styles/typography';
+
+.footer {
+  border-top: 1px solid var(--color-dark-100);
+  height: clamp(56px, 20vh, 167px);
+  flex: 0 0 auto;
+  margin-top: auto;
+}
+.actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 24px;
+}
+.actionsLeft {
+  display: flex;
+  gap: 24px;
+}
+.actionButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.likes {
+  font-weight: 700;
+  padding: 5px 24px;
+
+}
+.timeReal {
+  border-bottom: 1px solid var(--color-dark-100);
+  font-size: var(--font-size-12);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-light-900);
+  padding: 0 24px 7px;
+}

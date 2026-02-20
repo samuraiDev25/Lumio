@@ -1,1 +1,1 @@
-export { AuthorizedMainPage as default } from '@/pages_fsd/main';
+export { MainPage as default } from '../../../src/widgets/mainContent/ui/MainContent';
