@@ -6,7 +6,6 @@ import { ArrowIosBackOutline, ArrowIosForwardOutline } from '@/shared/ui/icons';
 import { Post } from '@/entities/post/model/types/postApi.types';
 import { getRelativeTime } from '@/shared/lib';
 import s from './PostCard.module.scss';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -36,7 +35,6 @@ export const PostCard = ({ post }: PostCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const [isImageHovered, setIsImageHovered] = useState(false);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const router = useRouter();
 
   const images = post.postFiles || [];
   const description = post.description || '';
@@ -83,17 +81,15 @@ export const PostCard = ({ post }: PostCardProps) => {
               key={post.id}
               href={`/posts/${post.id}`}
               scroll={false}
-              style={{ textDecoration: 'none' }}
+              className={s['image-link']}
             >
               <Image
                 src={images[currentSlideIndex].url}
                 alt="User posts image"
-                width={234}
-                height={200}
+                fill={true}
+                sizes="234px"
                 className={s['image-element']}
-                onClick={() => router.push(`/posts/${post.id}`)}
                 priority={true}
-                style={{ objectFit: 'cover' }}
               />
             </Link>
           ) : (
