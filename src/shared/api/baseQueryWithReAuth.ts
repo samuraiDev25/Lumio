@@ -5,24 +5,44 @@ import {
   fetchBaseQuery,
   FetchBaseQueryError,
 } from '@reduxjs/toolkit/query';
+import { jwtDecode } from 'jwt-decode';
 
 const mutex = new Mutex();
+
+const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
+
+// С токеном — для обычных запросов
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_BASE_API_URL,
+  baseUrl,
   prepareHeaders: (headers) => {
     const token = localStorage.getItem('accessToken');
-    // Без этой проверки при token = null отправлялось бы "Bearer null"
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }
-    // headers.set('Content-Type', 'multipart/form-data');
     return headers;
   },
   credentials: 'include',
 });
-const isAuthUrl = (args: string | FetchArgs) => {
-  const url = typeof args === 'string' ? args : args.url;
 
+// Без токена — только для рефреша
+const baseQueryWithoutAuth = fetchBaseQuery({
+  baseUrl,
+  credentials: 'include',
+});
+
+const isTokenExpired = (token: string | null): boolean => {
+  if (!token) return true;
+  try {
+    const decoded: { exp?: number } = jwtDecode(token);
+    if (!decoded.exp) return true;
+    return decoded.exp < Date.now() / 1000 + 10;
+  } catch {
+    return true;
+  }
+};
+
+const isAuthUrl = (args: string | FetchArgs): boolean => {
+  const url = typeof args === 'string' ? args : args.url;
   return (
     url.includes('/api/v1/auth/refresh-token') ||
     url.includes('/api/v1/auth/login') ||
@@ -35,50 +55,68 @@ export const baseQueryWithReauth: BaseQueryFn<
   unknown,
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
-  // wait until the mutex is available without locking it
-  await mutex.waitForUnlock(); // Проверка заблокирован ли Mutex другим потоком
+  if (!isAuthUrl(args)) {
+    const token = localStorage.getItem('accessToken');
+
+    // Только если токен есть но истёк — не трогаем если токена нет вообще
+    if (token && isTokenExpired(token)) {
+      if (mutex.isLocked()) {
+        await mutex.waitForUnlock();
+      } else {
+        const release = await mutex.acquire();
+        try {
+          // Double-check после захвата mutex
+          if (isTokenExpired(localStorage.getItem('accessToken'))) {
+            const refreshResult = await baseQueryWithoutAuth(
+              { url: '/api/v1/auth/refresh-token', method: 'POST' },
+              api,
+              extraOptions,
+            );
+            if (refreshResult.data) {
+              const data = refreshResult.data as { accessToken?: string };
+              if (data?.accessToken) {
+                localStorage.setItem('accessToken', data.accessToken);
+              }
+            }
+          }
+        } finally {
+          release();
+        }
+      }
+    }
+  }
+
+  await mutex.waitForUnlock();
   let result = await baseQuery(args, api, extraOptions);
 
-  if (result.error && result.error.status === 401) {
-    if (isAuthUrl(args)) return result;
-
-    // checking whether the mutex is locked
-    if (!mutex.isLocked()) {
+  // Реактивная обработка — если всё равно получили 401
+  if (result.error && result.error.status === 401 && !isAuthUrl(args)) {
+    if (mutex.isLocked()) {
+      await mutex.waitForUnlock();
+      result = await baseQuery(args, api, extraOptions);
+    } else {
       const release = await mutex.acquire();
-
       try {
-        const refreshResult = (await baseQuery(
-          {
-            url: '/api/v1/auth/refresh-token',
-            method: 'POST',
-          },
+        const refreshResult = await baseQueryWithoutAuth(
+          { url: '/api/v1/auth/refresh-token', method: 'POST' },
           api,
           extraOptions,
-          // eslint-disable-next-line
-        )) as any;
-        if (refreshResult.error) return result;
-        const data = refreshResult.data as { accessToken?: string } | undefined;
-        if (data?.accessToken) {
-          localStorage.setItem('accessToken', data.accessToken);
-          result = await baseQuery(args, api, extraOptions);
-        }
+        );
 
         if (refreshResult.data) {
-          localStorage.setItem('accessToken', refreshResult.data.accessToken);
-          // retry the initial query
-          console.log(refreshResult);
-          result = await baseQuery(args, api, extraOptions);
+          const data = refreshResult.data as { accessToken?: string };
+          if (data?.accessToken) {
+            localStorage.setItem('accessToken', data.accessToken);
+            // Повторяем оригинальный запрос один раз
+            result = await baseQuery(args, api, extraOptions);
+          }
         } else {
-          return {
-            error: { status: 401, data: { error: 'Refresh token failed' } },
-          };
+          // Рефреш не удался — чистим токен, редирект через middleware
+          localStorage.removeItem('accessToken');
         }
       } finally {
         release();
       }
-    } else {
-      await mutex.waitForUnlock();
-      result = await baseQuery(args, api, extraOptions);
     }
   }
 
