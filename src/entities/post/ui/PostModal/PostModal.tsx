@@ -4,18 +4,11 @@ import { ReactNode, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import Image from 'next/image';
 import s from './PostModal.module.scss';
-import {
-  BookmarkOutline,
-  CloseOutline,
-  Edit2Outline,
-  HeartOutline,
-  PaperPlaneOutline,
-  TrashOutline,
-} from '@/shared/ui/icons';
+import { CloseOutline } from '@/shared/ui/icons';
 import { Post } from '@/entities/post/model/types/postApi.types';
-import { ConfirmClosePost } from '@/entities/post/ui/confirmClosePost/ConfirmClosePost';
+import { ConfirmClosePost } from '@/entities/post/ui/ConfirmClosePost/ConfirmClosePost';
 import { useProtectedRoute } from '@/shared/hooks/useProtectedRoute';
-import { formatDate, formatDateFull } from '@/entities/post/lib/formatDate';
+import { formatDate } from '@/entities/post/lib/formatDate';
 import { useImageNavigation } from '@/entities/post/model/hooks/useImageNavigation';
 import { PostImage } from '@/entities/post/ui/PostModal/PostImage/PostImage';
 import { DeletePostModal } from '@/entities/post';
@@ -23,8 +16,8 @@ import { useMeQuery } from '@/features/auth/api/authApi';
 import { EditPostForm, useEditPost } from '@/features/posts/edit-post';
 import { PostHeader } from '@/entities/post/ui/PostModal/PostHeader/PostHeader';
 import { CommentItem } from '@/entities/post/ui/PostModal/CommentItem/CommentItem';
-import { useAddComment } from '@/features/posts/add-comment/model/useAddComment';
-import { CommentForm } from '@/features/posts/add-comment/ui/CommentForm';
+import { PostActions } from '@/entities/post/ui/PostModal/PostActions/PostActions';
+import { MenuDropdown } from '@/entities/post/ui/PostModal/MenuDropdown/MenuDropdown';
 
 type Props = {
   children?: ReactNode;
@@ -99,9 +92,6 @@ export const PostModal = ({
     setIsLiked((prev) => !prev);
   };
 
-  const timeReal = formatDateFull(new Date());
-  const { comments, newComment, addComment, updateComment } = useAddComment();
-
   const handleCloseEditing = () => {
     if (hasUnsavedChanges()) {
       setIsClosePost(true);
@@ -123,7 +113,16 @@ export const PostModal = ({
   const handleCancelClose = () => {
     setIsClosePost(false);
   };
-
+  const handleClickOutside = (e: Event) => {
+    if (isEditing) {
+      e.preventDefault();
+      if (description !== (post.description || '')) {
+        setIsClosePost(true);
+      } else {
+        cancelEditing();
+      }
+    }
+  };
   return (
     <Dialog.Root
       open={actualOpen}
@@ -142,16 +141,7 @@ export const PostModal = ({
         <Dialog.Overlay className={s.overlay} />
         <Dialog.Content
           className={`${s.content} ${isClosePost ? s.modalDisabled : ''}`}
-          onPointerDownOutside={(e) => {
-            if (isEditing) {
-              e.preventDefault();
-              if (description !== (post.description || '')) {
-                setIsClosePost(true);
-              } else {
-                cancelEditing();
-              }
-            }
-          }}
+          onPointerDownOutside={handleClickOutside}
         >
           <Dialog.Title className={s.dialogTitle}>
             Post by {userName}
@@ -170,7 +160,6 @@ export const PostModal = ({
 
             {/* Правая часть - информация */}
             <div className={s.infoSection}>
-              {/* Комментарии */}
               {isEditing ? (
                 <EditPostForm
                   userName={userName}
@@ -191,24 +180,10 @@ export const PostModal = ({
                       isMenuOpen={isMenuOpen}
                       setIsMenuOpen={() => setIsMenuOpen(!isMenuOpen)}
                     >
-                      <div className={s.menuDropdown}>
-                        <button
-                          onClick={handleEditPost}
-                          className={s.menuButton}
-                        >
-                          <Edit2Outline />
-                          EditPost
-                        </button>
-                        {/*=======================================================================================*/}
-                        <button
-                          onClick={onCloseOpenDeleteModal}
-                          className={s.menuButton}
-                        >
-                          <TrashOutline />
-                          Delete Post
-                        </button>
-                        {/*=======================================================================================*/}
-                      </div>
+                      <MenuDropdown
+                        onEditPostAction={handleEditPost}
+                        onDeletePostAction={onCloseOpenDeleteModal}
+                      />
                     </PostHeader>
                     <div className={s.scrollArea}>
                       <div className={s.descriptionContainer}>
@@ -247,7 +222,6 @@ export const PostModal = ({
                           likes={12}
                           isLiked={false}
                           onLikeAction={handleCountLikesPost}
-                          handleCountLikesPost={handleCountLikesPost}
                         />
                         <CommentItem
                           userName={'anotherUserName2'}
@@ -259,45 +233,11 @@ export const PostModal = ({
                           likes={5}
                           isLiked={false}
                           onLikeAction={handleCountLikesPost}
-                          handleCountLikesPost={handleCountLikesPost}
                         />
                       </div>
                     </div>
                   </div>
-                  <div className={s.footer}>
-                    {/* Иконки действий */}
-                    <div className={s.actions}>
-                      <div className={s.actionsLeft}>
-                        <button className={s.actionButton} aria-label="Like">
-                          <HeartOutline />
-                        </button>
-                        <button className={s.actionButton} aria-label="Share">
-                          <PaperPlaneOutline />
-                        </button>
-                      </div>
-                      <button className={s.actionButton} aria-label="Save">
-                        <BookmarkOutline />
-                      </button>
-                    </div>
-
-                    {/* Лайки */}
-                    <div className={s.likes}>
-                      <span className={s.likesCount}>{likes} Likes</span>
-                    </div>
-                    <div className={s.timeReal}>
-                      <div>{timeReal}</div>
-                    </div>
-
-                    {/* Поле ввода комментария */}
-                    {isAuthorized && (
-                      <CommentForm
-                        value={newComment}
-                        onChangeAction={updateComment}
-                        onSubmitAction={addComment}
-                        placeholder={'Add a Comment...'}
-                      />
-                    )}
-                  </div>
+                  <PostActions likes={likes} isAuthorized={isAuthorized} />
                 </>
               )}
             </div>
