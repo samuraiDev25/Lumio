@@ -146,7 +146,7 @@ export function UserProfilePage({ userId }: UserProfilePageProps) {
               <Button
                 variant="secondary"
                 size="md"
-                onClick={() => router.push(PROFILE_ROUTES.SETTINGS)}
+                onClick={() => router.push(`/profile/fill/${userId}`)}
                 className={s.settingsButton}
               >
                 Profile Setting
