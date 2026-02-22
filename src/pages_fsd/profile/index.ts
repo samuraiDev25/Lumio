@@ -1,1 +1,2 @@
-export { UserProfilePage } from './UserProfilePage/UserProfilePage';
+export { UserProfilePage } from '@/pages_fsd/profile/ui/UserProfilePage/UserProfilePage';
+export { GeneralInformation } from '@/pages_fsd/profile/ui/GeneralInformation/GeneralInformation';

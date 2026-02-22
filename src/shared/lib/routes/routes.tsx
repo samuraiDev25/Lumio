@@ -26,7 +26,7 @@ export const SIDEBAR_ROUTES = {
 };
 
 export const PROFILE_ROUTES = {
-  SETTINGS: `${SIDEBAR_ROUTES.PROFILE}/settings`,
+  SETTINGS: (userId: string) => `${SIDEBAR_ROUTES.PROFILE}/fill/${userId}`,
 };
 
 // example
