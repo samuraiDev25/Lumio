@@ -20,41 +20,55 @@ async function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-export async function getCroppedImageBlob(
-  imageSrc: string,
-  crop: CropAreaPixels,
+export async function getCroppedFilteredImageBlob(
+  dataUrl: string,
+  crop: CropAreaPixels | null | undefined,
   mimeType: string,
-  quality = 0.92,
+  cssFilter: string, // например: 'grayscale(1)' или 'none'
 ): Promise<Blob> {
-  const image = await loadImage(imageSrc);
+  const image = await loadImage(dataUrl);
 
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Canvas context is not available');
 
-  canvas.width = crop.width;
-  canvas.height = crop.height;
+  if (!ctx) {
+    throw new Error('Canvas 2D context not available');
+  }
+
+  const sx = crop?.x ?? 0;
+  const sy = crop?.y ?? 0;
+  const sWidth = crop?.width ?? image.width;
+  const sHeight = crop?.height ?? image.height;
+
+  canvas.width = Math.max(1, Math.round(sWidth));
+  canvas.height = Math.max(1, Math.round(sHeight));
+
+  ctx.filter = cssFilter && cssFilter !== 'none' ? cssFilter : 'none';
 
   ctx.drawImage(
     image,
-    crop.x,
-    crop.y,
-    crop.width,
-    crop.height,
+    sx,
+    sy,
+    sWidth,
+    sHeight,
     0,
     0,
-    crop.width,
-    crop.height,
+    canvas.width,
+    canvas.height,
   );
 
-  return new Promise((resolve, reject) => {
+  ctx.filter = 'none';
+
+  const quality =
+    mimeType === 'image/jpeg' || mimeType === 'image/webp' ? 0.92 : undefined;
+
+  const blob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
-      (blob) => {
-        if (!blob) return reject(new Error('Canvas is empty'));
-        resolve(blob);
-      },
+      (b) => (b ? resolve(b) : reject(new Error('Failed to create blob'))),
       mimeType,
       quality,
     );
   });
+
+  return blob;
 }

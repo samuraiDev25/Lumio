@@ -10,8 +10,6 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  min-width: 492px;
-  max-width: calc(100vw - 24px);
   min-height: 564px;
   background: var(--color-dark-100);
   color: var(--color-light-100);
@@ -61,6 +59,7 @@
 
 .body {
   background: var(--color-dark-100);
+  min-width: 492px;
 }
 
 .selectBody {
@@ -317,6 +316,7 @@
 .filtersLayout {
   display: grid;
   grid-template-columns: 1fr 420px;
+  width: 972px;
 }
 
 .filtersPanel {
@@ -359,7 +359,8 @@
 
 .publicationLayout {
   display: grid;
-  grid-template-columns: 1fr 520px;
+  grid-template-columns: 1fr 480px;
+  width: 972px;
 }
 
 .publicationPanel {
