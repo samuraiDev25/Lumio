@@ -1,11 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import {
-  ClassNames,
-  DateRange,
-  ModifiersClassNames,
-} from 'react-day-picker';
+import React, { useState } from 'react';
+import { ClassNames, DateRange, ModifiersClassNames } from 'react-day-picker';
 import * as Popover from '@radix-ui/react-popover';
 import s from './DatePicker.module.scss';
 import 'react-day-picker/dist/style.css';
@@ -34,9 +30,9 @@ type DatePickerProps = {
   reverseYears?: boolean;
   labelTitle?: string;
   value?: Date;
-  onChange?: (value: Date | undefined) => void;
+  onChangeAction?: (value: Date | undefined) => void;
   rangeValue?: DateRange;
-  onRangeChange?: (value: DateRange | undefined) => void;
+  onRangeChangeAction?: (value: DateRange | undefined) => void;
 };
 export const DatePicker = ({
   mode,
@@ -55,9 +51,9 @@ export const DatePicker = ({
   reverseYears,
   labelTitle,
   value,
-  onChange,
+  onChangeAction,
   rangeValue,
-  onRangeChange,
+  onRangeChangeAction,
 }: DatePickerProps) => {
   const [open, setOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<Date | undefined>();
@@ -66,15 +62,29 @@ export const DatePicker = ({
   const [error, setError] = useState<string | null>(null);
 
   const today = new Date();
+  const isMultipleControlled = mode === 'multiple' && !!onChangeAction;
+  const isRangeControlled = mode === 'range' && !!onRangeChangeAction;
+  const effectiveSelectedDay = isMultipleControlled ? value : selectedDay;
+  const effectiveSelectedWeek = isMultipleControlled
+    ? value
+      ? getWeekForDay(value)
+      : []
+    : selectedWeek;
+  const effectiveSelectedRange = isRangeControlled ? rangeValue : selectedRange;
+
   const handleMultipleSelect = (day: Date, week: Date[]) => {
-    setSelectedDay(day);
-    setSelectedWeek(week);
-    onChange?.(day);
+    if (!isMultipleControlled) {
+      setSelectedDay(day);
+      setSelectedWeek(week);
+    }
+    onChangeAction?.(day);
   };
 
   const handleRangeSelect = (range: DateRange | undefined) => {
-    setSelectedRange(range);
-    onRangeChange?.(range);
+    if (!isRangeControlled) {
+      setSelectedRange(range);
+    }
+    onRangeChangeAction?.(range);
   };
 
   const wrapperClassName = [s.wrapper, className].filter(Boolean).join(' ');
@@ -97,26 +107,6 @@ export const DatePicker = ({
   const resolvedLabelTitle =
     labelTitle ?? (mode === 'multiple' ? 'Date' : 'Date range');
 
-  useEffect(() => {
-    if (mode !== 'multiple') return;
-    if (value) {
-      setSelectedDay(value);
-      setSelectedWeek(getWeekForDay(value));
-    } else {
-      setSelectedDay(undefined);
-      setSelectedWeek([]);
-    }
-  }, [mode, value]);
-
-  useEffect(() => {
-    if (mode !== 'range') return;
-    if (rangeValue) {
-      setSelectedRange(rangeValue);
-    } else {
-      setSelectedRange(undefined);
-    }
-  }, [mode, rangeValue]);
-
   return (
     <div className={wrapperClassName}>
       <label className={resolvedLabelClassName}>{resolvedLabelTitle}</label>
@@ -124,8 +114,8 @@ export const DatePicker = ({
         <Popover.Trigger asChild>
           <button className={resolvedInputClassName} disabled={disabled}>
             {mode === 'multiple'
-              ? formatDate(selectedDay)
-              : formatRange(selectedRange)}
+              ? formatDate(effectiveSelectedDay)
+              : formatRange(effectiveSelectedRange)}
             <span className={s.icon}>
               {open ? <Calendar /> : <CalendarOutline />}
             </span>
@@ -141,7 +131,7 @@ export const DatePicker = ({
               (mode === 'multiple' ? (
                 <DatePickerMultipleMode
                   today={today}
-                  selectedWeek={selectedWeek}
+                  selectedWeek={effectiveSelectedWeek}
                   onSelectAction={handleMultipleSelect}
                   onErrorAction={setError}
                   allowPastDates={allowPastDates}
@@ -155,7 +145,7 @@ export const DatePicker = ({
               ) : (
                 <DatePickerRangeMode
                   today={today}
-                  selectedRange={selectedRange}
+                  selectedRange={effectiveSelectedRange}
                   onSelectAction={handleRangeSelect}
                   onErrorAction={setError}
                   allowPastDates={allowPastDates}
