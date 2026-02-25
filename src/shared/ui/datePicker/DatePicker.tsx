@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ClassNames,
   DateRange,
@@ -11,7 +11,7 @@ import s from './DatePicker.module.scss';
 import 'react-day-picker/dist/style.css';
 import { Calendar, CalendarOutline } from '@/shared/ui/icons';
 import './datePickerMode/DatePicker.global.scss';
-import { formatDate, formatRange } from './utilsDate';
+import { formatDate, formatRange, getWeekForDay } from './utilsDate';
 import { DatePickerRangeMode } from './datePickerMode/DatePickerRangeMode';
 import { DatePickerMultipleMode } from './datePickerMode/DatePickerMultipleMode';
 import { CaptionLayout } from './types';
@@ -33,6 +33,10 @@ type DatePickerProps = {
   endMonth?: Date;
   reverseYears?: boolean;
   labelTitle?: string;
+  value?: Date;
+  onChange?: (value: Date | undefined) => void;
+  rangeValue?: DateRange;
+  onRangeChange?: (value: DateRange | undefined) => void;
 };
 export const DatePicker = ({
   mode,
@@ -50,6 +54,10 @@ export const DatePicker = ({
   endMonth,
   reverseYears,
   labelTitle,
+  value,
+  onChange,
+  rangeValue,
+  onRangeChange,
 }: DatePickerProps) => {
   const [open, setOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<Date | undefined>();
@@ -61,10 +69,12 @@ export const DatePicker = ({
   const handleMultipleSelect = (day: Date, week: Date[]) => {
     setSelectedDay(day);
     setSelectedWeek(week);
+    onChange?.(day);
   };
 
   const handleRangeSelect = (range: DateRange | undefined) => {
     setSelectedRange(range);
+    onRangeChange?.(range);
   };
 
   const wrapperClassName = [s.wrapper, className].filter(Boolean).join(' ');
@@ -86,6 +96,26 @@ export const DatePicker = ({
     .join(' ');
   const resolvedLabelTitle =
     labelTitle ?? (mode === 'multiple' ? 'Date' : 'Date range');
+
+  useEffect(() => {
+    if (mode !== 'multiple') return;
+    if (value) {
+      setSelectedDay(value);
+      setSelectedWeek(getWeekForDay(value));
+    } else {
+      setSelectedDay(undefined);
+      setSelectedWeek([]);
+    }
+  }, [mode, value]);
+
+  useEffect(() => {
+    if (mode !== 'range') return;
+    if (rangeValue) {
+      setSelectedRange(rangeValue);
+    } else {
+      setSelectedRange(undefined);
+    }
+  }, [mode, rangeValue]);
 
   return (
     <div className={wrapperClassName}>
