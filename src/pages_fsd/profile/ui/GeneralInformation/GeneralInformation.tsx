@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, useCallback, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import s from './GeneralInformation.module.scss';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -13,13 +13,15 @@ import { Button, DatePicker, TextField } from '@/shared/ui';
 import { useFillProfileMutation } from '@/pages_fsd/profile/api/profileApi';
 import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useParams } from 'next/navigation';
+import { useGetUserProfileQuery } from '@/entities/profile/api/profileApi';
 
 const COUNTRIES = [
   'Belarus',
   'Germany',
   'France',
+  'Russia',
   'Italy',
   'Spain',
   'Ukraine',
@@ -36,6 +38,7 @@ const CITIES = [
   'Minsk',
   'Berlin',
   'Paris',
+  'Moscow',
   'Rome',
   'Madrid',
   'Kyiv',
@@ -55,13 +58,17 @@ export function GeneralInformation() {
 
   const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
   const { userId } = useParams<{ userId: string }>();
-  console.log('userId type:', typeof userId, 'value:', userId);
   const [fillProfile] = useFillProfileMutation();
+  const { data: profile } = useGetUserProfileQuery(userId, {
+    skip: !userId,
+  });
   const dispatch = useAppDispatch();
   const {
     register,
     handleSubmit,
     setError,
+    reset,
+    control,
     formState: { errors, isSubmitting, isValid },
   } = useForm<GeneralInformationSchema>({
     resolver: zodResolver(generalInformationSchema),
@@ -77,6 +84,42 @@ export function GeneralInformation() {
     },
   });
 
+  const normalizeDateString = useCallback(
+    (value: string | null | undefined) => {
+      if (!value) return '';
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+      const match = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(value);
+      if (!match) return value;
+      const [, day, month, year] = match;
+      return `${year}-${month}-${day}`;
+    },
+    [],
+  );
+
+  const parseDateString = useCallback(
+    (value: string | null | undefined) => {
+      const normalized = normalizeDateString(value);
+      if (!normalized) return undefined;
+      const date = new Date(normalized);
+      if (Number.isNaN(date.getTime())) return undefined;
+      return date;
+    },
+    [normalizeDateString],
+  );
+
+  useEffect(() => {
+    if (!profile) return;
+    reset({
+      username: profile.username ?? '',
+      firstName: profile.firstName ?? '',
+      lastName: profile.lastName ?? '',
+      dateOfBirth: normalizeDateString(profile.dateOfBirth),
+      country: profile.country ?? '',
+      city: profile.city ?? '',
+      aboutMe: profile.aboutMe ?? '',
+    });
+  }, [profile, reset, normalizeDateString]);
+
   const handleAvatarClick = () => fileInputRef.current?.click();
 
   const handleFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +133,14 @@ export function GeneralInformation() {
   const onSubmit = useCallback(
     async (data: GeneralInformationSchema) => {
       try {
-        await fillProfile({ userId, data }).unwrap();
+        const normalizedDate = normalizeDateString(data.dateOfBirth);
+        await fillProfile({
+          userId,
+          data: {
+            ...data,
+            dateOfBirth: normalizedDate || null,
+          },
+        }).unwrap();
       } catch (error) {
         handleNetworkError({
           error,
@@ -104,6 +154,10 @@ export function GeneralInformation() {
                 });
               }
             });
+            toast.error(
+              error.errorsMessages?.[0]?.message ??
+                'Validation error or business rule violation',
+            );
           },
           handle401Error: () => {
             toast.error('Unauthorized');
@@ -120,7 +174,7 @@ export function GeneralInformation() {
         });
       }
     },
-    [userId, fillProfile, dispatch, setError],
+    [userId, fillProfile, dispatch, setError, normalizeDateString],
   );
 
   return (
@@ -202,13 +256,34 @@ export function GeneralInformation() {
                 errorMessage={errors.lastName?.message}
               />
             </div>
-
-            <div className={s.formGroup}>
-              {/*<label className={s.label} htmlFor="dateOfBirth">*/}
-              {/*  Date of birth*/}
-              {/*</label>*/}
-              <DatePicker mode={'multiple'} />
-            </div>
+            <Controller
+              name="dateOfBirth"
+              control={control}
+              render={({ field }) => {
+                const selectedDate = parseDateString(field.value);
+                return (
+                  <DatePicker
+                    labelTitle={'Date of birth'}
+                    mode={'multiple'}
+                    allowPastDates
+                    className={s.formGroup}
+                    captionLayout="dropdown"
+                    startMonth={new Date(1950, 0, 1)}
+                    endMonth={new Date(2026, 11, 1)}
+                    reverseYears
+                    value={selectedDate}
+                    onChangeAction={(date) => {
+                      if (!date) {
+                        field.onChange('');
+                        return;
+                      }
+                      const iso = date.toISOString().slice(0, 10);
+                      field.onChange(iso);
+                    }}
+                  />
+                );
+              }}
+            />
 
             <div className={s.formRow}>
               <div className={s.formGroup}>

@@ -6,6 +6,9 @@ import {
   FetchBaseQueryError,
 } from '@reduxjs/toolkit/query';
 import { jwtDecode } from 'jwt-decode';
+import { clearAuthData } from '@/features/auth/api/authUtils';
+import { logout } from '@/features/auth/model/authSlice';
+import { APP_ROUTES } from '@/shared/lib/routes';
 
 const mutex = new Mutex();
 
@@ -50,6 +53,14 @@ const isAuthUrl = (args: string | FetchArgs): boolean => {
   );
 };
 
+const handleUnauthorized = (api: { dispatch: (action: unknown) => void }) => {
+  clearAuthData();
+  api.dispatch(logout());
+  if (typeof window !== 'undefined') {
+    window.location.replace(APP_ROUTES.ROOT);
+  }
+};
+
 export const baseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
   unknown,
@@ -76,7 +87,11 @@ export const baseQueryWithReauth: BaseQueryFn<
               const data = refreshResult.data as { accessToken?: string };
               if (data?.accessToken) {
                 localStorage.setItem('accessToken', data.accessToken);
+              } else {
+                handleUnauthorized(api);
               }
+            } else {
+              handleUnauthorized(api);
             }
           }
         } finally {
@@ -109,10 +124,12 @@ export const baseQueryWithReauth: BaseQueryFn<
             localStorage.setItem('accessToken', data.accessToken);
             // Повторяем оригинальный запрос один раз
             result = await baseQuery(args, api, extraOptions);
+          } else {
+            handleUnauthorized(api);
           }
         } else {
           // Рефреш не удался — чистим токен, редирект через middleware
-          localStorage.removeItem('accessToken');
+          handleUnauthorized(api);
         }
       } finally {
         release();

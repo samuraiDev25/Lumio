@@ -20,6 +20,9 @@ export const profileApi = baseApi.injectEndpoints({
           aboutMe: data.aboutMe || null,
         },
       }),
+      invalidatesTags: (result, error, { userId }) => [
+        { type: 'Profile', id: userId },
+      ],
     }),
   }),
 });
