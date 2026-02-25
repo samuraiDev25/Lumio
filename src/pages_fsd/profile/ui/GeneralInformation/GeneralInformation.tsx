@@ -104,6 +104,7 @@ export function GeneralInformation() {
                 });
               }
             });
+            toast.error(error.errorsMessages?.[0]?.message ?? 'Forbidden');
           },
           handle401Error: () => {
             toast.error('Unauthorized');
@@ -202,13 +203,16 @@ export function GeneralInformation() {
                 errorMessage={errors.lastName?.message}
               />
             </div>
-
-            <div className={s.formGroup}>
-              {/*<label className={s.label} htmlFor="dateOfBirth">*/}
-              {/*  Date of birth*/}
-              {/*</label>*/}
-              <DatePicker mode={'multiple'} />
-            </div>
+            <DatePicker
+              labelTitle={'Date of birth'}
+              mode={'multiple'}
+              allowPastDates
+              className={s.formGroup}
+              captionLayout="dropdown"
+              startMonth={new Date(1900, 0, 1)}
+              endMonth={new Date(2026, 11, 1)}
+              reverseYears
+            />
 
             <div className={s.formRow}>
               <div className={s.formGroup}>
