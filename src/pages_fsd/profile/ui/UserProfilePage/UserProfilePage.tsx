@@ -1,51 +1,33 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useGetUserProfileQuery } from '@/entities/profile/api/profileApi';
+
 import { useMeQuery } from '@/features/auth/api/authApi';
 import { Button, Typography } from '@/shared/ui';
+import { PROFILE_ROUTES } from '@/shared/lib/routes';
 import { useRouter } from 'next/navigation';
 import s from './UserProfilePage.module.scss';
 import { PostGrid } from '@/entities/post/ui/PostGrid/PostGrid';
 import { Loading } from '@/shared/ui/loading/Loading';
-import {
-  GetMyPostsResponse,
-  Post,
-} from '@/entities/post/model/types/postApi.types';
+import { Post } from '@/entities/post/model/types/postApi.types';
 import { useGetMyPostsQuery } from '@/entities/post/api/postApi';
-import { useGetUserProfileQuery } from '@/pages_fsd/profile/api/profileApi';
-import { UserProfile } from '@/pages_fsd/profile/modal/types/profile.types';
 
 type UserProfilePageProps = {
   userId: string;
-  initialProfile: UserProfile;
-  initialPosts: GetMyPostsResponse;
 };
 
-const PAGE_SIZE = 8;
-
-export function UserProfilePage({
-  userId,
-  initialProfile,
-  initialPosts,
-}: UserProfilePageProps) {
+export function UserProfilePage({ userId }: UserProfilePageProps) {
   const router = useRouter();
   const { data: currentUser } = useMeQuery();
 
-  const userIdNumber = useMemo(() => Number(userId), [userId]);
-  // const isValidUserId = Number.isFinite(userIdNumber); ХЗ, если на до позже добавлю
-
-  const isOwnProfile = currentUser?.userId?.toString() === userId;
-  const { data: profileFromApi, isLoading: isProfileLoading } =
-    useGetUserProfileQuery(userIdNumber);
-
-  const displayProfile = profileFromApi ?? initialProfile;
-  console.log(initialProfile);
+  const { data: profile, isLoading: isProfileLoading } =
+    useGetUserProfileQuery(userId);
 
   const [page, setPage] = useState(1);
-  const [allPosts, setAllPosts] = useState<Post[]>(initialPosts?.items ?? []);
-
-  const pagesCount = initialPosts?.pagesCount ?? 1;
-
+  const [allPosts, setAllPosts] = useState<Post[]>([]);
+  const pageSize = 8;
+  const isOwnProfile = currentUser?.userId?.toString() === userId;
   const {
     data: postsData,
     isLoading: isPostsLoading,
@@ -54,79 +36,77 @@ export function UserProfilePage({
     isOwnProfile
       ? {
           pageNumber: page,
-          pageSize: PAGE_SIZE,
+          pageSize,
           sortBy: 'createdAt',
           sortDirection: 'desc',
         }
-      : {
-          pageNumber: page,
-          pageSize: PAGE_SIZE,
-          sortBy: 'createdAt',
-          sortDirection: 'desc',
-        },
-    { skip: false },
+      : undefined,
+    { skip: !isOwnProfile },
   );
 
-  const hasMore = isOwnProfile
-    ? postsData
-      ? page < postsData.pagesCount
-      : page < pagesCount
-    : false;
-
   const loadMoreRef = useRef<HTMLDivElement>(null);
-  const lockRef = useRef(false);
+  const hasMore = postsData ? page < postsData.pagesCount : false;
 
   useEffect(() => {
     setPage(1);
-    setAllPosts(initialPosts?.items ?? []);
-    lockRef.current = false;
-  }, [userId, initialPosts]);
+    setAllPosts([]);
+  }, [userId, setPage]);
 
   useEffect(() => {
-    if (!postsData?.items) return;
-
-    if (page === 1) {
-      setAllPosts(postsData.items);
-    } else {
-      setAllPosts((prev) => [...prev, ...postsData.items]);
+    if (postsData?.items) {
+      if (page === 1) {
+        setAllPosts(postsData.items);
+      } else {
+        setAllPosts((prev) => [...prev, ...postsData.items]);
+      }
     }
-  }, [postsData, page]);
+  }, [postsData, page, setAllPosts]);
 
   useEffect(() => {
-    if (!isFetching) lockRef.current = false;
-  }, [isFetching]);
-
-  useEffect(() => {
-    const el = loadMoreRef.current;
-    if (!el) return;
+    const currentRef = loadMoreRef.current;
+    if (!currentRef) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const first = entries[0];
-        if (!first?.isIntersecting) return;
-
-        if (!hasMore) return;
-        if (isFetching) return;
-        if (lockRef.current) return;
-
-        lockRef.current = true;
-        setPage((prev) => prev + 1);
+        if (entries[0].isIntersecting && hasMore && !isFetching) {
+          setPage((prev) => prev + 1);
+        }
       },
       { threshold: 0.1 },
     );
 
-    observer.observe(el);
-    return () => observer.disconnect();
+    observer.observe(currentRef);
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
   }, [hasMore, isFetching]);
 
+  if (isProfileLoading) {
+    return <Loading />;
+  }
+  // Это временно, для того пока пост не создан, что бы отображались данные юзера
+  const displayProfile =
+    profile ||
+    (isOwnProfile && currentUser
+      ? {
+          id: currentUser.userId,
+          username: currentUser.username,
+          firstName: null,
+          lastName: null,
+          dateOfBirth: null,
+          country: null,
+          city: null,
+          aboutMe: null,
+          avatarUrl: null,
+        }
+      : null);
   if (!displayProfile) {
-    if (isProfileLoading) {
-      return <Loading />;
-    }
-
     return (
       <div className={s.error}>
-        <Typography variant="h2">User not found1</Typography>
+        <Typography variant="h2">User not found</Typography>
       </div>
     );
   }
@@ -145,17 +125,17 @@ export function UserProfilePage({
             />
           ) : (
             <div className={s.avatarPlaceholder}>
-              <Typography variant="h1">{displayProfile.username}</Typography>
+              <Typography variant="h1">
+                {displayProfile.username[0]?.toUpperCase()}
+              </Typography>
             </div>
           )}
         </div>
-
         <div className={s.profileInfo}>
           <div className={s.profileHeaderSection}>
             <Typography variant="h1" className={s.username}>
               {displayProfile.username}
             </Typography>
-
             {displayProfile.aboutMe && (
               <Typography variant="regular_text_16" className={s.aboutMe}>
                 {displayProfile.aboutMe}
@@ -173,7 +153,6 @@ export function UserProfilePage({
               </Button>
             )}
           </div>
-
           <div className={s.stats}>
             <div className={s.statItem}>
               <div className={s.statNumber}>Following</div>
@@ -188,7 +167,6 @@ export function UserProfilePage({
               <div className={s.statLabel}>Publications</div>
             </div>
           </div>
-
           <p className={s.text}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
             eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
@@ -202,19 +180,17 @@ export function UserProfilePage({
       </div>
 
       <div className={s.postsSection}>
-        {allPosts.length > 0 ? (
+        {allPosts?.length > 0 ? (
           <>
             <PostGrid posts={allPosts} />
-
             {isFetching && (
               <div className={s.loading}>
                 <Loading />
               </div>
             )}
-
             {hasMore && <div ref={loadMoreRef} className={s.loadMoreTrigger} />}
           </>
-        ) : isOwnProfile && isPostsLoading ? (
+        ) : isPostsLoading ? (
           <div className={s.loading}>
             <Loading />
           </div>

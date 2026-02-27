@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import s from './not-found.module.scss';
+import MainLayout from '@/app/MainLayout';
 import { APP_ROUTES } from '@/shared/lib/routes';
 import { Button } from '@/shared/ui';
 import Image from 'next/image';
-import { BaseLayout } from '@/app/BaseLayout';
 
 export default function NotFound() {
   return (
-    <BaseLayout>
+    <MainLayout>
       <div className={s.container}>
         <Image
           src="/404/notFound.png"
@@ -25,6 +25,6 @@ export default function NotFound() {
           <Button variant={'outline'}>Back to Home</Button>
         </Link>
       </div>
-    </BaseLayout>
+    </MainLayout>
   );
 }

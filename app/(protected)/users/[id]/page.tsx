@@ -1,4 +1,3 @@
-/*
 'use client';
 
 import { UserProfilePage } from '@/pages_fsd/profile/ui/UserProfilePage/UserProfilePage';
@@ -6,5 +5,3 @@ import { UserProfilePage } from '@/pages_fsd/profile/ui/UserProfilePage/UserProf
 export default function ProfilePage({ params }: { params: { id: string } }) {
   return <UserProfilePage userId={params.id} />;
 }
-*/
-// Что это вообще за папка и для чего?
