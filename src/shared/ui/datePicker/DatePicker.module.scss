@@ -3,7 +3,6 @@
 
 .wrapper {
   border-radius: 2px;
-  //min-width: 158px;
 }
 .label {
   color: var(--color-light-900);
@@ -11,7 +10,6 @@
 }
 .controls {
   display: flex;
-  //margin-bottom: 1rem;
 }
 
 .input {
@@ -21,7 +19,6 @@
   background-color: var(--color-dark-500);
   color: var(--color-light-100);
   padding: 6px 12px;
-  //border-radius: 6px;
   border: 1px solid var(--color-dark-300);
   cursor: pointer;
   &:hover {
@@ -31,11 +28,9 @@
     border: 1px solid var(--color-accent-700);
   }
 }
-
-//.icon {
-//  margin-left: 12px;
-//}
-
+.icon {
+  color: var(--color-light-100);
+}
 .weekend {
   color: var(--color-danger-300);
 }
@@ -46,6 +41,11 @@
 }
 
 .errorText {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  font-size: 12px;
+  margin-top: 2px;
   color: var(--color-danger-500);
 }
 

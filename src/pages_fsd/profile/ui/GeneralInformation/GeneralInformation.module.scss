@@ -132,17 +132,15 @@ cursor: pointer;
     background: var(--color-dark-500);
   }
 }
-
+.textareaContainer {
+  gap: 0;
+}
 .textarea {
-  @include field-base;
-  background: var(--color-dark-500);
   min-height: 100px;
 }
 
-
-
 .errorMsg {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--color-danger-500);
   margin-top: 2px;
   display: none;
@@ -150,6 +148,21 @@ cursor: pointer;
   &.show {
     display: block;
   }
+}
+
+.inlineDateError {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.errorMsg.show.inlineDateError {
+  display: inline-flex;
+}
+
+.policyLink {
+  text-decoration: underline;
 }
 
 .pageFooter {
@@ -161,4 +174,7 @@ cursor: pointer;
 
 .btnSave {
   cursor: pointer;
+}
+.privacyLink {
+  text-decoration: underline;
 }
