@@ -52,6 +52,16 @@ export const useSignUpForm = () => {
             }
           });
         },
+        handle403Error: (error) => {
+          error.errorsMessages?.forEach((m) => {
+            if (m.field) {
+              setError(m.field as keyof SignUpType, {
+                type: 'server',
+                message: m.message,
+              });
+            }
+          });
+        },
         handle429Error: () => {
           toast.error('Too many requests. Try again later.');
         },

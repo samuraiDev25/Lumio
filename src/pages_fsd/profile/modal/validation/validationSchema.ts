@@ -1,5 +1,14 @@
 import { z } from 'zod';
 
+function isAtLeast13(date: Date) {
+  const today = new Date();
+  const cutoff = new Date(
+    today.getFullYear() - 13,
+    today.getMonth(),
+    today.getDate(),
+  );
+  return date <= cutoff;
+}
 export const generalInformationSchema = z.object({
   username: z
     .string()
@@ -36,8 +45,12 @@ export const generalInformationSchema = z.object({
       'Date of birth cannot be in the future',
     )
     .refine(
-      (val) => !val || new Date(val) > new Date('1900-01-01'),
-      'Date of birth cannot be earlier than 1900',
+      (val) => !val || new Date(val) > new Date('1950-01-01'),
+      'Date of birth cannot be earlier than 1950',
+    )
+    .refine(
+      (val) => !val || isAtLeast13(new Date(val)),
+      'A user under 13 cannot create a profile.',
     ),
   country: z.string().optional(),
 

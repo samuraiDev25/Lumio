@@ -8,7 +8,6 @@ import {
 import { jwtDecode } from 'jwt-decode';
 import { clearAuthData } from '@/features/auth/api/authUtils';
 import { logout } from '@/features/auth/model/authSlice';
-import { APP_ROUTES } from '@/shared/lib/routes';
 
 const mutex = new Mutex();
 
@@ -56,9 +55,6 @@ const isAuthUrl = (args: string | FetchArgs): boolean => {
 const handleUnauthorized = (api: { dispatch: (action: unknown) => void }) => {
   clearAuthData();
   api.dispatch(logout());
-  if (typeof window !== 'undefined') {
-    window.location.replace(APP_ROUTES.ROOT);
-  }
 };
 
 export const baseQueryWithReauth: BaseQueryFn<
@@ -66,6 +62,20 @@ export const baseQueryWithReauth: BaseQueryFn<
   unknown,
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
+  const requestUrl = typeof args === 'string' ? args : args.url;
+  const token =
+    typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+
+  // Do not hit /auth/me when logged out - prevents request storms after logout.
+  if (!token && requestUrl.includes('/api/v1/auth/me')) {
+    return {
+      error: {
+        status: 401,
+        data: { errorsMessages: [{ message: 'Unauthorized' }] },
+      } as FetchBaseQueryError,
+    };
+  }
+
   if (!isAuthUrl(args)) {
     const token = localStorage.getItem('accessToken');
 

@@ -33,6 +33,8 @@ type DatePickerProps = {
   onChangeAction?: (value: Date | undefined) => void;
   rangeValue?: DateRange;
   onRangeChangeAction?: (value: DateRange | undefined) => void;
+  errorMessage?: string | null;
+  errorNode?: React.ReactNode;
 };
 export const DatePicker = ({
   mode,
@@ -54,13 +56,16 @@ export const DatePicker = ({
   onChangeAction,
   rangeValue,
   onRangeChangeAction,
+  errorMessage,
+  errorNode,
 }: DatePickerProps) => {
   const [open, setOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<Date | undefined>();
   const [selectedWeek, setSelectedWeek] = useState<Date[]>([]);
   const [selectedRange, setSelectedRange] = useState<DateRange | undefined>();
   const [error, setError] = useState<string | null>(null);
-
+  const displayError = errorMessage ?? error;
+  const hasError = Boolean(displayError);
   const today = new Date();
   const isMultipleControlled = mode === 'multiple' && !!onChangeAction;
   const isRangeControlled = mode === 'range' && !!onRangeChangeAction;
@@ -93,7 +98,7 @@ export const DatePicker = ({
     .join(' ');
   const resolvedInputClassName = [
     s.input,
-    error ? s.errorInput : '',
+    hasError ? s.errorInput : '',
     inputClassName,
   ]
     .filter(Boolean)
@@ -161,7 +166,11 @@ export const DatePicker = ({
         </Popover.Portal>
       </Popover.Root>
 
-      {error && <div className={resolvedErrorClassName}>{error}</div>}
+      {hasError && (
+        <div className={resolvedErrorClassName}>
+          {errorNode ?? displayError}
+        </div>
+      )}
     </div>
   );
 };
