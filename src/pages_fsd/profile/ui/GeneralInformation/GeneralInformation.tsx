@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import s from './GeneralInformation.module.scss';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -8,7 +8,7 @@ import {
   generalInformationSchema,
 } from '@/pages_fsd/profile/modal/validation';
 import { toast } from 'react-toastify';
-import { Button, DatePicker, TextArea, TextField } from '@/shared/ui';
+import { Button, DatePicker, TextField } from '@/shared/ui';
 import {
   useFillProfileMutation,
   useGetProfileQuery,
@@ -19,22 +19,19 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useParams, usePathname } from 'next/navigation';
 import { AUTH_ROUTES } from '@/shared/lib/routes';
 import Link from 'next/link';
-import {
-  ABOUT_ME_MAX,
-  CITIES,
-  COUNTRIES,
-} from '@/pages_fsd/profile/modal/constants';
+import { CITIES, COUNTRIES } from '@/pages_fsd/profile/modal/constants';
 import { AvatarUploader } from '@/pages_fsd/profile';
+import {
+  normalizeDateString,
+  parseDateString,
+} from '@/pages_fsd/profile/modal/utils/dateOfBirthUtil';
+import { TextAreaSection } from '@/pages_fsd/profile/ui/GeneralInformation/TextAreaSection/TextAreaSection';
 
 export function GeneralInformation() {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
   const [isDraftInitialized, setIsDraftInitialized] = useState(false);
   const hasDraftRef = useRef(false);
   const { userId } = useParams<{ userId: string }>();
   const { data: profile } = useGetProfileQuery(userId);
-  console.log('userId type:', typeof userId, 'value:', userId);
   const pathname = usePathname();
   const draftStorageKey = `general-information-draft:${userId ?? 'unknown'}`;
   const privacyPolicyHref = `${AUTH_ROUTES.PRIVACY_POLICY}?returnTo=${encodeURIComponent(pathname)}`;
@@ -92,29 +89,6 @@ export function GeneralInformation() {
     }
   }, [draftStorageKey, reset]);
 
-  const normalizeDateString = useCallback(
-    (value: string | null | undefined) => {
-      if (!value) return '';
-      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
-      const match = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(value);
-      if (!match) return value;
-      const [, day, month, year] = match;
-      return `${year}-${month}-${day}`;
-    },
-    [],
-  );
-
-  const parseDateString = useCallback(
-    (value: string | null | undefined) => {
-      const normalized = normalizeDateString(value);
-      if (!normalized) return undefined;
-      const date = new Date(normalized);
-      if (Number.isNaN(date.getTime())) return undefined;
-      return date;
-    },
-    [normalizeDateString],
-  );
-
   useEffect(() => {
     if (!profile || !isDraftInitialized || hasDraftRef.current) return;
     reset({
@@ -126,22 +100,12 @@ export function GeneralInformation() {
       city: profile.city ?? '',
       aboutMe: profile.aboutMe ?? '',
     });
-  }, [profile, reset, normalizeDateString, isDraftInitialized]);
+  }, [profile, reset, isDraftInitialized]);
 
   useEffect(() => {
     if (!isDraftInitialized) return;
     sessionStorage.setItem(draftStorageKey, JSON.stringify(values));
   }, [values, draftStorageKey, isDraftInitialized]);
-
-  const handleAvatarClick = () => fileInputRef.current?.click();
-
-  const handleFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => setAvatarSrc(event.target?.result as string);
-    reader.readAsDataURL(file);
-  }, []);
 
   const onSubmit = useCallback(
     async (data: GeneralInformationSchema) => {
@@ -189,14 +153,7 @@ export function GeneralInformation() {
         });
       }
     },
-    [
-      userId,
-      fillProfile,
-      dispatch,
-      setError,
-      normalizeDateString,
-      draftStorageKey,
-    ],
+    [userId, fillProfile, dispatch, setError, draftStorageKey],
   );
 
   return (
@@ -342,27 +299,28 @@ export function GeneralInformation() {
                 </div>
               </div>
             </div>
-            <div className={s.formGroup}>
-              <Controller
-                name="aboutMe"
-                control={control}
-                render={({ field }) => (
-                  <TextArea
-                    id="aboutMe"
-                    placeholder="Text-area"
-                    label={'About Me'}
-                    maxLength={ABOUT_ME_MAX}
-                    value={field.value ?? ''}
-                    onChange={field.onChange}
-                    onBlur={field.onBlur}
-                    errorMessage={errors.aboutMe?.message}
-                    className={`${s.textareaWrapper} ${errors.aboutMe ? s.invalid : ''}`}
-                    textareaClassName={s.textarea}
-                    containerClassName={s.textareaContainer}
-                  />
-                )}
-              />
-            </div>
+            <TextAreaSection control={control} errors={errors} />
+            {/*<div className={s.formGroup}>*/}
+            {/*  <Controller*/}
+            {/*    name="aboutMe"*/}
+            {/*    control={control}*/}
+            {/*    render={({ field }) => (*/}
+            {/*      <TextArea*/}
+            {/*        id="aboutMe"*/}
+            {/*        placeholder="Text-area"*/}
+            {/*        label={'About Me'}*/}
+            {/*        maxLength={ABOUT_ME_MAX}*/}
+            {/*        value={field.value ?? ''}*/}
+            {/*        onChange={field.onChange}*/}
+            {/*        onBlur={field.onBlur}*/}
+            {/*        errorMessage={errors.aboutMe?.message}*/}
+            {/*        className={`${s.textareaWrapper} ${errors.aboutMe ? s.invalid : ''}`}*/}
+            {/*        textareaClassName={s.textarea}*/}
+            {/*        containerClassName={s.textareaContainer}*/}
+            {/*      />*/}
+            {/*    )}*/}
+            {/*  />*/}
+            {/*</div>*/}
           </form>
         </div>
       </div>
