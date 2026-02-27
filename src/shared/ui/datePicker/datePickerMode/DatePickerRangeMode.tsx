@@ -1,13 +1,25 @@
 'use client';
-import { DateRange, DayPicker } from 'react-day-picker';
+import {
+  ClassNames,
+  DateRange,
+  DayPicker,
+  ModifiersClassNames,
+} from 'react-day-picker';
 import s from '../DatePicker.module.scss';
 import './DatePicker.global.scss';
-
+import { CaptionLayout } from '../types';
 type Props = {
   today: Date;
   selectedRange?: DateRange;
   onSelectAction: (range: DateRange | undefined) => void;
   onErrorAction: (error: string | null) => void;
+  allowPastDates: boolean;
+  dayPickerClassNames?: Partial<ClassNames>;
+  dayPickerModifiersClassNames?: Partial<ModifiersClassNames>;
+  captionLayout?: CaptionLayout;
+  startMonth?: Date;
+  endMonth?: Date;
+  reverseYears?: boolean;
 };
 
 export const DatePickerRangeMode = ({
@@ -15,6 +27,13 @@ export const DatePickerRangeMode = ({
   selectedRange,
   onSelectAction,
   onErrorAction,
+  allowPastDates,
+  dayPickerClassNames,
+  dayPickerModifiersClassNames,
+  captionLayout,
+  startMonth,
+  endMonth,
+  reverseYears,
 }: Props) => {
   const validateRange = (range?: DateRange) => {
     if (!range?.from) {
@@ -27,7 +46,7 @@ export const DatePickerRangeMode = ({
       return true;
     }
 
-    if (range.to < today) {
+    if (!allowPastDates && range.to < today) {
       onErrorAction?.('Error, select current month or last month');
       return false;
     }
@@ -42,6 +61,37 @@ export const DatePickerRangeMode = ({
     }
   };
 
+  const defaultClassNames: Partial<ClassNames> = {
+    month: 'rdp-month',
+    day_button: 'rdp-day_button',
+    range_start: 'rdp-range_start',
+    range_end: 'rdp-range_end',
+    range_middle: 'rdp-range_middle',
+    button_previous: 'rdp-button_previous',
+    button_next: 'rdp-button_next',
+    month_grid: 'rdp-month_grid',
+    dropdowns: 'rdp-dropdowns',
+    dropdown: 'rdp-dropdown',
+    dropdown_root: 'rdp-dropdown_root',
+    months_dropdown: 'rdp-months_dropdown',
+    years_dropdown: 'rdp-years_dropdown',
+    caption_label: 'rdp-caption_label',
+  };
+  const defaultModifiersClassNames: ModifiersClassNames = {
+    selected: s.selected,
+    weekend: s.weekend,
+  };
+  const mergedModifiersClassNames: ModifiersClassNames = {
+    ...defaultModifiersClassNames,
+  };
+  if (dayPickerModifiersClassNames) {
+    for (const [key, value] of Object.entries(dayPickerModifiersClassNames)) {
+      if (value) {
+        mergedModifiersClassNames[key] = value;
+      }
+    }
+  }
+
   return (
     <DayPicker
       mode="range"
@@ -50,24 +100,16 @@ export const DatePickerRangeMode = ({
       numberOfMonths={1}
       weekStartsOn={1}
       showOutsideDays
+      captionLayout={captionLayout}
+      startMonth={startMonth}
+      endMonth={endMonth}
+      reverseYears={reverseYears}
       modifiers={{
         weekend: { dayOfWeek: [0, 6] },
         today: today,
       }}
-      modifiersClassNames={{
-        selected: s.selected,
-        weekend: s.weekend,
-      }}
-      classNames={{
-        month: 'rdp-month',
-        button: 'rdp-day_button',
-        day_range_start: 'rdp-range_start',
-        day_range_end: 'rdp-range_end',
-        day_range_middle: 'rdp-range_middle',
-        nav_button_previous: 'rdp-button_previous',
-        nav_button_next: 'rdp-button_next',
-        table: 'rdp-month_grid',
-      }}
+      modifiersClassNames={mergedModifiersClassNames}
+      classNames={{ ...defaultClassNames, ...dayPickerClassNames }}
     />
   );
 };

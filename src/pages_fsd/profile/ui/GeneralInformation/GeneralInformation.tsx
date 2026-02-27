@@ -1,25 +1,30 @@
 'use client';
 
-import { ChangeEvent, useCallback, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 import s from './GeneralInformation.module.scss';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   GeneralInformationSchema,
   generalInformationSchema,
 } from '@/pages_fsd/profile/modal/validation';
-import { ImageOutline } from '@/shared/ui/icons';
 import { toast } from 'react-toastify';
 import { Button, DatePicker, TextField } from '@/shared/ui';
-import { useFillProfileMutation } from '@/pages_fsd/profile/api/profileApi';
+import {
+  useFillProfileMutation,
+  useGetProfileQuery,
+} from '@/pages_fsd/profile/api/profileApi';
 import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useParams } from 'next/navigation';
+import { AvatarUploader } from '@/pages_fsd/profile';
+import { useGetUserProfileQuery } from '@/entities/profile/api/profileApi';
 
 const COUNTRIES = [
   'Belarus',
   'Germany',
   'France',
+  'Russia',
   'Italy',
   'Spain',
   'Ukraine',
@@ -36,6 +41,7 @@ const CITIES = [
   'Minsk',
   'Berlin',
   'Paris',
+  'Moscow',
   'Rome',
   'Madrid',
   'Kyiv',
@@ -51,17 +57,20 @@ const CITIES = [
 const ABOUT_ME_MAX = 200;
 
 export function GeneralInformation() {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
   const { userId } = useParams<{ userId: string }>();
+  const { data: profile } = useGetProfileQuery(userId);
   console.log('userId type:', typeof userId, 'value:', userId);
   const [fillProfile] = useFillProfileMutation();
+  const { data: profile } = useGetUserProfileQuery(userId, {
+    skip: !userId,
+  });
   const dispatch = useAppDispatch();
   const {
     register,
     handleSubmit,
     setError,
+    reset,
+    control,
     formState: { errors, isSubmitting, isValid },
   } = useForm<GeneralInformationSchema>({
     resolver: zodResolver(generalInformationSchema),
@@ -77,6 +86,42 @@ export function GeneralInformation() {
     },
   });
 
+  const normalizeDateString = useCallback(
+    (value: string | null | undefined) => {
+      if (!value) return '';
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+      const match = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(value);
+      if (!match) return value;
+      const [, day, month, year] = match;
+      return `${year}-${month}-${day}`;
+    },
+    [],
+  );
+
+  const parseDateString = useCallback(
+    (value: string | null | undefined) => {
+      const normalized = normalizeDateString(value);
+      if (!normalized) return undefined;
+      const date = new Date(normalized);
+      if (Number.isNaN(date.getTime())) return undefined;
+      return date;
+    },
+    [normalizeDateString],
+  );
+
+  useEffect(() => {
+    if (!profile) return;
+    reset({
+      username: profile.username ?? '',
+      firstName: profile.firstName ?? '',
+      lastName: profile.lastName ?? '',
+      dateOfBirth: normalizeDateString(profile.dateOfBirth),
+      country: profile.country ?? '',
+      city: profile.city ?? '',
+      aboutMe: profile.aboutMe ?? '',
+    });
+  }, [profile, reset, normalizeDateString]);
+
   const handleAvatarClick = () => fileInputRef.current?.click();
 
   const handleFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +135,14 @@ export function GeneralInformation() {
   const onSubmit = useCallback(
     async (data: GeneralInformationSchema) => {
       try {
-        await fillProfile({ userId, data }).unwrap();
+        const normalizedDate = normalizeDateString(data.dateOfBirth);
+        await fillProfile({
+          userId,
+          data: {
+            ...data,
+            dateOfBirth: normalizedDate || null,
+          },
+        }).unwrap();
       } catch (error) {
         handleNetworkError({
           error,
@@ -104,6 +156,10 @@ export function GeneralInformation() {
                 });
               }
             });
+            toast.error(
+              error.errorsMessages?.[0]?.message ??
+                'Validation error or business rule violation',
+            );
           },
           handle401Error: () => {
             toast.error('Unauthorized');
@@ -120,7 +176,7 @@ export function GeneralInformation() {
         });
       }
     },
-    [userId, fillProfile, dispatch, setError],
+    [userId, fillProfile, dispatch, setError, normalizeDateString],
   );
 
   return (
@@ -128,38 +184,8 @@ export function GeneralInformation() {
       <div className={s.content}>
         <div className={s.profileLayout}>
           <div className={s.avatarSection}>
-            <div className={s.avatarWrap} onClick={handleAvatarClick}>
-              {avatarSrc ? (
-                <img
-                  className={s.avatarImg}
-                  src={avatarSrc}
-                  alt="avatar"
-                  style={{ display: 'block' }}
-                />
-              ) : (
-                <ImageOutline />
-              )}
-            </div>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
-
-            <Button
-              variant={'outline'}
-              size={'lg'}
-              type="button"
-              className={s.btnPhoto}
-              onClick={handleAvatarClick}
-            >
-              Select Profile Photo
-            </Button>
+            <AvatarUploader currentAvatar={profile?.avatarUrl} />
           </div>
-
           <form
             className={s.formSection}
             onSubmit={handleSubmit(onSubmit)}
@@ -177,7 +203,6 @@ export function GeneralInformation() {
                 errorMessage={errors.username?.message}
               />
             </div>
-
             <div className={s.formGroup}>
               <label className={s.label} htmlFor="firstName">
                 First Name<span className={s.req}>*</span>
@@ -202,13 +227,40 @@ export function GeneralInformation() {
                 errorMessage={errors.lastName?.message}
               />
             </div>
-
             <div className={s.formGroup}>
               {/*<label className={s.label} htmlFor="dateOfBirth">*/}
               {/*  Date of birth*/}
               {/*</label>*/}
               <DatePicker mode={'multiple'} />
             </div>
+            <Controller
+              name="dateOfBirth"
+              control={control}
+              render={({ field }) => {
+                const selectedDate = parseDateString(field.value);
+                return (
+                  <DatePicker
+                    labelTitle={'Date of birth'}
+                    mode={'multiple'}
+                    allowPastDates
+                    className={s.formGroup}
+                    captionLayout="dropdown"
+                    startMonth={new Date(1950, 0, 1)}
+                    endMonth={new Date(2026, 11, 1)}
+                    reverseYears
+                    value={selectedDate}
+                    onChangeAction={(date) => {
+                      if (!date) {
+                        field.onChange('');
+                        return;
+                      }
+                      const iso = date.toISOString().slice(0, 10);
+                      field.onChange(iso);
+                    }}
+                  />
+                );
+              }}
+            />
 
             <div className={s.formRow}>
               <div className={s.formGroup}>
@@ -256,7 +308,6 @@ export function GeneralInformation() {
                 </div>
               </div>
             </div>
-
             <div className={s.formGroup}>
               <label className={s.label} htmlFor="aboutMe">
                 About Me
@@ -277,7 +328,6 @@ export function GeneralInformation() {
           </form>
         </div>
       </div>
-
       <footer className={s.pageFooter}>
         <Button
           variant={'primary'}
