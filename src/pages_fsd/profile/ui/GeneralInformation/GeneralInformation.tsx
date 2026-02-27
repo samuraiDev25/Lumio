@@ -1,20 +1,23 @@
 'use client';
 
-import { ChangeEvent, useCallback, useRef, useState } from 'react';
+import { useCallback } from 'react';
 import s from './GeneralInformation.module.scss';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   GeneralInformationSchema,
   generalInformationSchema,
 } from '@/pages_fsd/profile/modal/validation';
-import { ImageOutline } from '@/shared/ui/icons';
 import { toast } from 'react-toastify';
 import { Button, DatePicker, TextField } from '@/shared/ui';
-import { useFillProfileMutation } from '@/pages_fsd/profile/api/profileApi';
+import {
+  useFillProfileMutation,
+  useGetProfileQuery,
+} from '@/pages_fsd/profile/api/profileApi';
 import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
 import { useForm } from 'react-hook-form';
 import { useParams } from 'next/navigation';
+import { AvatarUploader } from '@/pages_fsd/profile';
 
 const COUNTRIES = [
   'Belarus',
@@ -51,10 +54,8 @@ const CITIES = [
 const ABOUT_ME_MAX = 200;
 
 export function GeneralInformation() {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
   const { userId } = useParams<{ userId: string }>();
+  const { data: profile } = useGetProfileQuery(userId);
   console.log('userId type:', typeof userId, 'value:', userId);
   const [fillProfile] = useFillProfileMutation();
   const dispatch = useAppDispatch();
@@ -76,16 +77,6 @@ export function GeneralInformation() {
       aboutMe: '',
     },
   });
-
-  const handleAvatarClick = () => fileInputRef.current?.click();
-
-  const handleFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => setAvatarSrc(event.target?.result as string);
-    reader.readAsDataURL(file);
-  }, []);
 
   const onSubmit = useCallback(
     async (data: GeneralInformationSchema) => {
@@ -128,38 +119,8 @@ export function GeneralInformation() {
       <div className={s.content}>
         <div className={s.profileLayout}>
           <div className={s.avatarSection}>
-            <div className={s.avatarWrap} onClick={handleAvatarClick}>
-              {avatarSrc ? (
-                <img
-                  className={s.avatarImg}
-                  src={avatarSrc}
-                  alt="avatar"
-                  style={{ display: 'block' }}
-                />
-              ) : (
-                <ImageOutline />
-              )}
-            </div>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
-
-            <Button
-              variant={'outline'}
-              size={'lg'}
-              type="button"
-              className={s.btnPhoto}
-              onClick={handleAvatarClick}
-            >
-              Select Profile Photo
-            </Button>
+            <AvatarUploader currentAvatar={profile?.avatarUrl} />
           </div>
-
           <form
             className={s.formSection}
             onSubmit={handleSubmit(onSubmit)}
@@ -177,7 +138,6 @@ export function GeneralInformation() {
                 errorMessage={errors.username?.message}
               />
             </div>
-
             <div className={s.formGroup}>
               <label className={s.label} htmlFor="firstName">
                 First Name<span className={s.req}>*</span>
@@ -202,14 +162,12 @@ export function GeneralInformation() {
                 errorMessage={errors.lastName?.message}
               />
             </div>
-
             <div className={s.formGroup}>
               {/*<label className={s.label} htmlFor="dateOfBirth">*/}
               {/*  Date of birth*/}
               {/*</label>*/}
               <DatePicker mode={'multiple'} />
             </div>
-
             <div className={s.formRow}>
               <div className={s.formGroup}>
                 <label className={s.label} htmlFor="country">
@@ -256,7 +214,6 @@ export function GeneralInformation() {
                 </div>
               </div>
             </div>
-
             <div className={s.formGroup}>
               <label className={s.label} htmlFor="aboutMe">
                 About Me
@@ -277,7 +234,6 @@ export function GeneralInformation() {
           </form>
         </div>
       </div>
-
       <footer className={s.pageFooter}>
         <Button
           variant={'primary'}
