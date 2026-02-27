@@ -4,6 +4,15 @@ import { UserProfile } from '@/entities/profile/modal/types/profileApi.types';
 
 export const profileApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    getUserProfile: builder.query<UserProfile, number>({
+      query: (userId) => ({
+        url: `/api/v1/profile/${userId}`,
+        method: 'GET',
+      }),
+      providesTags: (_result, _error, userId) => [
+        { type: 'Profile', id: userId },
+      ],
+    }),
     fillProfile: builder.mutation<
       void,
       { userId: string; data: GeneralInformationSchema }
