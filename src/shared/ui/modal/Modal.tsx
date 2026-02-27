@@ -4,7 +4,7 @@ import s from './Modal.module.scss';
 import { Close } from '@/shared/ui/icons';
 import { clsx } from 'clsx';
 
-type ModalSize = 'lg' | 'md' | 'sm';
+type ModalSize = 'lg' | 'md' | 'sm' | 'delete';
 
 export type ModalProps = {
   open: boolean;

@@ -20,20 +20,36 @@ export const profileApi = baseApi.injectEndpoints({
           city: data.city || null,
           aboutMe: data.aboutMe || null,
         },
+        providesTags: ['Profile'],
       }),
       invalidatesTags: (result, error, { userId }) => [
         { type: 'Profile', id: userId },
       ],
     }),
-    getUserProfile: builder.query<UserProfile, string>({
-      query: (userId) => ({
-        url: `/api/v1/profile/${userId}`,
-        method: 'GET',
+    getProfile: builder.query<UserProfile, string>({
+      query: (userId) => `/api/v1/profile/${userId}`,
+      providesTags: ['Profile'],
+    }),
+    uploadAvatar: builder.mutation<{ url: string }, FormData>({
+      query: (formData) => ({
+        url: `/api/v1/profile/avatar`,
+        method: 'POST',
+        body: formData,
       }),
-      providesTags: (result, error, userId) => [
-        { type: 'Profile', id: userId },
-      ],
+      invalidatesTags: ['Profile'],
+    }),
+    deleteAvatar: builder.mutation<void, void>({
+      query: () => ({
+        url: `/api/v1/profile/avatar`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Profile'],
     }),
   }),
 });
-export const { useFillProfileMutation, useGetUserProfileQuery } = profileApi;
+export const {
+  useFillProfileMutation,
+  useGetProfileQuery,
+  useUploadAvatarMutation,
+  useDeleteAvatarMutation,
+} = profileApi;

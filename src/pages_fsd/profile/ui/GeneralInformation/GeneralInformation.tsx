@@ -7,12 +7,11 @@ import {
   GeneralInformationSchema,
   generalInformationSchema,
 } from '@/pages_fsd/profile/modal/validation';
-import { ImageOutline } from '@/shared/ui/icons';
 import { toast } from 'react-toastify';
 import { Button, DatePicker, TextArea, TextField } from '@/shared/ui';
 import {
   useFillProfileMutation,
-  useGetUserProfileQuery,
+  useGetProfileQuery,
 } from '@/pages_fsd/profile/api/profileApi';
 import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
@@ -25,6 +24,7 @@ import {
   CITIES,
   COUNTRIES,
 } from '@/pages_fsd/profile/modal/constants';
+import { AvatarUploader } from '@/pages_fsd/profile';
 
 export function GeneralInformation() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -33,13 +33,14 @@ export function GeneralInformation() {
   const [isDraftInitialized, setIsDraftInitialized] = useState(false);
   const hasDraftRef = useRef(false);
   const { userId } = useParams<{ userId: string }>();
+  const { data: profile } = useGetProfileQuery(userId);
+  console.log('userId type:', typeof userId, 'value:', userId);
   const pathname = usePathname();
   const draftStorageKey = `general-information-draft:${userId ?? 'unknown'}`;
   const privacyPolicyHref = `${AUTH_ROUTES.PRIVACY_POLICY}?returnTo=${encodeURIComponent(pathname)}`;
   const [fillProfile] = useFillProfileMutation();
-  const { data: profile } = useGetUserProfileQuery(userId, { skip: !userId });
-  const dispatch = useAppDispatch();
 
+  const dispatch = useAppDispatch();
   const {
     register,
     handleSubmit,
@@ -146,12 +147,11 @@ export function GeneralInformation() {
     async (data: GeneralInformationSchema) => {
       try {
         const normalizedDate = normalizeDateString(data.dateOfBirth);
-
         await fillProfile({
           userId,
           data: {
             ...data,
-            dateOfBirth: normalizedDate || null, // если '' -> null
+            dateOfBirth: normalizedDate || null,
           },
         }).unwrap();
         sessionStorage.removeItem(draftStorageKey);
@@ -174,12 +174,18 @@ export function GeneralInformation() {
                 'Validation error or business rule violation',
             );
           },
-          handle401Error: () => toast.error('Unauthorized'),
-          handle403Error: (err) =>
-            toast.error(err.errorsMessages?.[0]?.message ?? 'Forbidden'),
-          handle500Error: () => toast.error('Internal server error'),
-          handleUnknownError: () =>
-            toast.error('Error! Server is not available!'),
+          handle401Error: () => {
+            toast.error('Unauthorized');
+          },
+          handle403Error: (err) => {
+            toast.error(err.errorsMessages?.[0]?.message ?? 'Forbidden');
+          },
+          handle500Error: () => {
+            toast.error('Internal server error');
+          },
+          handleUnknownError: () => {
+            toast.error('Error! Server is not available!');
+          },
         });
       }
     },
@@ -198,38 +204,8 @@ export function GeneralInformation() {
       <div className={s.content}>
         <div className={s.profileLayout}>
           <div className={s.avatarSection}>
-            <div className={s.avatarWrap} onClick={handleAvatarClick}>
-              {avatarSrc ? (
-                <img
-                  className={s.avatarImg}
-                  src={avatarSrc}
-                  alt="avatar"
-                  style={{ display: 'block' }}
-                />
-              ) : (
-                <ImageOutline />
-              )}
-            </div>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
-
-            <Button
-              variant={'outline'}
-              size={'lg'}
-              type="button"
-              className={s.btnPhoto}
-              onClick={handleAvatarClick}
-            >
-              Select Profile Photo
-            </Button>
+            <AvatarUploader currentAvatar={profile?.avatarUrl} />
           </div>
-
           <form
             className={s.formSection}
             onSubmit={handleSubmit(onSubmit)}
@@ -247,7 +223,6 @@ export function GeneralInformation() {
                 errorMessage={errors.username?.message}
               />
             </div>
-
             <div className={s.formGroup}>
               <label className={s.label} htmlFor="firstName">
                 First Name<span className={s.req}>*</span>
@@ -260,7 +235,6 @@ export function GeneralInformation() {
                 errorMessage={errors.firstName?.message}
               />
             </div>
-
             <div className={s.formGroup}>
               <label className={s.label} htmlFor="lastName">
                 Last Name<span className={s.req}>*</span>
@@ -273,13 +247,11 @@ export function GeneralInformation() {
                 errorMessage={errors.lastName?.message}
               />
             </div>
-
             <Controller
               name="dateOfBirth"
               control={control}
               render={({ field }) => {
                 const selectedDate = parseDateString(field.value);
-
                 return (
                   <>
                     <DatePicker
@@ -370,11 +342,7 @@ export function GeneralInformation() {
                 </div>
               </div>
             </div>
-
             <div className={s.formGroup}>
-              {/*<label className={s.label} htmlFor="aboutMe">*/}
-              {/*  About Me*/}
-              {/*</label>*/}
               <Controller
                 name="aboutMe"
                 control={control}
@@ -394,16 +362,10 @@ export function GeneralInformation() {
                   />
                 )}
               />
-              {/*{errors.aboutMe && (*/}
-              {/*  <span className={`${s.errorMsg} ${s.show}`}>*/}
-              {/*    {errors.aboutMe.message}*/}
-              {/*  </span>*/}
-              {/*)}*/}
             </div>
           </form>
         </div>
       </div>
-
       <footer className={s.pageFooter}>
         <Button
           variant={'primary'}
