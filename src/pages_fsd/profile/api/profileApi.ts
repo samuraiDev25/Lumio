@@ -1,8 +1,18 @@
 import { baseApi } from '@/shared/api';
 import { GeneralInformationSchema } from '@/pages_fsd/profile/modal/validation';
+import { UserProfile } from '@/pages_fsd/profile/modal/types/profile.types';
 
 export const profileApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    getUserProfile: builder.query<UserProfile, number>({
+      query: (userId) => ({
+        url: `/api/v1/profile/${userId}`,
+        method: 'GET',
+      }),
+      providesTags: (_result, _error, userId) => [
+        { type: 'Profile', id: userId },
+      ],
+    }),
     fillProfile: builder.mutation<
       void,
       { userId: string; data: GeneralInformationSchema }
@@ -23,4 +33,4 @@ export const profileApi = baseApi.injectEndpoints({
     }),
   }),
 });
-export const { useFillProfileMutation } = profileApi;
+export const { useFillProfileMutation, useGetUserProfileQuery } = profileApi;
