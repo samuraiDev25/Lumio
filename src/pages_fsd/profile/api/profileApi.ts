@@ -1,5 +1,6 @@
 import { baseApi } from '@/shared/api';
 import { GeneralInformationSchema } from '@/pages_fsd/profile/modal/validation';
+import { UserProfile } from '@/entities/profile/modal/types/profileApi.types';
 
 export const profileApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -19,11 +20,36 @@ export const profileApi = baseApi.injectEndpoints({
           city: data.city || null,
           aboutMe: data.aboutMe || null,
         },
+        providesTags: ['Profile'],
       }),
       invalidatesTags: (result, error, { userId }) => [
         { type: 'Profile', id: userId },
       ],
     }),
+    getProfile: builder.query<UserProfile, string>({
+      query: (userId) => `/api/v1/profile/${userId}`,
+      providesTags: ['Profile'],
+    }),
+    uploadAvatar: builder.mutation<{ url: string }, FormData>({
+      query: (formData) => ({
+        url: `/api/v1/profile/avatar`,
+        method: 'POST',
+        body: formData,
+      }),
+      invalidatesTags: ['Profile'],
+    }),
+    deleteAvatar: builder.mutation<void, void>({
+      query: () => ({
+        url: `/api/v1/profile/avatar`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Profile'],
+    }),
   }),
 });
-export const { useFillProfileMutation } = profileApi;
+export const {
+  useFillProfileMutation,
+  useGetProfileQuery,
+  useUploadAvatarMutation,
+  useDeleteAvatarMutation,
+} = profileApi;
