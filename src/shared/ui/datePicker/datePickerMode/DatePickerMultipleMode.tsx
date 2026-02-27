@@ -1,25 +1,40 @@
 'use client';
 
 import s from '../DatePicker.module.scss';
-import { DayPicker } from 'react-day-picker';
+import { ClassNames, DayPicker, ModifiersClassNames } from 'react-day-picker';
 import React from 'react';
 import { getWeekForDay } from '@/shared/ui/datePicker/utilsDate';
+import { CaptionLayout } from '../types';
 
 type Props = {
   today: Date;
   selectedWeek?: Date[];
   onSelectAction: (day: Date, week: Date[]) => void;
   onErrorAction: (error: string | null) => void;
+  allowPastDates: boolean;
+  dayPickerClassNames?: Partial<ClassNames>;
+  dayPickerModifiersClassNames?: Partial<ModifiersClassNames>;
+  captionLayout?: CaptionLayout;
+  startMonth?: Date;
+  endMonth?: Date;
+  reverseYears?: boolean;
 };
 export const DatePickerMultipleMode = ({
   today,
   selectedWeek = [],
   onSelectAction,
   onErrorAction,
+  allowPastDates,
+  dayPickerClassNames,
+  dayPickerModifiersClassNames,
+  captionLayout,
+  startMonth,
+  endMonth,
+  reverseYears,
 }: Props) => {
   const validateDays = (day: Date, week: Date[]) => {
     const lastDayOfWeek = week[6];
-    if (lastDayOfWeek <= today) {
+    if (!allowPastDates && lastDayOfWeek <= today) {
       onErrorAction('Error!!');
       onSelectAction(day, week);
     } else {
@@ -40,6 +55,34 @@ export const DatePickerMultipleMode = ({
     validateDays(day, week);
   };
 
+  const defaultClassNames: Partial<ClassNames> = {
+    month: 'rdp-month',
+    day_button: 'rdp-day_button',
+    button_previous: 'rdp-button_previous',
+    button_next: 'rdp-button_next',
+    month_grid: 'rdp-month_grid',
+    dropdowns: 'rdp-dropdowns',
+    dropdown: 'rdp-dropdown',
+    dropdown_root: 'rdp-dropdown_root',
+    months_dropdown: 'rdp-months_dropdown',
+    years_dropdown: 'rdp-years_dropdown',
+    caption_label: 'rdp-caption_label',
+  };
+  const defaultModifiersClassNames: ModifiersClassNames = {
+    selected: s.selected,
+    weekend: s.weekend,
+  };
+  const mergedModifiersClassNames: ModifiersClassNames = {
+    ...defaultModifiersClassNames,
+  };
+  if (dayPickerModifiersClassNames) {
+    for (const [key, value] of Object.entries(dayPickerModifiersClassNames)) {
+      if (value) {
+        mergedModifiersClassNames[key] = value;
+      }
+    }
+  }
+
   return (
     <DayPicker
       mode="multiple"
@@ -49,21 +92,16 @@ export const DatePickerMultipleMode = ({
       numberOfMonths={1}
       weekStartsOn={1}
       showOutsideDays
+      captionLayout={captionLayout}
+      startMonth={startMonth}
+      endMonth={endMonth}
+      reverseYears={reverseYears}
       modifiers={{
         weekend: { dayOfWeek: [0, 6] },
         today: today,
       }}
-      modifiersClassNames={{
-        selected: s.selected,
-        weekend: s.weekend,
-      }}
-      classNames={{
-        month: 'rdp-month',
-        button: 'rdp-day_button',
-        nav_button_previous: 'rdp-button_previous',
-        nav_button_next: 'rdp-button_next',
-        table: 'rdp-table',
-      }}
+      modifiersClassNames={mergedModifiersClassNames}
+      classNames={{ ...defaultClassNames, ...dayPickerClassNames }}
     />
   );
 };
