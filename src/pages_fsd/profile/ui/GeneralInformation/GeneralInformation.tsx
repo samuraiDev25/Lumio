@@ -12,6 +12,7 @@ import { Button, DatePicker, TextField } from '@/shared/ui';
 import {
   useFillProfileMutation,
   useGetProfileQuery,
+  useUpdateProfileMutation,
 } from '@/pages_fsd/profile/api/profileApi';
 import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
@@ -36,6 +37,7 @@ export function GeneralInformation() {
   const draftStorageKey = `general-information-draft:${userId ?? 'unknown'}`;
   const privacyPolicyHref = `${AUTH_ROUTES.PRIVACY_POLICY}?returnTo=${encodeURIComponent(pathname)}`;
   const [fillProfile] = useFillProfileMutation();
+  const [updateProfile] = useUpdateProfileMutation();
 
   const dispatch = useAppDispatch();
   const {
@@ -110,15 +112,23 @@ export function GeneralInformation() {
   const onSubmit = useCallback(
     async (data: GeneralInformationSchema) => {
       try {
+        sessionStorage.removeItem(draftStorageKey);
+
         const normalizedDate = normalizeDateString(data.dateOfBirth);
-        await fillProfile({
+
+        await updateProfile({
           userId,
           data: {
-            ...data,
+            firstName: data.firstName,
+            lastName: data.lastName,
             dateOfBirth: normalizedDate || null,
+            country: data.country || null,
+            city: data.city || null,
+            aboutMe: data.aboutMe || null,
           },
         }).unwrap();
-        sessionStorage.removeItem(draftStorageKey);
+
+        toast.success('Profile updated successfully');
         hasDraftRef.current = false;
       } catch (error) {
         handleNetworkError({
@@ -153,7 +163,7 @@ export function GeneralInformation() {
         });
       }
     },
-    [userId, fillProfile, dispatch, setError, draftStorageKey],
+    [userId, updateProfile, dispatch, setError, draftStorageKey],
   );
 
   return (
@@ -332,7 +342,7 @@ export function GeneralInformation() {
           disabled={!isValid || isSubmitting}
           onClick={handleSubmit(onSubmit)}
         >
-          Save Changes
+          {isSubmitting ? 'Saving...' : 'Save Changes'}
         </Button>
       </footer>
     </>
