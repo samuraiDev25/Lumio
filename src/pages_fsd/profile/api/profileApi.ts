@@ -1,6 +1,6 @@
 import { baseApi } from '@/shared/api';
 import { GeneralInformationSchema } from '@/pages_fsd/profile/modal/validation';
-import { UserProfile } from '@/entities/profile/modal/types/profileApi.types';
+import { UserProfile } from '@/pages_fsd/profile/modal/types/profile.types';
 
 export const profileApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -61,4 +61,5 @@ export const {
   useGetProfileQuery,
   useUploadAvatarMutation,
   useDeleteAvatarMutation,
+  useGetUserProfileQuery,
 } = profileApi;

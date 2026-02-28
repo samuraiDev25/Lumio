@@ -39,7 +39,6 @@ export function UserProfilePage({
     useGetUserProfileQuery(userIdNumber);
 
   const displayProfile = profileFromApi ?? initialProfile;
-  console.log(initialProfile);
 
   const [page, setPage] = useState(1);
   const [allPosts, setAllPosts] = useState<Post[]>(initialPosts?.items ?? []);

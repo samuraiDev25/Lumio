@@ -300,27 +300,6 @@ export function GeneralInformation() {
               </div>
             </div>
             <TextAreaSection control={control} errors={errors} />
-            {/*<div className={s.formGroup}>*/}
-            {/*  <Controller*/}
-            {/*    name="aboutMe"*/}
-            {/*    control={control}*/}
-            {/*    render={({ field }) => (*/}
-            {/*      <TextArea*/}
-            {/*        id="aboutMe"*/}
-            {/*        placeholder="Text-area"*/}
-            {/*        label={'About Me'}*/}
-            {/*        maxLength={ABOUT_ME_MAX}*/}
-            {/*        value={field.value ?? ''}*/}
-            {/*        onChange={field.onChange}*/}
-            {/*        onBlur={field.onBlur}*/}
-            {/*        errorMessage={errors.aboutMe?.message}*/}
-            {/*        className={`${s.textareaWrapper} ${errors.aboutMe ? s.invalid : ''}`}*/}
-            {/*        textareaClassName={s.textarea}*/}
-            {/*        containerClassName={s.textareaContainer}*/}
-            {/*      />*/}
-            {/*    )}*/}
-            {/*  />*/}
-            {/*</div>*/}
           </form>
         </div>
       </div>
