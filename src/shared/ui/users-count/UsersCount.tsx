@@ -18,18 +18,23 @@ type UsersCountProps = {
 export const UsersCount: FC<UsersCountProps> = ({ count }) => {
   const formattedCount = count.toString().padStart(5, '0');
 
+  const renderDigits = () => {
+    return formattedCount.split('').map((digit, index) => {
+      const isNotLast = index < formattedCount.length - 1;
+
+      return (
+        <div key={index} className={s['digit-wrapper']}>
+          <span className={s.digit}>{digit}</span>
+          {isNotLast && <div className={s.divider} />}
+        </div>
+      );
+    });
+  };
+
   return (
     <div className={s.container}>
       <span className={s.label}>Registered users:</span>
-
-      <div className={s['numbers-container']}>
-        {formattedCount.split('').map((digit, index) => (
-          <div key={index} className={s['digit-wrapper']}>
-            <span className={s.digit}>{digit}</span>
-            {index < formattedCount.length - 1 && <div className={s.divider} />}
-          </div>
-        ))}
-      </div>
+      <div className={s['numbers-container']}>{renderDigits()}</div>
     </div>
   );
 };
