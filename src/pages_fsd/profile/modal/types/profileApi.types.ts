@@ -1,8 +1,22 @@
+export type Nullable<T> = T | null;
+
 export type InputFillProfileDto = {
-  dateOfBirth: string;
-  country: string;
-  city: string;
-  aboutMe: string;
+  dateOfBirth: Nullable<string>;
+  country: Nullable<string>;
+  city: Nullable<string>;
+  aboutMe: Nullable<string>;
   firstName: string;
   lastName: string;
+};
+
+export type UserProfile = {
+  userId: number;
+  username: string;
+  firstName: Nullable<string>;
+  lastName: Nullable<string>;
+  dateOfBirth: Nullable<string>;
+  country: Nullable<string>;
+  city: Nullable<string>;
+  aboutMe: Nullable<string>;
+  avatarUrl: Nullable<string>;
 };
