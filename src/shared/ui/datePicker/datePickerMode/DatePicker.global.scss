@@ -16,6 +16,63 @@
   margin: 16px 24px 12px 24px;
 }
 
+.rdp-caption_label {
+  color: var(--color-light-100);
+}
+
+.rdp-dropdowns {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background-color: var(--color-dark-500);
+}
+
+.rdp-dropdown_root {
+  position: relative;
+  background-color: var(--color-dark-500);
+  border-radius: 6px;
+}
+
+.rdp-dropdown {
+  appearance: none;
+  background-color: var(--color-dark-500);
+  border: 1px solid var(--color-dark-300);
+  border-radius: 6px;
+  color: var(--color-light-100);
+  font-size: 14px;
+  line-height: 1.4;
+  padding: 4px 28px 4px 10px;
+  cursor: pointer;
+}
+
+.rdp-dropdown:focus {
+  border-color: var(--color-accent-700);
+}
+
+.rdp-dropdown::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 6px solid var(--color-light-100);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.rdp-months_dropdown,
+.rdp-years_dropdown {
+  min-width: 100px;
+}
+
+.rdp-dropdown option {
+  background-color: var(--color-dark-500);
+  color: var(--color-light-100);
+}
+
 .rdp-nav {
   inset-block-start: 31px;
   inset-inline-end: 36px;

@@ -1,14 +1,20 @@
-'use client';
+// 'use client';
 
 import Link from 'next/link';
 import s from './LegalLinks.module.scss';
 import { AUTH_ROUTES } from '@/shared/lib/routes';
+import { useSearchParams } from 'next/navigation';
 
 export default function PrivacyPolicy() {
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get('returnTo');
+  const backHref =
+    returnTo && returnTo.startsWith('/') ? returnTo : AUTH_ROUTES.SIGN_UP;
+
   return (
     <div className={s.fullscreenPage}>
-      <Link href={AUTH_ROUTES.SIGN_UP} className={s.backLink}>
-        ← Back to Sign Up
+      <Link href={backHref} className={s.backLink}>
+        Back
       </Link>
       <h1 className={s.title}>Privacy Policy</h1>
       <div className={s.content}>

@@ -1,8 +1,4 @@
 
-@mixin focus-ring {
-  border-color: var(--color-accent-500);
-}
-
 @mixin field-base {
   width: 100%;
   height: 36px;
@@ -14,7 +10,7 @@
   font-size: 16px;
 
   &:focus {
-    @include focus-ring;
+    border-color: var(--color-accent-500);
   }
 
   &::placeholder {
@@ -118,7 +114,9 @@ cursor: pointer;
 }
 
 .inputDate {
-  @include field-base;
+  width: 100%;
+  max-width: 740px;
+  height: 36px;
 }
 
 .selectWrap {
@@ -134,17 +132,15 @@ cursor: pointer;
     background: var(--color-dark-500);
   }
 }
-
+.textareaContainer {
+  gap: 0;
+}
 .textarea {
-  @include field-base;
-  background: var(--color-dark-500);
   min-height: 100px;
 }
 
-
-
 .errorMsg {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--color-danger-500);
   margin-top: 2px;
   display: none;
@@ -152,6 +148,21 @@ cursor: pointer;
   &.show {
     display: block;
   }
+}
+
+.inlineDateError {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.errorMsg.show.inlineDateError {
+  display: inline-flex;
+}
+
+.policyLink {
+  text-decoration: underline;
 }
 
 .pageFooter {
@@ -163,4 +174,12 @@ cursor: pointer;
 
 .btnSave {
   cursor: pointer;
+}
+
+.btnBack {
+  cursor: pointer;
+  margin-right: 12px;
+}
+.privacyLink {
+  text-decoration: underline;
 }
