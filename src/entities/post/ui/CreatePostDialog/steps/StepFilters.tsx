@@ -5,7 +5,7 @@ import s from '../CreatePostDialog.module.scss';
 
 import { ImageListType } from 'react-images-uploading';
 import { fileKey } from '../../../lib/keys';
-import { ImageEditsMap } from '@/entities/post/model/types/types';
+import { FilterPreset, ImageEditsMap } from '@/entities/post/model/types/types';
 import { FILTERS } from '@/entities/post/model/types/constant';
 
 type Props = {
@@ -37,6 +37,17 @@ export const StepFilters = ({
     : 'none';
 
   if (!active || !activeEdit) return null;
+
+  const filterHandler = (f: {
+    label: string;
+    value: FilterPreset;
+    css: string;
+  }) => {
+    setEdits({
+      ...edits,
+      [k]: { ...activeEdit, filter: f.value },
+    });
+  };
 
   return (
     <>
@@ -142,12 +153,7 @@ export const StepFilters = ({
                 className={s.filterItem}
                 role="button"
                 tabIndex={0}
-                onClick={() =>
-                  setEdits({
-                    ...edits,
-                    [k]: { ...activeEdit, filter: f.value },
-                  })
-                }
+                onClick={() => filterHandler(f)}
               >
                 <div
                   className={clsx(

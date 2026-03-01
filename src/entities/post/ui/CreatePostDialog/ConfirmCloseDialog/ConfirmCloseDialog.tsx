@@ -2,7 +2,7 @@
 
 import * as Dialog from '@radix-ui/react-dialog';
 import { Button } from '@/shared/ui/button/Button';
-import s from './CreatePostDialog.module.scss';
+import s from '../CreatePostDialog.module.scss';
 import { CLOSE_CONFIRM_TEXT } from '@/entities/post/model/types/constant';
 
 type Props = {

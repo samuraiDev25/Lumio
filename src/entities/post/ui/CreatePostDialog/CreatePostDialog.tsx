@@ -6,14 +6,15 @@ import { toast } from 'react-toastify';
 import { ImageListType } from 'react-images-uploading';
 
 import s from './CreatePostDialog.module.scss';
-import { ConfirmCloseDialog } from './ConfirmCloseDialog';
+import { ConfirmCloseDialog } from './ConfirmCloseDialog/ConfirmCloseDialog';
 import { StepSelect } from './steps/StepSelect';
 import { StepCrop } from './steps/StepCrop';
 import { StepFilters } from './steps/StepFilters';
 import { StepPublication } from './steps/StepPublication';
 
 import { useCreateNewPostMutation } from '@/entities/post/api/postApi';
-import { getCroppedImageBlob } from '../../lib/image';
+import { getCroppedFilteredImageBlob } from '../../lib/image';
+import { FILTERS } from '@/entities/post/model/types/constant';
 import { fileKey } from '../../lib/keys';
 import {
   CreatePostStep,
@@ -86,6 +87,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: Props) => {
 
   const publish = async () => {
     if (!images.length) return;
+    if (isLoading) return;
 
     const formData = new FormData();
 
@@ -96,14 +98,17 @@ export const CreatePostDialog = ({ open, onOpenChange }: Props) => {
       const key = fileKey(item.file);
       const edit = edits[key];
 
-      filtersArr.push(edit?.filter ?? 'none');
+      const filterValue = edit?.filter ?? 'none';
+      const cssFilter =
+        FILTERS.find((f) => f.value === filterValue)?.css ?? 'none';
 
       let blob: Blob;
-      if (edit?.croppedAreaPixels && item.data_url) {
-        blob = await getCroppedImageBlob(
+      if (item.data_url) {
+        blob = await getCroppedFilteredImageBlob(
           item.data_url,
-          edit.croppedAreaPixels,
+          edit?.croppedAreaPixels,
           item.file.type,
+          cssFilter,
         );
       } else {
         blob = item.file;
@@ -116,7 +121,16 @@ export const CreatePostDialog = ({ open, onOpenChange }: Props) => {
     }
 
     formData.append('description', description);
-    formData.append('filters', JSON.stringify(filtersArr));
+    formData.append(
+      'filters',
+      JSON.stringify(
+        images.map((it) => {
+          const key = it.file ? fileKey(it.file) : '';
+          const edit = key ? edits[key] : undefined;
+          return edit?.filter ?? 'none';
+        }),
+      ),
+    );
     try {
       await createNewPost(formData).unwrap();
 
@@ -130,18 +144,29 @@ export const CreatePostDialog = ({ open, onOpenChange }: Props) => {
     }
   };
 
+  const takeImage = (arg: ImageListType) => {
+    setImages(arg);
+    const next: ImageEditsMap = {};
+    for (const it of arg) {
+      if (it.file) {
+        const k = fileKey(it.file);
+        next[k] = edits[k] ?? {
+          crop: { x: 0, y: 0 },
+          zoom: 1,
+          aspect: 1,
+          filter: 'none',
+        };
+      }
+    }
+    setEdits(next);
+    if (activeIndex >= arg.length) setActiveIndex(Math.max(0, arg.length - 1));
+  };
+
   return (
     <>
       <Dialog.Root
         open={open}
-        onOpenChange={(v) => {
-          // если закрывают через overlay/esc — показываем confirm
-          if (!v) {
-            requestClose();
-            return;
-          }
-          onOpenChange(true);
-        }}
+        onOpenChange={(v) => (v ? onOpenChange(true) : requestClose())}
       >
         <Dialog.Portal>
           <Dialog.Overlay
@@ -153,30 +178,11 @@ export const CreatePostDialog = ({ open, onOpenChange }: Props) => {
             aria-describedby={undefined}
             style={confirmClose ? { pointerEvents: 'none' } : undefined}
           >
-            {/* Внутренний UI с headerBar уже в шагах, здесь только body */}
             <div className={s.body} data-step={step}>
               {step === 'select' && (
                 <StepSelect
                   images={images}
-                  setImages={(list) => {
-                    setImages(list);
-                    // sync edits
-                    const next: ImageEditsMap = {};
-                    for (const it of list) {
-                      if (it.file) {
-                        const k = fileKey(it.file);
-                        next[k] = edits[k] ?? {
-                          crop: { x: 0, y: 0 },
-                          zoom: 1,
-                          aspect: 1,
-                          filter: 'none',
-                        };
-                      }
-                    }
-                    setEdits(next);
-                    if (activeIndex >= list.length)
-                      setActiveIndex(Math.max(0, list.length - 1));
-                  }}
+                  setImages={takeImage}
                   onNext={goNext}
                   onRequestClose={requestClose}
                 />
@@ -185,7 +191,7 @@ export const CreatePostDialog = ({ open, onOpenChange }: Props) => {
               {step === 'crop' && (
                 <StepCrop
                   images={images}
-                  setImages={setImages}
+                  setImages={takeImage}
                   edits={edits}
                   setEdits={setEdits}
                   activeIndex={activeIndex}

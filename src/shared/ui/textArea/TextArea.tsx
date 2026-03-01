@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import styles from './TextArea.module.scss';
 
 export interface TextAreaProps {
+  id?: string;
   value?: string;
   placeholder?: string;
   label?: string;
@@ -17,9 +18,13 @@ export interface TextAreaProps {
   maxLength?: number;
   readOnly?: boolean;
   className?: string;
+  containerClassName?: string;
+  wrapperClassName?: string;
+  textareaClassName?: string;
 }
 
 export const TextArea: React.FC<TextAreaProps> = ({
+  id,
   value = '',
   placeholder = '',
   label = '',
@@ -33,6 +38,9 @@ export const TextArea: React.FC<TextAreaProps> = ({
   maxLength,
   readOnly = false,
   className = '',
+  containerClassName,
+  wrapperClassName,
+  textareaClassName,
 }) => {
   const [internalValue, setInternalValue] = useState(value);
   const [isFocused, setIsFocused] = useState(false);
@@ -89,7 +97,10 @@ export const TextArea: React.FC<TextAreaProps> = ({
   };
 
   return (
-    <div className={`${styles.textAreaContainer} ${className}`}>
+    <div
+      className={`${styles.textAreaContainer} ${containerClassName ?? ''} ${className}`}
+      id={id}
+    >
       {label && (
         <label
           className={`${styles.textAreaLabel} ${disabled ? styles.textAreaLabelDisabled : ''}`}
@@ -99,13 +110,13 @@ export const TextArea: React.FC<TextAreaProps> = ({
       )}
 
       <div
-        className={`${styles.textAreaWrapper} ${getStateClasses()}`}
+        className={`${styles.textAreaWrapper} ${getStateClasses()} ${wrapperClassName ?? ''}`}
         data-state={getDataState()}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <textarea
-          className={styles.textAreaElement}
+          className={`${styles.textAreaElement} ${textareaClassName ?? ''}`}
           value={internalValue}
           placeholder={placeholder}
           onChange={handleChange}
@@ -127,9 +138,9 @@ export const TextArea: React.FC<TextAreaProps> = ({
       </div>
 
       {hasError && (
-        <div id="error-message" className={styles.textAreaError} role="alert">
+        <span id="error-message" className={styles.textAreaError} role="alert">
           {errorMessage || 'Ошибка'}
-        </div>
+        </span>
       )}
     </div>
   );

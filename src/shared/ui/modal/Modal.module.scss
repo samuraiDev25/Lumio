@@ -52,7 +52,11 @@
 }
 
 .Title {
-  @include t.typography(var(--font-size-xl), var(--font-weight-700), var(--line-height-l));
+  @include t.typography(
+    var(--font-size-xl),
+    var(--font-weight-700),
+    var(--line-height-l)
+  );
 
   margin: 0;
 }
@@ -90,6 +94,30 @@
     background-color: var(--color-dark-100);
     outline: none;
   }
+}
+
+.delete {
+  width: 438px;
+  height: 240px;
+  max-width: 438px;
+  border-radius: 2px;
+  background-color: var(--color-dark-300);
+  display: flex;
+  flex-direction: column;
+
+  .ContentBox {
+    flex: 1;
+    padding: 30px 24px 24px 24px;
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.Separator {
+  height: 1px;
+  width: 100%;
+  background-color: var(--color-dark-100);
+  border: none;
 }
 
 @keyframes scale-fade-in {
