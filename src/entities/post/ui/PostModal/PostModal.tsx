@@ -18,6 +18,7 @@ import { PostHeader } from '@/entities/post/ui/PostModal/PostHeader/PostHeader';
 import { CommentItem } from '@/entities/post/ui/PostModal/CommentItem/CommentItem';
 import { PostActions } from '@/entities/post/ui/PostModal/PostActions/PostActions';
 import { MenuDropdown } from '@/entities/post/ui/PostModal/MenuDropdown/MenuDropdown';
+import { useRouter } from 'next/navigation';
 
 type Props = {
   children?: ReactNode;
@@ -63,6 +64,25 @@ export const PostModal = ({
   const { data: currentUser } = useMeQuery();
   const isOwnPost = currentUser?.userId?.toString() === post.userId?.toString();
   const images = post.postFiles || [];
+  const router = useRouter();
+
+  // Определяем, откуда пришел пользователь для правильного редиректа
+  const getRedirectPath = () => {
+    const referer = document.referrer || '';
+    
+    // Если пришли по прямой ссылке (URL содержит postId)
+    if (typeof window !== 'undefined' && window.location.search.includes('postId=')) {
+      return `/profile/${currentUser?.userId || ''}`;
+    }
+    
+    // Если пришли со страницы профиля
+    if (referer.includes('/profile')) {
+      return `/profile/${currentUser?.userId || ''}`;
+    }
+    
+    // Если пришли с главной страницы
+    return '/';
+  };
 
   const handleRequestClose = () => {
     // Если в режиме редактирования и есть несохранённые изменения
@@ -77,6 +97,9 @@ export const PostModal = ({
     if (externalOnClose) {
       externalOnClose();
     }
+    // Выполняем редирект на нужную страницу
+    const redirectPath = getRedirectPath();
+    router.push(redirectPath);
     setOpen(false);
   };
   const { currentIndex, nextImage, prevImage, selectImage } =

@@ -66,7 +66,7 @@ export const PostPage = ({ post }: Props) => {
     try {
       setIsEditing(false);
       await updatePost({
-        postId: post.id,
+        postId: post.id!!,
         description: postDescription,
       }).unwrap();
     } catch (error) {
@@ -243,7 +243,7 @@ export const PostPage = ({ post }: Props) => {
                     </div>
                   </div>
                   <div className={s.timestamp}>
-                    {formatDate(post.createdAt)}
+                    {formatDate(post.createdAt!!)}
                   </div>
                 </div>
 
@@ -298,7 +298,7 @@ export const PostPage = ({ post }: Props) => {
                   <span className={s.likesCount}>{likes} Likes</span>
                 </div>
 
-                <div className={s.postDate}>{formatDate(post.createdAt)}</div>
+                <div className={s.postDate}>{formatDate(post.createdAt!!)}</div>
 
                 {/* Поле ввода комментария */}
                 {isAuthorized && (
@@ -332,7 +332,7 @@ export const PostPage = ({ post }: Props) => {
       </div>
 
       <DeletePostModal
-        postId={post.id}
+        postId={post.id!!}
         isOpenModal={isDeletePost}
         onCloseModalAction={() => setIsDeletePost(false)}
       />

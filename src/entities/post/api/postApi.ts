@@ -68,6 +68,12 @@ export const postsApi = baseApi.injectEndpoints({
       },
       invalidatesTags: ['Posts'],
     }),
+    getPostById: builder.query<Post, string>({
+      query: (postId) => ({
+        url: `/api/v1/posts/post/${postId}`,
+        method: 'GET',
+      }),
+    }),
     getMyPosts: builder.query<
       GetMyPostsResponse,
       GetMyPostsRequest | undefined
@@ -100,6 +106,7 @@ export const {
   useDeletePostMutation,
   useUpdatePostUserMutation,
   useGetMyPostsQuery,
+  useGetPostByIdQuery,
 } = postsApi;
 
 /**
@@ -123,6 +130,55 @@ export const fetchMainPageData = async (
 
   if (!res.ok) {
     throw new Error('Failed to fetch main page data');
+  }
+
+  return res.json();
+};
+
+// написаноое первое /**
+//  * Server-side function for data fetching (ISR).
+//  *
+//  * Note: We use native 'fetch' here because RTK Query in Next.js Server Components
+//  * does not support the native cache configuration { next: { revalidate } }
+//  * as effectively as the built-in fetch API.
+//  *
+//  * @param pageSize - Number of posts to fetch (default: 4).
+//  * @returns Promise with MainPageResponse data.
+//  */
+// export const fetchMainPageData = async (
+//   pageSize: number = 4,
+// ): Promise<MainPageResponse> => {
+//   const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
+
+//   const res = await fetch(`${baseUrl}api/v1?pageSize=${pageSize}`, {
+//     next: { revalidate: 60 },
+//   });
+
+//   if (!res.ok) {
+//     throw new Error('Failed to fetch main page data');
+//   }
+
+//   return res.json();
+// };
+
+/**
+ * Server-side function for fetching a specific post by ID.
+ *
+ * @param postId - ID of the post to fetch.
+ * @returns Promise with Post data or null if not found.
+ */
+export const fetchPostById = async (postId: string): Promise<Post | null> => {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
+
+  const res = await fetch(`${baseUrl}api/v1/posts/post/${postId}`, {
+    next: { revalidate: 60 },
+  });
+
+  if (!res.ok) {
+    if (res.status === 404) {
+      return null;
+    }
+    throw new Error('Failed to fetch post');
   }
 
   return res.json();

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useGetUserProfileQuery } from '@/entities/profile/api/profileApi';
-
 import { useMeQuery } from '@/features/auth/api/authApi';
 import { Button, Typography } from '@/shared/ui';
 import { PROFILE_ROUTES } from '@/shared/lib/routes';
@@ -15,9 +14,11 @@ import { useGetMyPostsQuery } from '@/entities/post/api/postApi';
 
 type UserProfilePageProps = {
   userId: string;
+  initialProfile?: any;
+  initialPostId?: string;
 };
 
-export function UserProfilePage({ userId }: UserProfilePageProps) {
+export function UserProfilePage({ userId, initialProfile, initialPostId }: UserProfilePageProps) {
   const router = useRouter();
   const { data: currentUser } = useMeQuery();
 

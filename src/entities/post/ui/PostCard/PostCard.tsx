@@ -11,6 +11,7 @@ import Link from 'next/link';
 
 type PostCardProps = {
   post: Post;
+  profileId?: string; // Добавляем profileId для правильного роутинга
 };
 
 // Truncation limits optimized for Pixel Perfect layout:
@@ -31,7 +32,7 @@ const MIN_CONTENT_LENGTH_FOR_TOGGLE = 96;
  * 3. Dynamic Relative Time: Uses getRelativeTime utility.
  * 4. Fallback State: Includes a placeholder for posts without images.
  */
-export const PostCard = ({ post }: PostCardProps) => {
+export const PostCard = ({ post, profileId }: PostCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const [isImageHovered, setIsImageHovered] = useState(false);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -68,6 +69,8 @@ export const PostCard = ({ post }: PostCardProps) => {
       );
     }
   };
+
+
   return (
     <div className={s.card}>
       <div
@@ -79,7 +82,7 @@ export const PostCard = ({ post }: PostCardProps) => {
           {images.length > 0 && images[currentSlideIndex]?.url ? (
             <Link
               key={post.id}
-              href={`/posts/${post.id}`}
+              href={`/profile/${post.userId}?postId=${post.id}`}
               scroll={false}
               className={s['image-link']}
             >
