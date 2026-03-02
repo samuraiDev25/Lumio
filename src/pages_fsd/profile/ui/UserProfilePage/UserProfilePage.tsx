@@ -13,11 +13,11 @@ import {
 } from '@/entities/post/model/types/postApi.types';
 import { useGetMyPostsQuery } from '@/entities/post/api/postApi';
 import { useGetUserProfileQuery } from '@/pages_fsd/profile/api/profileApi';
-import { UserProfile } from '@/pages_fsd/profile/modal/types/profile.types';
+import { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
 
 type UserProfilePageProps = {
-  userId: string;
-  initialProfile: UserProfile;
+  userId: number;
+  initialProfile: UserProfile | null;
   initialPosts: GetMyPostsResponse;
 };
 
@@ -34,7 +34,8 @@ export function UserProfilePage({
   const userIdNumber = useMemo(() => Number(userId), [userId]);
   // const isValidUserId = Number.isFinite(userIdNumber); ХЗ, если на до позже добавлю
 
-  const isOwnProfile = currentUser?.userId?.toString() === userId;
+  const isOwnProfile = currentUser?.userId?.toString() === userId.toString();
+  console.log(userId);
   const { data: profileFromApi, isLoading: isProfileLoading } =
     useGetUserProfileQuery(userIdNumber);
 

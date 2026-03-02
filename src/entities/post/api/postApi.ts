@@ -5,7 +5,6 @@ import {
   MainPageResponse,
   Post,
 } from '@/entities/post/model/types/postApi.types';
-import { UserPosts } from '@/pages_fsd/profile/modal/types/profile.types';
 
 export const postsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -93,15 +92,6 @@ export const postsApi = baseApi.injectEndpoints({
       },
       providesTags: () => [{ type: 'Posts', id: 'MY' }],
     }),
-    getUserPosts: builder.query<GetMyPostsResponse, UserPosts>({
-      query: ({ userId, ...params }) => ({
-        url: `/api/v1/posts/${userId}`,
-        params,
-      }),
-      providesTags: (_result, _error, arg) => [
-        { type: 'Posts', id: `USER_${arg.userId}` },
-      ],
-    }),
   }),
 });
 
@@ -109,7 +99,6 @@ export const {
   useCreateNewPostMutation,
   useDeletePostMutation,
   useUpdatePostUserMutation,
-  useGetUserPostsQuery,
   useGetMyPostsQuery,
 } = postsApi;
 
