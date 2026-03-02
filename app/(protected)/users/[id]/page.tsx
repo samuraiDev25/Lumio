@@ -7,4 +7,5 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
   return <UserProfilePage userId={params.id} />;
 }
 */
-// Что это вообще за папка и для чего?
+
+// ????
