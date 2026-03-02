@@ -13,9 +13,8 @@ export default async function ProfilePage({ params }: Props) {
   const { userId } = await params;
 
   const profile = await fetchUserProfileSSR(Number(userId));
-  if (userId) {
-  }
-  // if (!profile) notFound();
+  if (!profile) notFound();
+
   const posts = await fetchUserPostsSSR(Number(userId), {
     pageNumber: 1,
     pageSize: 8,
@@ -25,7 +24,7 @@ export default async function ProfilePage({ params }: Props) {
 
   return (
     <UserProfileClientShell
-      userId={Number(userId)}
+      userId={userId}
       initialProfile={profile}
       initialPosts={posts}
     />

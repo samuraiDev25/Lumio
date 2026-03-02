@@ -1,5 +1,5 @@
 import { GetMyPostsResponse } from '@/entities/post/model/types/postApi.types';
-import { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
+import { UserProfile } from '@/pages_fsd/profile/modal/types/profile.types';
 
 export async function fetchUserProfileSSR(
   userId: number,

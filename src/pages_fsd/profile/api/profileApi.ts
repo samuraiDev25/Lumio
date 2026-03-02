@@ -1,6 +1,6 @@
 import { baseApi } from '@/shared/api';
 import { GeneralInformationSchema } from '@/pages_fsd/profile/modal/validation';
-import { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
+import { UserProfile } from '@/pages_fsd/profile/modal/types/profile.types';
 
 export type UpdateProfileRequest = {
   firstName: string;
@@ -86,5 +86,6 @@ export const {
   useUploadAvatarMutation,
   useDeleteAvatarMutation,
   useUpdateProfileMutation,
-  useGetUserProfileQuery,
 } = profileApi;
+
+export const useGetUserProfileQuery = useGetProfileQuery;
