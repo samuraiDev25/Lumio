@@ -10,7 +10,7 @@ export type InputFillProfileDto = {
 };
 
 export type UserProfile = {
-  userId: number;
+  id: number;
   username: string;
   firstName: Nullable<string>;
   lastName: Nullable<string>;
@@ -19,4 +19,12 @@ export type UserProfile = {
   city: Nullable<string>;
   aboutMe: Nullable<string>;
   avatarUrl: Nullable<string>;
+};
+
+export type UserPosts = {
+  userId: number;
+  pageNumber?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
 };
