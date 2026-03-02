@@ -1,4 +1,4 @@
 export { UserProfilePage } from '@/pages_fsd/profile/ui/UserProfilePage/UserProfilePage';
-export { UserProfileClientShell } from '@/pages_fsd/profile/ui/UserProfilePage/UserProfileClientShell';
 export { GeneralInformation } from '@/pages_fsd/profile/ui/GeneralInformation/GeneralInformation';
 export { AvatarUploader } from '@/pages_fsd/profile/ui/AvatarUploader/AvatarUploader';
+export { UserProfileClientShell } from '@/pages_fsd/profile/ui/UserProfilePage/UserProfileClientShell';
