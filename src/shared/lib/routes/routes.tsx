@@ -26,7 +26,9 @@ export const SIDEBAR_ROUTES = {
 };
 
 export const PROFILE_ROUTES = {
-  SETTINGS: (userId: string) => `${SIDEBAR_ROUTES.PROFILE}/fill/${userId}`,
+  SETTINGS: `${APP_ROUTES.ROOT}settings`,
+  SETTINGS_PART: (part: 'info' | 'devices' | 'subscriptions' | 'payments') =>
+    `${APP_ROUTES.ROOT}settings?part=${part}`,
 };
 
 // example

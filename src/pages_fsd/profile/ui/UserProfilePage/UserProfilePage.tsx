@@ -35,12 +35,10 @@ export function UserProfilePage({
   // const isValidUserId = Number.isFinite(userIdNumber); ХЗ, если на до позже добавлю
 
   const isOwnProfile = currentUser?.userId?.toString() === userId.toString();
-  console.log(userId);
   const { data: profileFromApi, isLoading: isProfileLoading } =
     useGetUserProfileQuery(userIdNumber);
 
   const displayProfile = profileFromApi ?? initialProfile;
-  console.log(initialProfile);
 
   const [page, setPage] = useState(1);
   const [allPosts, setAllPosts] = useState<Post[]>(initialPosts?.items ?? []);
@@ -167,7 +165,7 @@ export function UserProfilePage({
               <Button
                 variant="secondary"
                 size="md"
-                onClick={() => router.push(`/profile/fill/${userId}`)}
+                onClick={() => router.push(`/settings?part=info`)}
                 className={s.settingsButton}
               >
                 Profile Setting

@@ -15,7 +15,7 @@ type SettingsPageProps = {
   }>;
 };
 
-export default async function SettingsPage({
+export default async function ProfileSettingsPage({
   searchParams,
 }: SettingsPageProps) {
   const params = await searchParams;
