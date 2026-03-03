@@ -10,7 +10,7 @@ export type InputFillProfileDto = {
 };
 
 export type UserProfile = {
-  userId: number;
+  id: number;
   username: string;
   firstName: Nullable<string>;
   lastName: Nullable<string>;

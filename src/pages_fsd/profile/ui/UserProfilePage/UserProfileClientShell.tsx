@@ -21,7 +21,7 @@ export function UserProfileClientShell({
   const router = useRouter();
   const { data: me } = useMeQuery();
   const isAuth = !!me;
-  if (isAuth && userId) router.push(`/profile/fill/${userId}`);
+  if (isAuth && userId) router.push(`/settings?part=info`);
   if (!isAuth) {
     return (
       <UserProfilePage

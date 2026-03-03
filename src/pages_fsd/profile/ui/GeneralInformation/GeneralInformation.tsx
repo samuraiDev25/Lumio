@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import s from './GeneralInformation.module.scss';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -16,8 +16,8 @@ import {
 } from '@/pages_fsd/profile/api/profileApi';
 import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
-import { Controller, useForm, useWatch } from 'react-hook-form';
-import { useParams, usePathname } from 'next/navigation';
+import { Controller, useForm } from 'react-hook-form';
+import { usePathname } from 'next/navigation';
 import { AUTH_ROUTES } from '@/shared/lib/routes';
 import Link from 'next/link';
 import { CITIES, COUNTRIES } from '@/pages_fsd/profile/modal/constants';
@@ -27,14 +27,16 @@ import {
   parseDateString,
 } from '@/pages_fsd/profile/modal/utils/dateOfBirthUtil';
 import { TextAreaSection } from '@/pages_fsd/profile/ui/GeneralInformation/TextAreaSection/TextAreaSection';
+import { useMeQuery } from '@/features/auth/api/authApi';
 
 export function GeneralInformation() {
-  const [isDraftInitialized, setIsDraftInitialized] = useState(false);
-  const hasDraftRef = useRef(false);
-  const { userId } = useParams<{ userId: string }>();
-  const { data: profile } = useGetProfileQuery(userId);
+  const { data: me, isLoading: isMeLoading } = useMeQuery();
+  const userId = me?.userId ? Number(me.userId) : null;
+  const { data: profile } = useGetProfileQuery(userId!, {
+    skip: !userId || isMeLoading,
+    refetchOnMountOrArgChange: false,
+  });
   const pathname = usePathname();
-  const draftStorageKey = `general-information-draft:${userId ?? 'unknown'}`;
   const privacyPolicyHref = `${AUTH_ROUTES.PRIVACY_POLICY}?returnTo=${encodeURIComponent(pathname)}`;
   const [fillProfile] = useFillProfileMutation();
   const [updateProfile] = useUpdateProfileMutation();
@@ -61,38 +63,9 @@ export function GeneralInformation() {
       aboutMe: '',
     },
   });
-  const values = useWatch({ control });
 
   useEffect(() => {
-    const rawDraft = sessionStorage.getItem(draftStorageKey);
-    if (!rawDraft) {
-      setIsDraftInitialized(true);
-      return;
-    }
-
-    try {
-      const parsedDraft = JSON.parse(
-        rawDraft,
-      ) as Partial<GeneralInformationSchema>;
-      hasDraftRef.current = true;
-      reset({
-        username: parsedDraft.username ?? '',
-        firstName: parsedDraft.firstName ?? '',
-        lastName: parsedDraft.lastName ?? '',
-        dateOfBirth: parsedDraft.dateOfBirth ?? '',
-        country: parsedDraft.country ?? '',
-        city: parsedDraft.city ?? '',
-        aboutMe: parsedDraft.aboutMe ?? '',
-      });
-    } catch {
-      sessionStorage.removeItem(draftStorageKey);
-    } finally {
-      setIsDraftInitialized(true);
-    }
-  }, [draftStorageKey, reset]);
-
-  useEffect(() => {
-    if (!profile || !isDraftInitialized || hasDraftRef.current) return;
+    if (!profile) return;
     reset({
       username: profile.username ?? '',
       firstName: profile.firstName ?? '',
@@ -102,34 +75,42 @@ export function GeneralInformation() {
       city: profile.city ?? '',
       aboutMe: profile.aboutMe ?? '',
     });
-  }, [profile, reset, isDraftInitialized]);
-
-  useEffect(() => {
-    if (!isDraftInitialized) return;
-    sessionStorage.setItem(draftStorageKey, JSON.stringify(values));
-  }, [values, draftStorageKey, isDraftInitialized]);
+  }, [profile, reset]);
 
   const onSubmit = useCallback(
     async (data: GeneralInformationSchema) => {
+      if (!userId) {
+        toast.error('User not authenticated');
+        return;
+      }
+
       try {
-        sessionStorage.removeItem(draftStorageKey);
-
         const normalizedDate = normalizeDateString(data.dateOfBirth);
+        const hasProfile = Boolean(profile?.id);
+        const profileData = {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          dateOfBirth: normalizedDate || null,
+          country: data.country || null,
+          city: data.city || null,
+          aboutMe: data.aboutMe || null,
+        };
 
-        await updateProfile({
-          userId,
-          data: {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            dateOfBirth: normalizedDate || null,
-            country: data.country || null,
-            city: data.city || null,
-            aboutMe: data.aboutMe || null,
-          },
-        }).unwrap();
+        if (hasProfile) {
+          await updateProfile({
+            userId,
+            data: profileData,
+          }).unwrap();
 
-        toast.success('Profile updated successfully');
-        hasDraftRef.current = false;
+          toast.success(' Your settings are saved! ');
+        } else {
+          await fillProfile({
+            userId,
+            data: profileData,
+          }).unwrap();
+
+          toast.success('Profile created successfully');
+        }
       } catch (error) {
         handleNetworkError({
           error,
@@ -163,7 +144,7 @@ export function GeneralInformation() {
         });
       }
     },
-    [userId, updateProfile, dispatch, setError, draftStorageKey],
+    [userId, profile, fillProfile, updateProfile, dispatch, setError],
   );
 
   return (
@@ -234,15 +215,12 @@ export function GeneralInformation() {
                       onChangeAction={async (date) => {
                         if (!date) {
                           field.onChange('');
-                          // чтобы ошибка ушла сразу
                           await trigger('dateOfBirth');
                           return;
                         }
 
                         const iso = date.toISOString().slice(0, 10);
                         field.onChange(iso);
-
-                        // чтобы ошибка/валидность обновилась сразу после выбора
                         await trigger('dateOfBirth');
                       }}
                       errorMessage={errors.dateOfBirth?.message}
@@ -310,27 +288,6 @@ export function GeneralInformation() {
               </div>
             </div>
             <TextAreaSection control={control} errors={errors} />
-            {/*<div className={s.formGroup}>*/}
-            {/*  <Controller*/}
-            {/*    name="aboutMe"*/}
-            {/*    control={control}*/}
-            {/*    render={({ field }) => (*/}
-            {/*      <TextArea*/}
-            {/*        id="aboutMe"*/}
-            {/*        placeholder="Text-area"*/}
-            {/*        label={'About Me'}*/}
-            {/*        maxLength={ABOUT_ME_MAX}*/}
-            {/*        value={field.value ?? ''}*/}
-            {/*        onChange={field.onChange}*/}
-            {/*        onBlur={field.onBlur}*/}
-            {/*        errorMessage={errors.aboutMe?.message}*/}
-            {/*        className={`${s.textareaWrapper} ${errors.aboutMe ? s.invalid : ''}`}*/}
-            {/*        textareaClassName={s.textarea}*/}
-            {/*        containerClassName={s.textareaContainer}*/}
-            {/*      />*/}
-            {/*    )}*/}
-            {/*  />*/}
-            {/*</div>*/}
           </form>
         </div>
       </div>
