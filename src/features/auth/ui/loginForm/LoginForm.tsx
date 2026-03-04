@@ -8,11 +8,11 @@ import Link from 'next/link';
 import SvgYandex from '@/shared/ui/icons/YandexSvg';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useLoginMutation } from '@/features/auth/api/authApi';
+import { authApi, useLoginMutation } from '@/features/auth/api/authApi';
 import { useAppDispatch } from '@/shared/hooks/useAppDispatch';
 import { setCredentials } from '@/features/auth/model/authSlice';
 import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
-import { APP_ROUTES, AUTH_ROUTES } from '@/shared/lib/routes';
+import { APP_ROUTES, AUTH_ROUTES, SIDEBAR_ROUTES } from '@/shared/lib/routes';
 import { signInSchema, SignInType } from '@/features/auth/model/validation';
 import { handleNetworkError } from '@/shared/lib';
 
@@ -53,8 +53,12 @@ export const LoginForm = () => {
       const response = await login(data).unwrap();
       // Save token via Redux action (automatically persists to localStorage)
       dispatch(setCredentials({ accessToken: response.accessToken }));
-      //router.push(SIDEBAR_ROUTES.FEED);
-      router.push(APP_ROUTES.ROOT);
+      // Fetch current user data to obtain the userId
+      // Use dispatch to initiate the 'me' endpoint and wait for the result
+      const user = await dispatch(authApi.endpoints.me.initiate()).unwrap();
+      const userId = user.userId;
+
+      router.push(`/profile/${userId}`);
       router.refresh();
     } catch (error: unknown) {
       handleNetworkError({
