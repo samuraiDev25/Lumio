@@ -29,6 +29,8 @@ export const PostCard = ({ post }: PostCardProps) => {
         images={images}
         postId={post.id}
         isExpanded={isExpanded}
+        from="main"
+        profileId={post.userId}
       />
 
       <div className={s.content}>

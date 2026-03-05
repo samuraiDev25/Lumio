@@ -92,6 +92,44 @@ export const postsApi = baseApi.injectEndpoints({
       },
       providesTags: () => [{ type: 'Posts', id: 'MY' }],
     }),
+    getProfilePost: builder.query<Post, { profileId: number; postId: string }>({
+      query: ({ profileId, postId }) => ({
+        url: `/api/v1/posts/${profileId}`,
+        params: { postId },
+      }),
+      providesTags: (_res, _err, arg) => [
+        { type: 'Posts', id: `PROFILE_${arg.profileId}_${arg.postId}` },
+      ],
+    }),
+    getUserPosts: builder.query<
+      GetMyPostsResponse,
+      {
+        userId: number;
+        pageNumber?: number;
+        pageSize?: number;
+        sortBy?: string;
+        sortDirection?: 'asc' | 'desc';
+      }
+    >({
+      query: ({
+        userId,
+        pageNumber = 1,
+        pageSize = 8,
+        sortBy,
+        sortDirection,
+      }) => ({
+        url: `/api/v1/posts/${userId}`,
+        params: {
+          pageNumber,
+          pageSize,
+          ...(sortBy && { sortBy }),
+          ...(sortDirection && { sortDirection }),
+        },
+      }),
+      providesTags: (_result, _error, arg) => [
+        { type: 'Posts', id: `USER_${arg.userId}` },
+      ],
+    }),
   }),
 });
 
@@ -99,6 +137,8 @@ export const {
   useCreateNewPostMutation,
   useDeletePostMutation,
   useUpdatePostUserMutation,
+  useGetUserPostsQuery,
+  useGetProfilePostQuery,
   useGetMyPostsQuery,
 } = postsApi;
 

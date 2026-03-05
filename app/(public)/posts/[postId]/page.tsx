@@ -1,31 +1,52 @@
 import { notFound } from 'next/navigation';
 import { PostPageClient } from './PostPageClient';
+import { fetchProfilePostSSR } from '@/pages_fsd/profile/api/ssr';
 import { fetchMainPageData } from '@/entities/post/api/postApi';
 
 type Props = {
   params: Promise<{ postId: string }>;
+  searchParams?: {
+    profileId?: string;
+    from?: 'main' | 'profile';
+  };
 };
 
-export default async function PostPage({ params }: Props) {
-  const resolvedParams = await params;
-  const postId = resolvedParams.postId;
+export default async function PostPage({ params, searchParams }: Props) {
+  const resoledPostId = await params;
+  const postId = resoledPostId.postId;
 
-  if (!postId) {
-    notFound();
+  if (!postId) notFound();
+
+  const from = searchParams?.from;
+
+  const profileIdRaw = searchParams?.profileId;
+  const profileId = profileIdRaw ? Number(profileIdRaw) : NaN;
+
+  if (Number.isFinite(profileId)) {
+    const post = await fetchProfilePostSSR(profileId, postId);
+    if (!post) notFound();
+
+    return (
+      <PostPageClient
+        post={post}
+        profileId={searchParams?.profileId}
+        from={from}
+      />
+    );
   }
-  const data = await fetchMainPageData(4);
 
-  if (!Array.isArray(data?.posts?.items)) {
-    notFound();
-  }
+  const data = await fetchMainPageData(100);
 
-  const post = data.posts.items.find((post) => {
-    return post.id.toString() === postId;
-  });
+  if (!Array.isArray(data?.posts?.items)) notFound();
 
-  if (!post) {
-    notFound();
-  }
+  const post = data.posts.items.find((p) => p.id.toString() === postId);
+  if (!post) notFound();
 
-  return <PostPageClient post={post} />;
+  return (
+    <PostPageClient
+      post={post}
+      from={from ?? 'main'}
+      profileId={searchParams?.profileId}
+    />
+  );
 }
