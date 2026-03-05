@@ -110,6 +110,7 @@ export function GeneralInformation() {
           }).unwrap();
 
           toast.success('Profile created successfully');
+          // предлагаю сделать редирект на страницу профайла
         }
       } catch (error) {
         handleNetworkError({

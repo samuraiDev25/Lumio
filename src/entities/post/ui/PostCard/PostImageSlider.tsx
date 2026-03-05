@@ -11,12 +11,18 @@ type PostImageSliderProps = {
   images: { url: string }[];
   postId: number;
   isExpanded: boolean;
+
+  // Для условия ТЗ
+  from?: 'main' | 'profile';
+  profileId?: number;
 };
 
 export const PostImageSlider = ({
   images,
   postId,
   isExpanded,
+  from = 'main',
+  profileId,
 }: PostImageSliderProps) => {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -34,6 +40,8 @@ export const PostImageSlider = ({
     setCurrentSlideIndex((prev) => (prev - 1 + imagesCount) % imagesCount);
   };
 
+  const href = `/posts/${postId}?from=${from}&profileId=${profileId}`;
+
   return (
     <div
       className={clsx(s.image, isExpanded && s.expanded)}
@@ -42,11 +50,7 @@ export const PostImageSlider = ({
     >
       <div className={s['image-content']}>
         {imagesCount > 0 ? (
-          <Link
-            href={`/posts/${postId}`}
-            scroll={false}
-            className={s['image-link']}
-          >
+          <Link href={href} scroll={false} className={s['image-link']}>
             <Image
               src={images[currentSlideIndex].url}
               alt="Post image"
@@ -89,7 +93,11 @@ export const PostImageSlider = ({
                 s.dot,
                 index === currentSlideIndex && s['active-dot'],
               )}
-              onClick={() => setCurrentSlideIndex(index)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setCurrentSlideIndex(index);
+              }}
             />
           ))}
         </div>

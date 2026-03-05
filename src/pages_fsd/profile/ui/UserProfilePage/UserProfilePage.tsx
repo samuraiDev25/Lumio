@@ -1,24 +1,25 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useMeQuery } from '@/features/auth/api/authApi';
 import { Button, Typography } from '@/shared/ui';
-import { useRouter } from 'next/navigation';
-import s from './UserProfilePage.module.scss';
 import { PostGrid } from '@/entities/post/ui/PostGrid/PostGrid';
 import { Loading } from '@/shared/ui/loading/Loading';
+import { useGetUserPostsQuery } from '@/entities/post/api/postApi';
+import { useGetUserProfileQuery } from '@/pages_fsd/profile/api/profileApi';
 import {
   GetMyPostsResponse,
   Post,
 } from '@/entities/post/model/types/postApi.types';
-import { useGetMyPostsQuery } from '@/entities/post/api/postApi';
-import { useGetUserProfileQuery } from '@/pages_fsd/profile/api/profileApi';
 import { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
+import s from './UserProfilePage.module.scss';
 
-type UserProfilePageProps = {
+type Props = {
   userId: number;
   initialProfile: UserProfile | null;
   initialPosts: GetMyPostsResponse;
+  initialPost: Post | null;
 };
 
 const PAGE_SIZE = 8;
@@ -27,58 +28,58 @@ export function UserProfilePage({
   userId,
   initialProfile,
   initialPosts,
-}: UserProfilePageProps) {
+  initialPost,
+}: Props) {
   const router = useRouter();
   const { data: currentUser } = useMeQuery();
 
-  const userIdNumber = useMemo(() => Number(userId), [userId]);
-  // const isValidUserId = Number.isFinite(userIdNumber); ХЗ, если на до позже добавлю
+  const [isPostOpen, setIsPostOpen] = useState(!!initialPost);
 
+  useEffect(() => {
+    setIsPostOpen(!!initialPost);
+  }, [initialPost]);
+
+  const isValidUserId = Number.isFinite(userId);
   const isOwnProfile = currentUser?.userId?.toString() === userId.toString();
+
   const { data: profileFromApi, isLoading: isProfileLoading } =
-    useGetUserProfileQuery(userIdNumber);
+    useGetUserProfileQuery(userId, {
+      skip: !isValidUserId,
+      refetchOnMountOrArgChange: false,
+    });
 
   const displayProfile = profileFromApi ?? initialProfile;
 
   const [page, setPage] = useState(1);
   const [allPosts, setAllPosts] = useState<Post[]>(initialPosts?.items ?? []);
 
-  const pagesCount = initialPosts?.pagesCount ?? 1;
+  const queryArgs = useMemo(
+    () => ({
+      userId,
+      pageNumber: page,
+      pageSize: PAGE_SIZE,
+      sortBy: 'createdAt',
+      sortDirection: 'desc' as const,
+    }),
+    [userId, page],
+  );
 
   const {
     data: postsData,
     isLoading: isPostsLoading,
     isFetching,
-  } = useGetMyPostsQuery(
-    isOwnProfile
-      ? {
-          pageNumber: page,
-          pageSize: PAGE_SIZE,
-          sortBy: 'createdAt',
-          sortDirection: 'desc',
-        }
-      : {
-          pageNumber: page,
-          pageSize: PAGE_SIZE,
-          sortBy: 'createdAt',
-          sortDirection: 'desc',
-        },
-    { skip: false },
-  );
+  } = useGetUserPostsQuery(queryArgs, {
+    skip: !isValidUserId,
+    refetchOnMountOrArgChange: false,
+  });
 
-  const hasMore = isOwnProfile
-    ? postsData
-      ? page < postsData.pagesCount
-      : page < pagesCount
-    : false;
+  const pagesCount = postsData?.pagesCount ?? initialPosts?.pagesCount ?? 1;
 
-  const loadMoreRef = useRef<HTMLDivElement>(null);
-  const lockRef = useRef(false);
+  const hasMore = page < pagesCount;
 
   useEffect(() => {
     setPage(1);
     setAllPosts(initialPosts?.items ?? []);
-    lockRef.current = false;
   }, [userId, initialPosts]);
 
   useEffect(() => {
@@ -90,6 +91,9 @@ export function UserProfilePage({
       setAllPosts((prev) => [...prev, ...postsData.items]);
     }
   }, [postsData, page]);
+
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const lockRef = useRef(false);
 
   useEffect(() => {
     if (!isFetching) lockRef.current = false;
@@ -103,7 +107,6 @@ export function UserProfilePage({
       (entries) => {
         const first = entries[0];
         if (!first?.isIntersecting) return;
-
         if (!hasMore) return;
         if (isFetching) return;
         if (lockRef.current) return;
@@ -119,13 +122,11 @@ export function UserProfilePage({
   }, [hasMore, isFetching]);
 
   if (!displayProfile) {
-    if (isProfileLoading) {
-      return <Loading />;
-    }
+    if (isProfileLoading) return <Loading />;
 
     return (
       <div className={s.error}>
-        <Typography variant="h2">User not found1</Typography>
+        <Typography variant="h2">User not found</Typography>
       </div>
     );
   }
@@ -165,7 +166,7 @@ export function UserProfilePage({
               <Button
                 variant="secondary"
                 size="md"
-                onClick={() => router.push(`/settings?part=info`)}
+                onClick={() => router.push('/settings?part=info')}
                 className={s.settingsButton}
               >
                 Profile Setting
@@ -175,35 +176,31 @@ export function UserProfilePage({
 
           <div className={s.stats}>
             <div className={s.statItem}>
-              <div className={s.statNumber}>Following</div>
+              <div className={s.statNumber}>Заглушка</div>
               <div className={s.statLabel}>Following</div>
             </div>
             <div className={s.statItem}>
-              <div className={s.statNumber}>Followers</div>
+              <div className={s.statNumber}>Заглушка</div>
               <div className={s.statLabel}>Followers</div>
             </div>
             <div className={s.statItem}>
-              <div className={s.statNumber}>Publications</div>
+              <div className={s.statNumber}>
+                {initialPosts?.totalCount ?? 0}
+              </div>
               <div className={s.statLabel}>Publications</div>
             </div>
           </div>
-
-          <p className={s.text}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
-            <a className={s.textLink}>
-              laboris nisi ut aliquip ex ea commodo consequat.
-            </a>
-          </p>
         </div>
       </div>
 
       <div className={s.postsSection}>
         {allPosts.length > 0 ? (
           <>
-            <PostGrid posts={allPosts} />
+            <PostGrid
+              posts={allPosts}
+              profileId={Number(userId)}
+              from="profile"
+            />
 
             {isFetching && (
               <div className={s.loading}>
@@ -213,7 +210,7 @@ export function UserProfilePage({
 
             {hasMore && <div ref={loadMoreRef} className={s.loadMoreTrigger} />}
           </>
-        ) : isOwnProfile && isPostsLoading ? (
+        ) : isPostsLoading ? (
           <div className={s.loading}>
             <Loading />
           </div>
