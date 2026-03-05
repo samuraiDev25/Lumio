@@ -1,10 +1,19 @@
 'use client';
 
 import MainLayout from '@/app/MainLayout';
-import React from 'react';
+import { ReactNode } from 'react';
 
 export default function Layout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
-  return <MainLayout>{children}</MainLayout>;
+  modal,
+}: Readonly<{
+  children: ReactNode;
+  modal: ReactNode;
+}>) {
+  return (
+    <MainLayout>
+      {children}
+      {modal}
+    </MainLayout>
+  );
 }
