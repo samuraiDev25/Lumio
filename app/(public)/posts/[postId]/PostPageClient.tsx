@@ -9,7 +9,7 @@ import { useState } from 'react';
 type Props = {
   post: Post;
   profile: UserProfile | null;
-  profileId: string | undefined;
+  profileId: number;
   from?: 'main' | 'profile';
 };
 

@@ -5,9 +5,10 @@ import Image from 'next/image';
 import { Post } from '@/entities/post/model/types/postApi.types';
 import type { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
 import { getRelativeTime } from '@/shared/lib';
-import { PostDescription } from './PostDescription';
 import { PostImageSlider } from './PostImageSlider';
+import { PostDescription } from './PostDescription';
 import s from './PostCard.module.scss';
+import Link from 'next/link';
 
 type PostCardProps = {
   post: Post;
@@ -25,6 +26,7 @@ export const PostCard = ({ post, profile }: PostCardProps) => {
 
   const images = post.postFiles || [];
   const description = post.description || '';
+  //const userName = post.userName || `User${post.userId}`;
   const userName = profile?.username || `User ${post.userId}`;
   const avatarUrl = profile?.avatarUrl;
 
@@ -53,7 +55,9 @@ export const PostCard = ({ post, profile }: PostCardProps) => {
               userName[0].toUpperCase()
             )}
           </div>
-          <div className={s['user-name']}>{userName}</div>
+          <div className={s['user-name']}>
+            <Link href={`/profile/${post.userId}`}>{userName}</Link>
+          </div>
         </div>
 
         <div className={s.time}>{getRelativeTime(post.createdAt, 'en')}</div>
