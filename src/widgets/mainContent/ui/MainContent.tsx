@@ -5,6 +5,7 @@ import { useMeQuery } from '@/features/auth/api/authApi';
 import { BaseLayout } from '@/app/BaseLayout';
 import MainLayout from '@/app/MainLayout';
 import { Post } from '@/entities/post/model/types/postApi.types';
+import type { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
 import { handleNetworkError } from '@/shared/lib';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { useAppDispatch } from '@/shared/hooks';
@@ -13,6 +14,7 @@ import { PostsFeed } from './PostsFeed';
 type MainPageProps = {
   serverPosts: Post[];
   serverUsersCount: number;
+  profileByUserId: Record<number, UserProfile | null>;
 };
 
 function PageLayout({
@@ -29,7 +31,11 @@ function PageLayout({
   );
 }
 
-export function MainPage({ serverPosts, serverUsersCount }: MainPageProps) {
+export function MainPage({
+  serverPosts,
+  serverUsersCount,
+  profileByUserId,
+}: MainPageProps) {
   const { data: user, isLoading, error, isError } = useMeQuery();
   const dispatch = useAppDispatch();
 
@@ -49,7 +55,11 @@ export function MainPage({ serverPosts, serverUsersCount }: MainPageProps) {
 
   return (
     <PageLayout isAuthorized={isAuthorized}>
-      <PostsFeed posts={serverPosts} usersCount={serverUsersCount} />
+      <PostsFeed
+        posts={serverPosts}
+        usersCount={serverUsersCount}
+        profileByUserId={profileByUserId}
+      />
     </PageLayout>
   );
 }

@@ -1,16 +1,22 @@
 'use client';
 
 import { PostCard } from '@/entities/post/ui/PostCard/PostCard';
-import { UsersCount } from '@/shared/ui/users-count/UsersCount';
 import { Post } from '@/entities/post/model/types/postApi.types';
-import s from './MainContent.module.scss'; // Используем те же стили
+import type { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
+import { UsersCount } from '@/shared/ui/users-count/UsersCount';
+import s from './MainContent.module.scss';
 
 type PostsFeedProps = {
   posts: Post[];
   usersCount: number;
+  profileByUserId: Record<number, UserProfile | null>;
 };
 
-export function PostsFeed({ posts, usersCount }: PostsFeedProps) {
+export function PostsFeed({
+  posts,
+  usersCount,
+  profileByUserId,
+}: PostsFeedProps) {
   const renderPosts = () => {
     if (posts.length === 0) {
       return (
@@ -19,7 +25,14 @@ export function PostsFeed({ posts, usersCount }: PostsFeedProps) {
         </div>
       );
     }
-    return posts.map((post) => <PostCard key={post.id} post={post} />);
+
+    return posts.map((post) => (
+      <PostCard
+        key={post.id}
+        post={post}
+        profile={profileByUserId[post.userId]}
+      />
+    ));
   };
 
   return (

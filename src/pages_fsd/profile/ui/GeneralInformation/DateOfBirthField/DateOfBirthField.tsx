@@ -1,0 +1,66 @@
+import {
+  Control,
+  Controller,
+  FieldErrors,
+  UseFormTrigger,
+} from 'react-hook-form';
+import { DatePicker } from '@/shared/ui';
+import { parseDateString } from '@/pages_fsd/profile/modal/utils/dateOfBirthUtil';
+import { AUTH_ROUTES } from '@/shared/lib/routes';
+import { usePathname } from 'next/navigation';
+import s from '@/pages_fsd/profile/ui/GeneralInformation/GeneralInformation.module.scss';
+import Link from 'next/link';
+import { GeneralInformationSchema } from '@/pages_fsd/profile/modal/validation';
+type Props = {
+  control: Control<GeneralInformationSchema>;
+  errors: FieldErrors<GeneralInformationSchema>;
+  trigger: UseFormTrigger<GeneralInformationSchema>;
+};
+export function DateOfBirthField({ control, errors, trigger }: Props) {
+  const pathname = usePathname();
+  const privacyPolicyHref = `${AUTH_ROUTES.PRIVACY_POLICY}?returnTo=${encodeURIComponent(pathname)}`;
+  return (
+    <Controller
+      name="dateOfBirth"
+      control={control}
+      render={({ field }) => {
+        const selectedDate = parseDateString(field.value);
+        return (
+          <>
+            <DatePicker
+              className={s.formGroup}
+              labelTitle={'Date of birth'}
+              mode={'multiple'}
+              allowPastDates
+              captionLayout="dropdown"
+              startMonth={new Date(1950, 0, 1)}
+              endMonth={new Date(2026, 11, 1)}
+              reverseYears
+              value={selectedDate}
+              onChangeAction={async (date) => {
+                if (!date) {
+                  field.onChange('');
+                  await trigger('dateOfBirth');
+                  return;
+                }
+
+                const iso = date.toISOString().slice(0, 10);
+                field.onChange(iso);
+                await trigger('dateOfBirth');
+              }}
+              errorMessage={errors.dateOfBirth?.message}
+              errorNode={
+                <>
+                  {errors.dateOfBirth?.message}{' '}
+                  <Link href={privacyPolicyHref} className={s.privacyLink}>
+                    Privacy Policy
+                  </Link>
+                </>
+              }
+            />
+          </>
+        );
+      }}
+    />
+  );
+}
