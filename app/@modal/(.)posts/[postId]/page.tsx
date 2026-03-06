@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { InterceptedPostModalClient } from './InterceptedPostModalClient';
 import { fetchMainPageData } from '@/entities/post/api/postApi';
+import { fetchUserProfileSSR } from '@/pages_fsd/profile/api/ssr';
 
 type Props = {
   params: Promise<{ postId: string }>;
@@ -27,10 +28,12 @@ export default async function InterceptedPostModal({
   const post = data.posts.items.find((p) => p.id.toString() === postId);
 
   if (!post) notFound();
+  const profile = await fetchUserProfileSSR(post.userId);
 
   return (
     <InterceptedPostModalClient
       post={post}
+      profile={profile}
       from={from}
       profileId={profileIdCurrent}
     />

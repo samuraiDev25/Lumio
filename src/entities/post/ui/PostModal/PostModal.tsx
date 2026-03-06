@@ -6,6 +6,7 @@ import Image from 'next/image';
 import s from './PostModal.module.scss';
 import { CloseOutline } from '@/shared/ui/icons';
 import { Post } from '@/entities/post/model/types/postApi.types';
+import type { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
 import { ConfirmClosePost } from '@/entities/post/ui/ConfirmClosePost/ConfirmClosePost';
 import { useProtectedRoute } from '@/shared/hooks/useProtectedRoute';
 import { formatDate } from '@/entities/post/lib/formatDate';
@@ -22,8 +23,7 @@ import { MenuDropdown } from '@/entities/post/ui/PostModal/MenuDropdown/MenuDrop
 type Props = {
   children?: ReactNode;
   post: Post;
-  userName: string;
-  avatarUrl: string;
+  profile: UserProfile | null;
   initialImageIndex?: number;
   likesPost?: number;
   isOpen?: boolean;
@@ -33,8 +33,7 @@ type Props = {
 export const PostModal = ({
   children,
   post,
-  userName,
-  avatarUrl,
+  profile,
   initialImageIndex,
   likesPost = 0,
   isOpen: externalOpen,
@@ -63,6 +62,8 @@ export const PostModal = ({
   const { data: currentUser } = useMeQuery();
   const isOwnPost = currentUser?.userId?.toString() === post.userId?.toString();
   const images = post.postFiles || [];
+  const userName = profile?.username || `User ${post.userId}`;
+  const avatarUrl = profile?.avatarUrl || '/User 03.jpg';
 
   const handleRequestClose = () => {
     // Если в режиме редактирования и есть несохранённые изменения

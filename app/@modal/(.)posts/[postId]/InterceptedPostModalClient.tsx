@@ -3,15 +3,22 @@
 import { useRouter } from 'next/navigation';
 import { PostModal } from '@/entities/post/ui/PostModal/PostModal';
 import { Post } from '@/entities/post/model/types/postApi.types';
+import type { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
 import { useState } from 'react';
 
 type Props = {
   post: Post;
+  profile: UserProfile | null;
   from?: 'main' | 'profile';
   profileId: number;
 };
 
-export function InterceptedPostModalClient({ post, from, profileId }: Props) {
+export function InterceptedPostModalClient({
+  post,
+  profile,
+  from,
+  profileId,
+}: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(true);
 
@@ -27,8 +34,7 @@ export function InterceptedPostModalClient({ post, from, profileId }: Props) {
   return (
     <PostModal
       post={post}
-      userName={post.userName || 'Avatar'}
-      avatarUrl={post.avatarUrl || '/User 03.jpg'}
+      profile={profile}
       isOpen={open}
       onCloseAction={handleClose}
     />

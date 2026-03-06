@@ -1,6 +1,9 @@
 import { notFound } from 'next/navigation';
 import { PostPageClient } from './PostPageClient';
-import { fetchProfilePostSSR } from '@/pages_fsd/profile/api/ssr';
+import {
+  fetchProfilePostSSR,
+  fetchUserProfileSSR,
+} from '@/pages_fsd/profile/api/ssr';
 import { fetchMainPageData } from '@/entities/post/api/postApi';
 
 type Props = {
@@ -25,10 +28,12 @@ export default async function PostPage({ params, searchParams }: Props) {
   if (Number.isFinite(profileId)) {
     const post = await fetchProfilePostSSR(profileId, postId);
     if (!post) notFound();
+    const profile = await fetchUserProfileSSR(post.userId);
 
     return (
       <PostPageClient
         post={post}
+        profile={profile}
         profileId={searchParams?.profileId}
         from={from}
       />
@@ -41,10 +46,12 @@ export default async function PostPage({ params, searchParams }: Props) {
 
   const post = data.posts.items.find((p) => p.id.toString() === postId);
   if (!post) notFound();
+  const profile = await fetchUserProfileSSR(post.userId);
 
   return (
     <PostPageClient
       post={post}
+      profile={profile}
       from={from ?? 'main'}
       profileId={searchParams?.profileId}
     />
