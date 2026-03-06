@@ -1,17 +1,20 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Post } from '@/entities/post/model/types/postApi.types';
+import type { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
 import { getRelativeTime } from '@/shared/lib';
-import { PostImageSlider } from './PostImageSlider';
 import { PostDescription } from './PostDescription';
+import { PostImageSlider } from './PostImageSlider';
 import s from './PostCard.module.scss';
 
 type PostCardProps = {
   post: Post;
+  profile?: UserProfile | null;
 };
 
-export const PostCard = ({ post }: PostCardProps) => {
+export const PostCard = ({ post, profile }: PostCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleToggleExpand = (e: React.MouseEvent) => {
@@ -22,6 +25,8 @@ export const PostCard = ({ post }: PostCardProps) => {
 
   const images = post.postFiles || [];
   const description = post.description || '';
+  const userName = profile?.username || `User ${post.userId}`;
+  const avatarUrl = profile?.avatarUrl;
 
   return (
     <article className={s.card}>
@@ -35,8 +40,20 @@ export const PostCard = ({ post }: PostCardProps) => {
 
       <div className={s.content}>
         <div className={s['user-row']}>
-          <div className={s.avatar}>U</div>
-          <div className={s['user-name']}>User {post.userId}</div>
+          <div className={s.avatar}>
+            {avatarUrl ? (
+              <Image
+                src={avatarUrl}
+                alt={userName}
+                width={36}
+                height={36}
+                className={s['avatar-image']}
+              />
+            ) : (
+              userName[0].toUpperCase()
+            )}
+          </div>
+          <div className={s['user-name']}>{userName}</div>
         </div>
 
         <div className={s.time}>{getRelativeTime(post.createdAt, 'en')}</div>
