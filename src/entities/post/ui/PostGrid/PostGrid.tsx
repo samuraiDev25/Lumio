@@ -18,7 +18,7 @@ export function PostGrid({ posts }: PostGridProps) {
             <div className={s.postImageContainer}>
               <Link
                 key={post.id}
-                href={`/profile/${post.userId}?postId=${post.id}`}
+                href={`/posts/${post.id}`}
                 scroll={false}
                 style={{ textDecoration: 'none' }}
               >

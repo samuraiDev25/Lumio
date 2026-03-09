@@ -55,7 +55,7 @@ export const Header = () => {
                 </>
               )}
               {data?.email && (
-                <Link href={`/profile/${data.userId}?postId=999999999`} scroll={false}>
+                <Link href="/posts/999999999" scroll={false}>
                   Open missing post
                 </Link>
               )}
