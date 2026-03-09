@@ -1,41 +1,37 @@
 'use client';
 
-import { Post } from '@/entities/post/model/types/postApi.types';
 import { useRouter } from 'next/navigation';
 import { PostModal } from '@/entities/post/ui/PostModal/PostModal';
-import { useMeQuery } from '@/features/auth/api/authApi';
-import { Loading } from '@/shared/ui/loading/Loading';
-import { useGetPostByIdQuery } from '@/entities/post/api/postApi';
+import { Post } from '@/entities/post/model/types/postApi.types';
+import type { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
+import { useState } from 'react';
 
 type Props = {
   post: Post;
+  profile: UserProfile | null;
+  profileId: number;
+  from?: 'main' | 'profile';
 };
 
-export function PostPageClient({ post }: Props) {
+export function PostPageClient({ post, profile, profileId, from }: Props) {
   const router = useRouter();
-  const { data: user, isLoading: isUserLoading } = useMeQuery();
-  const { data: updatedPost, isLoading: isPostLoading, isError } = useGetPostByIdQuery(
-    post.id.toString(),
-    {
-      skip: !user, // Загружаем обновленный пост только после авторизации
-    },
-  );
+  const [open, setOpen] = useState(true);
 
-  // Пока загружается информация о пользователе, показываем лоадер
-  if (isUserLoading) {
-    return <Loading />;
-  }
-
-  // Используем данные из кэша RTK Query, если они есть, иначе - серверные
-  const currentPost = updatedPost || post;
+  const handleClose = () => {
+    setOpen(false);
+    if (from === 'main') {
+      router.push('/', { scroll: false });
+      return;
+    }
+    router.push(`/profile/${profileId}`, { scroll: false });
+  };
 
   return (
     <PostModal
-      post={currentPost}
-      userName={currentPost.userName || 'User'}
-      avatarUrl={currentPost.avatarUrl || '/User 03.jpg'}
-      isOpen={true}
-      onCloseAction={() => router.back()}
+      post={post}
+      profile={profile}
+      isOpen={open}
+      onCloseAction={handleClose}
     />
   );
 }

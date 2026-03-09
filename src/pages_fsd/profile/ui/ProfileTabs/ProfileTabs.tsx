@@ -1,29 +1,34 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams, usePathname } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import s from './ProfileTabs.module.scss';
 import { PROFILE_ROUTES } from '@/shared/lib/routes';
 
 export const ProfileTabs = () => {
-  const pathname = usePathname();
-  const { userId } = useParams<{ userId: string }>();
+  const searchParams = useSearchParams();
+  const activePart = searchParams.get('part') ?? 'info';
+
   const TABS = [
     {
       label: 'General information',
-      href: PROFILE_ROUTES.SETTINGS(userId),
+      href: PROFILE_ROUTES.SETTINGS_PART('info'),
     },
-    { label: 'Devices', href: '/profile/fill/devices' },
-    { label: 'Account Management', href: '/profile/fill/account' },
-    { label: 'My payments', href: '/profile/fill/payments' },
+    { label: 'Devices', href: PROFILE_ROUTES.SETTINGS_PART('devices') },
+    {
+      label: 'Subscriptions',
+      href: PROFILE_ROUTES.SETTINGS_PART('subscriptions'),
+    },
+    { label: 'My payments', href: PROFILE_ROUTES.SETTINGS_PART('payments') },
   ];
+
   return (
     <nav className={s.navTabs}>
       {TABS.map(({ label, href }) => (
         <Link
           key={href}
           href={href}
-          className={`${s.navTab} ${pathname === href ? s.active : ''}`}
+          className={`${s.navTab} ${href.includes(`part=${activePart}`) ? s.active : ''}`}
         >
           {label}
         </Link>

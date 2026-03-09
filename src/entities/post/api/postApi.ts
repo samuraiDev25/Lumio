@@ -5,7 +5,6 @@ import {
   MainPageResponse,
   Post,
 } from '@/entities/post/model/types/postApi.types';
-import { UserPosts } from '@/pages_fsd/profile/modal/types/profile.types';
 
 export const postsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -69,12 +68,6 @@ export const postsApi = baseApi.injectEndpoints({
       },
       invalidatesTags: ['Posts'],
     }),
-    getPostById: builder.query<Post, string>({
-      query: (postId) => ({
-        url: `/api/v1/posts/post/${postId}`,
-        method: 'GET',
-      }),
-    }),
     getMyPosts: builder.query<
       GetMyPostsResponse,
       GetMyPostsRequest | undefined
@@ -99,10 +92,39 @@ export const postsApi = baseApi.injectEndpoints({
       },
       providesTags: () => [{ type: 'Posts', id: 'MY' }],
     }),
-    getUserPosts: builder.query<GetMyPostsResponse, UserPosts>({
-      query: ({ userId, ...params }) => ({
+    getProfilePost: builder.query<Post, { profileId: number; postId: string }>({
+      query: ({ profileId, postId }) => ({
+        url: `/api/v1/posts/${profileId}`,
+        params: { postId },
+      }),
+      providesTags: (_res, _err, arg) => [
+        { type: 'Posts', id: `PROFILE_${arg.profileId}_${arg.postId}` },
+      ],
+    }),
+    getUserPosts: builder.query<
+      GetMyPostsResponse,
+      {
+        userId: number;
+        pageNumber?: number;
+        pageSize?: number;
+        sortBy?: string;
+        sortDirection?: 'asc' | 'desc';
+      }
+    >({
+      query: ({
+        userId,
+        pageNumber = 1,
+        pageSize = 8,
+        sortBy,
+        sortDirection,
+      }) => ({
         url: `/api/v1/posts/${userId}`,
-        params,
+        params: {
+          pageNumber,
+          pageSize,
+          ...(sortBy && { sortBy }),
+          ...(sortDirection && { sortDirection }),
+        },
       }),
       providesTags: (_result, _error, arg) => [
         { type: 'Posts', id: `USER_${arg.userId}` },
@@ -116,8 +138,8 @@ export const {
   useDeletePostMutation,
   useUpdatePostUserMutation,
   useGetUserPostsQuery,
+  useGetProfilePostQuery,
   useGetMyPostsQuery,
-  useGetPostByIdQuery,
 } = postsApi;
 
 /**
@@ -146,51 +168,3 @@ export const fetchMainPageData = async (
   return res.json();
 };
 
-// написаноое первое /**
-//  * Server-side function for data fetching (ISR).
-//  *
-//  * Note: We use native 'fetch' here because RTK Query in Next.js Server Components
-//  * does not support the native cache configuration { next: { revalidate } }
-//  * as effectively as the built-in fetch API.
-//  *
-//  * @param pageSize - Number of posts to fetch (default: 4).
-//  * @returns Promise with MainPageResponse data.
-//  */
-// export const fetchMainPageData = async (
-//   pageSize: number = 4,
-// ): Promise<MainPageResponse> => {
-//   const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
-
-//   const res = await fetch(`${baseUrl}api/v1?pageSize=${pageSize}`, {
-//     next: { revalidate: 60 },
-//   });
-
-//   if (!res.ok) {
-//     throw new Error('Failed to fetch main page data');
-//   }
-
-//   return res.json();
-// };
-
-/**
- * Server-side function for fetching a specific post by ID.
- *
- * @param postId - ID of the post to fetch.
- * @returns Promise with Post data or null if not found.
- */
-export const fetchPostById = async (postId: string): Promise<Post | null> => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
-
-  const res = await fetch(`${baseUrl}api/v1/posts/post/${postId}`, {
-    next: { revalidate: 60 },
-  });
-
-  if (!res.ok) {
-    if (res.status === 404) {
-      return null;
-    }
-    throw new Error('Failed to fetch post');
-  }
-
-  return res.json();
-};

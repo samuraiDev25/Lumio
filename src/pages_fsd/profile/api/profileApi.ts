@@ -1,6 +1,8 @@
 import { baseApi } from '@/shared/api';
-import { GeneralInformationSchema } from '@/pages_fsd/profile/modal/validation';
-import { UserProfile } from '@/pages_fsd/profile/modal/types/profile.types';
+import {
+  InputFillProfileDto,
+  UserProfile,
+} from '@/pages_fsd/profile/modal/types/profileApi.types';
 
 export type UpdateProfileRequest = {
   firstName: string;
@@ -26,29 +28,31 @@ export const profileApi = baseApi.injectEndpoints({
     }),
     fillProfile: builder.mutation<
       void,
-      { userId: string; data: GeneralInformationSchema }
+      { userId: number; data: InputFillProfileDto }
     >({
       query: ({ userId, data }) => ({
         url: `/api/v1/profile/fill/${userId}`,
         method: 'PUT',
         body: {
           dateOfBirth: data.dateOfBirth || null,
-          username: data.username,
           firstName: data.firstName,
           lastName: data.lastName,
           country: data.country || null,
           city: data.city || null,
           aboutMe: data.aboutMe || null,
         },
-        providesTags: ['Profile'],
       }),
       invalidatesTags: (result, error, { userId }) => [
+        'Profile',
         { type: 'Profile', id: userId },
       ],
     }),
-    getProfile: builder.query<UserProfile, string>({
+    getProfile: builder.query<UserProfile, number>({
       query: (userId) => `/api/v1/profile/${userId}`,
-      providesTags: ['Profile'],
+      providesTags: (_result, _error, userId) => [
+        'Profile',
+        { type: 'Profile', id: userId },
+      ],
     }),
     uploadAvatar: builder.mutation<{ url: string }, FormData>({
       query: (formData) => ({
@@ -67,7 +71,7 @@ export const profileApi = baseApi.injectEndpoints({
     }),
     updateProfile: builder.mutation<
       UpdateProfileResponse,
-      { userId: string; data: UpdateProfileRequest }
+      { userId: number; data: UpdateProfileRequest }
     >({
       query: ({ userId, data }) => ({
         url: `/api/v1/profile/${userId}`,
@@ -75,6 +79,7 @@ export const profileApi = baseApi.injectEndpoints({
         body: data,
       }),
       invalidatesTags: (result, error, { userId }) => [
+        'Profile',
         { type: 'Profile', id: userId },
       ],
     }),
@@ -86,6 +91,5 @@ export const {
   useUploadAvatarMutation,
   useDeleteAvatarMutation,
   useUpdateProfileMutation,
+  useGetUserProfileQuery,
 } = profileApi;
-
-export const useGetUserProfileQuery = useGetProfileQuery;

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import s from './PostModal.module.scss';
 import { CloseOutline } from '@/shared/ui/icons';
 import { Post } from '@/entities/post/model/types/postApi.types';
+import type { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
 import { ConfirmClosePost } from '@/entities/post/ui/ConfirmClosePost/ConfirmClosePost';
 import { useProtectedRoute } from '@/shared/hooks/useProtectedRoute';
 import { formatDate } from '@/entities/post/lib/formatDate';
@@ -18,13 +19,11 @@ import { PostHeader } from '@/entities/post/ui/PostModal/PostHeader/PostHeader';
 import { CommentItem } from '@/entities/post/ui/PostModal/CommentItem/CommentItem';
 import { PostActions } from '@/entities/post/ui/PostModal/PostActions/PostActions';
 import { MenuDropdown } from '@/entities/post/ui/PostModal/MenuDropdown/MenuDropdown';
-import { useRouter } from 'next/navigation';
 
 type Props = {
   children?: ReactNode;
   post: Post;
-  userName: string;
-  avatarUrl: string;
+  profile: UserProfile | null;
   initialImageIndex?: number;
   likesPost?: number;
   isOpen?: boolean;
@@ -34,8 +33,7 @@ type Props = {
 export const PostModal = ({
   children,
   post,
-  userName,
-  avatarUrl,
+  profile,
   initialImageIndex,
   likesPost = 0,
   isOpen: externalOpen,
@@ -64,25 +62,8 @@ export const PostModal = ({
   const { data: currentUser } = useMeQuery();
   const isOwnPost = currentUser?.userId?.toString() === post.userId?.toString();
   const images = post.postFiles || [];
-  const router = useRouter();
-
-  // Определяем, откуда пришел пользователь для правильного редиректа
-  const getRedirectPath = () => {
-    const referer = document.referrer || '';
-    
-    // Если пришли по прямой ссылке (URL содержит postId)
-    if (typeof window !== 'undefined' && window.location.search.includes('postId=')) {
-      return `/profile/${currentUser?.userId || ''}`;
-    }
-    
-    // Если пришли со страницы профиля
-    if (referer.includes('/profile')) {
-      return `/profile/${currentUser?.userId || ''}`;
-    }
-    
-    // Если пришли с главной страницы
-    return '/';
-  };
+  const userName = profile?.username || `User ${post.userId}`;
+  const avatarUrl = profile?.avatarUrl || '/User 03.jpg';
 
   const handleRequestClose = () => {
     // Если в режиме редактирования и есть несохранённые изменения
@@ -97,9 +78,6 @@ export const PostModal = ({
     if (externalOnClose) {
       externalOnClose();
     }
-    // Выполняем редирект на нужную страницу
-    const redirectPath = getRedirectPath();
-    router.push(redirectPath);
     setOpen(false);
   };
   const { currentIndex, nextImage, prevImage, selectImage } =
