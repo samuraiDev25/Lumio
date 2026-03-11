@@ -6,7 +6,7 @@ import {
 } from '@/pages_fsd/profile/api/profileApi';
 import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
-import { normalizeDateString } from '@/pages_fsd/profile/modal/utils/dateOfBirthUtil';
+import { normalizeDateString } from '@/widgets/ProfileGeneralInfo/modal/utils/dateOfBirthUtil';
 import { GeneralInformationSchema } from '@/pages_fsd/profile/modal/validation';
 import { UseFormSetError } from 'react-hook-form';
 
