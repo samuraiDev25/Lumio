@@ -1,8 +1,11 @@
-import { ProfileTabs } from '@/pages_fsd/profile/ui/ProfileTabs/ProfileTabs';
-import { GeneralInformation } from '@/pages_fsd/profile';
+import { ProfileTabs } from '@/widgets/ProfileTabs/ui/ProfileTabs';
 import { redirect } from 'next/navigation';
+import { GeneralInformation } from '@/widgets/ProfileGeneralInfo';
+import { ProfileAccount } from '@/widgets/ProfileAccount/ui/ProfileAccount';
+import { ProfilePayments } from '@/widgets/ProfilePayments/ui/ProfilePayments';
+import { ProfileDevices } from '@/widgets/ProfileDevices/ui/ProfileDevices';
 
-const VALID_PARTS = ['info', 'devices', 'subscriptions', 'payments'] as const;
+const VALID_PARTS = ['info', 'devices', 'account', 'payments'] as const;
 
 type SettingsPart = (typeof VALID_PARTS)[number];
 
@@ -29,6 +32,9 @@ export default async function ProfileSettingsPage({
     <>
       <ProfileTabs />
       {part === 'info' && <GeneralInformation />}
+      {part === 'account' && <ProfileAccount />}
+      {part === 'devices' && <ProfileDevices />}
+      {part === 'payments' && <ProfilePayments />}
     </>
   );
 }
