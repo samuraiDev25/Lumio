@@ -27,7 +27,7 @@ export const SIDEBAR_ROUTES = {
 
 export const PROFILE_ROUTES = {
   SETTINGS: `${APP_ROUTES.ROOT}settings`,
-  SETTINGS_PART: (part: 'info' | 'devices' | 'subscriptions' | 'payments') =>
+  SETTINGS_PART: (part: 'info' | 'devices' | 'account' | 'payments') =>
     `${APP_ROUTES.ROOT}settings?part=${part}`,
 };
 
