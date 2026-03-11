@@ -16,8 +16,8 @@ export const ProfileTabs = () => {
     },
     { label: 'Devices', href: PROFILE_ROUTES.SETTINGS_PART('devices') },
     {
-      label: 'Subscriptions',
-      href: PROFILE_ROUTES.SETTINGS_PART('subscriptions'),
+      label: 'Account Management',
+      href: PROFILE_ROUTES.SETTINGS_PART('account'),
     },
     { label: 'My payments', href: PROFILE_ROUTES.SETTINGS_PART('payments') },
   ];
