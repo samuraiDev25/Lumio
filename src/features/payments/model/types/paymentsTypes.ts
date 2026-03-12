@@ -13,3 +13,8 @@ export type MySubscriptionResponse = {
   nextPaymentDate: string;
   autoRenewal: boolean;
 };
+
+export type UpdateAutoRenewalRequest = {
+  profileId: string;
+  autoRenewal: boolean;
+};
