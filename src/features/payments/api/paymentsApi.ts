@@ -1,5 +1,8 @@
 import { baseApi } from '@/shared/api/baseApi';
-import { CreateSubscriptionPayload } from '@/features/payments/modal/types/paymentsTypes';
+import {
+  CreateSubscriptionPayload,
+  MySubscriptionResponse,
+} from '@/features/payments/model/types/paymentsTypes';
 
 export const paymentsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -13,7 +16,13 @@ export const paymentsApi = baseApi.injectEndpoints({
         body,
       }),
     }),
+    getMyPayments: builder.query<MySubscriptionResponse, void>({
+      query: () => ({
+        url: '/api/v1/payments/my-subscription',
+      }),
+    }),
   }),
 });
 
-export const { useCreateSubscriptionPaymentMutation } = paymentsApi;
+export const { useCreateSubscriptionPaymentMutation, useGetMyPaymentsQuery } =
+  paymentsApi;
