@@ -16,11 +16,31 @@
   color: var(--color-light-100);
 }
 
-.card {
+.card, .flexCard {
   border: 1px solid var(--color-dark-300);
   border-radius: 2px;
   padding: 12px 6px;
   background: var(--color-dark-500);
+}
+
+.flexCard {
+  display: flex;
+  gap: 45px;
+  padding: 12px 0 12px 24px;
+}
+
+.expireCard, .nextPayment {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header {
+  color: var(--color-light-900);
+}
+
+.autoRenewal {
+  margin-top: 16px;
 }
 
 .radioGroup {

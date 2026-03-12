@@ -5,12 +5,12 @@ import {
   UseFormTrigger,
 } from 'react-hook-form';
 import { DatePicker } from '@/shared/ui';
-import { parseDateString } from '@/widgets/ProfileGeneralInfo/modal/utils/dateOfBirthUtil';
+import { parseDateString } from '@/widgets/ProfileGeneralInfo/model/utils/dateOfBirthUtil';
 import { AUTH_ROUTES } from '@/shared/lib/routes';
 import { usePathname } from 'next/navigation';
 import s from '@/widgets/ProfileGeneralInfo/ui/GeneralInformation.module.scss';
 import Link from 'next/link';
-import { GeneralInformationSchema } from '@/widgets/ProfileGeneralInfo/modal/validation/validationSchema';
+import { GeneralInformationSchema } from '@/widgets/ProfileGeneralInfo/model/validation/validationSchema';
 type Props = {
   control: Control<GeneralInformationSchema>;
   errors: FieldErrors<GeneralInformationSchema>;

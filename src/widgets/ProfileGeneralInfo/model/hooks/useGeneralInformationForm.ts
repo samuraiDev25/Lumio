@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   generalInformationSchema,
   GeneralInformationSchema,
-} from '@/widgets/ProfileGeneralInfo/modal/validation/validationSchema';
+} from '@/widgets/ProfileGeneralInfo/model/validation/validationSchema';
 
 export function useGeneralInformationForm() {
   return useForm<GeneralInformationSchema>({
