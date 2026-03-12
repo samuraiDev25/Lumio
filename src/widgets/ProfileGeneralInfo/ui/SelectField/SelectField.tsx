@@ -1,6 +1,6 @@
 import s from '@/widgets/ProfileGeneralInfo/ui/GeneralInformation.module.scss';
 import { UseFormRegister } from 'react-hook-form';
-import { GeneralInformationSchema } from '@/pages_fsd/profile/modal/validation';
+import { GeneralInformationSchema } from '@/widgets/ProfileGeneralInfo/model/validation/validationSchema';
 
 type Props = {
   name: keyof GeneralInformationSchema;
