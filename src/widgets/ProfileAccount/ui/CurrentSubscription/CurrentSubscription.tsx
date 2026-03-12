@@ -33,7 +33,7 @@ export const CurrentSubscription = ({
 
       <div className={s.autoRenewal}>
         <Checkbox
-          checked={autoRenewal ?? false}
+          checked={autoRenewal}
           onChangeAction={onToggleAutoRenewal}
           label="Auto-Renewal"
           disabled={isUpdating}

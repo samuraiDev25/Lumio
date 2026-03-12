@@ -18,8 +18,9 @@ import { useAppDispatch } from '@/shared/hooks';
 import { useSearchParams } from 'next/navigation';
 import { StripeAutoRenewalModal } from '@/widgets/ProfileAccount/ui/StripeAutoRenewalModal/StripeAutoRenewalModal';
 import { CurrentSubscription } from '@/widgets/ProfileAccount/ui/CurrentSubscription/CurrentSubscription';
+import { getActualAccountType } from '@/features/payments/model/hooks/getActualAccountType';
+import { AccountType } from '@/features/payments/model/types/paymentsTypes';
 
-type AccountType = 'personal' | 'business';
 type SubscriptionPlan = 'weekly10' | 'biweekly50' | 'monthly100';
 const accountOptions: {
   value: AccountType;
@@ -44,6 +45,7 @@ const subscriptionMap = {
 
 export const ProfileAccount = () => {
   const [accountType, setAccountType] = useState<AccountType>('personal');
+
   const [plan, setPlan] = useState<SubscriptionPlan>('weekly10');
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
   const [stripeModalKey, setStripeModalKey] = useState(0);
@@ -59,6 +61,10 @@ export const ProfileAccount = () => {
     skip: !userId || isMeLoading,
     refetchOnMountOrArgChange: false,
   });
+
+  useEffect(() => {
+    setAccountType(getActualAccountType(subscription));
+  }, [subscription]);
 
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
@@ -174,20 +180,28 @@ export const ProfileAccount = () => {
   };
   return (
     <div className={s.profileAccount}>
-      {/*{subscription && (*                            Логичнее будет так, но изначально сделаю как в ТЗ    /}
+      {/*Расскоментировать когда протестируют все*/}
+
+      {/*{subscription && (*/}
       {/*  <CurrentSubscription*/}
       {/*    endDate={subscription?.endDate}*/}
       {/*    nextPaymentDate={subscription?.nextPaymentDate}*/}
       {/*    autoRenewal={subscription?.autoRenewal}*/}
+      {/*    isUpdating={isAutoRenewalUpdating}*/}
+      {/*    onToggleAutoRenewal={handleToggleAutoRenewal}*/}
       {/*  />*/}
       {/*)}*/}
-      <CurrentSubscription
-        endDate={subscription?.endDate}
-        nextPaymentDate={subscription?.nextPaymentDate}
-        autoRenewal={subscription?.autoRenewal}
-        isUpdating={isAutoRenewalUpdating}
-        onToggleAutoRenewal={handleToggleAutoRenewal}
-      />
+
+      {/*Для наглядного пособия*/}
+      {1 && (
+        <CurrentSubscription
+          endDate={subscription?.endDate}
+          nextPaymentDate={subscription?.nextPaymentDate}
+          autoRenewal={subscription?.autoRenewal}
+          isUpdating={isAutoRenewalUpdating}
+          onToggleAutoRenewal={handleToggleAutoRenewal}
+        />
+      )}
       <div className={s.section}>
         <p className={s.sectionTitle}>Account type:</p>
 

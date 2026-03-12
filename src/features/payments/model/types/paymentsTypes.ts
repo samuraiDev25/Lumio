@@ -18,3 +18,5 @@ export type UpdateAutoRenewalRequest = {
   profileId: string;
   autoRenewal: boolean;
 };
+
+export type AccountType = 'personal' | 'business';
