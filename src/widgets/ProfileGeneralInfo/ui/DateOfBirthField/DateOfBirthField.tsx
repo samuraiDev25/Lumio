@@ -10,7 +10,7 @@ import { AUTH_ROUTES } from '@/shared/lib/routes';
 import { usePathname } from 'next/navigation';
 import s from '@/widgets/ProfileGeneralInfo/ui/GeneralInformation.module.scss';
 import Link from 'next/link';
-import { GeneralInformationSchema } from '@/pages_fsd/profile/modal/validation';
+import { GeneralInformationSchema } from '@/widgets/ProfileGeneralInfo/modal/validation/validationSchema';
 type Props = {
   control: Control<GeneralInformationSchema>;
   errors: FieldErrors<GeneralInformationSchema>;

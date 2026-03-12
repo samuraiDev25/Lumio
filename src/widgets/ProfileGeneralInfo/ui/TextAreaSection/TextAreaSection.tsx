@@ -2,7 +2,7 @@ import s from '@/widgets/ProfileGeneralInfo/ui/GeneralInformation.module.scss';
 import { Control, Controller, FieldErrors } from 'react-hook-form';
 import { TextArea } from '@/shared/ui';
 import { ABOUT_ME_MAX } from '@/pages_fsd/profile/modal/constants';
-import { GeneralInformationSchema } from '@/pages_fsd/profile/modal/validation';
+import { GeneralInformationSchema } from '@/widgets/ProfileGeneralInfo/modal/validation/validationSchema';
 type Props = {
   control: Control<GeneralInformationSchema>;
   errors: FieldErrors<GeneralInformationSchema>;

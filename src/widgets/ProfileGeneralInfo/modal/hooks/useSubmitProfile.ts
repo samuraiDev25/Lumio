@@ -7,7 +7,7 @@ import {
 import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
 import { normalizeDateString } from '@/widgets/ProfileGeneralInfo/modal/utils/dateOfBirthUtil';
-import { GeneralInformationSchema } from '@/pages_fsd/profile/modal/validation';
+import { GeneralInformationSchema } from '@/widgets/ProfileGeneralInfo/modal/validation/validationSchema';
 import { UseFormSetError } from 'react-hook-form';
 
 type Props = {
