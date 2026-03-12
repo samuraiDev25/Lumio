@@ -5,3 +5,11 @@ export type CreateSubscriptionPayload = {
   subscriptionType: string;
   paymentProvider: PaymentProvider;
 };
+export type MySubscriptionResponse = {
+  id: string;
+  accountType: string;
+  durationType: string;
+  endDate: string;
+  nextPaymentDate: string;
+  autoRenewal: boolean;
+};
