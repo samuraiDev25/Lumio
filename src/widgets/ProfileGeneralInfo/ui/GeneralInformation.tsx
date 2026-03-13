@@ -8,11 +8,11 @@ import { CITIES, COUNTRIES } from '@/pages_fsd/profile/modal/constants';
 import { AvatarUploader } from '@/pages_fsd/profile';
 import { TextAreaSection } from '@/widgets/ProfileGeneralInfo/ui/TextAreaSection/TextAreaSection';
 import { useMeQuery } from '@/features/auth/api/authApi';
-import { useSubmitProfile } from '@/widgets/ProfileGeneralInfo/modal/hooks/useSubmitProfile';
-import { useGeneralInformationForm } from '@/widgets/ProfileGeneralInfo/modal/hooks/useGeneralInformationForm';
+import { useGeneralInformationForm } from '@/widgets/ProfileGeneralInfo/model/hooks/useGeneralInformationForm';
 import { DateOfBirthField } from '@/widgets/ProfileGeneralInfo/ui/DateOfBirthField/DateOfBirthField';
-import { mapProfileToForm } from '@/widgets/ProfileGeneralInfo/modal/utils/mapProfileToForm';
+import { mapProfileToForm } from '@/widgets/ProfileGeneralInfo/model/utils/mapProfileToForm';
 import { SelectField } from '@/widgets/ProfileGeneralInfo/ui/SelectField/SelectField';
+import { useSubmitProfile } from '@/widgets/ProfileGeneralInfo/model/hooks/useSubmitProfile';
 
 export function GeneralInformation() {
   const { data: me, isLoading: isMeLoading } = useMeQuery();

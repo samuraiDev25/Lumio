@@ -9,3 +9,12 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 */
 
 // ????
+// Временная заглушка
+export default function TempProfilePage() {
+  return (
+    <div style={{ padding: '20px' }}>
+      <h1>Страница профиля временно недоступна</h1>
+      <p>Ведутся технические работы</p>
+    </div>
+  );
+}

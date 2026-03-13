@@ -1,11 +1,12 @@
 'use client';
 
 import PrivacyPolicy from '@/features/auth/ui/legalLinks/PrivacyPolicy';
+import { Suspense } from 'react';
 
 export default function Terms() {
   return (
-    <div>
+    <Suspense fallback={<div>Загрузка...</div>}>
       <PrivacyPolicy />
-    </div>
+    </Suspense>
   );
 }
