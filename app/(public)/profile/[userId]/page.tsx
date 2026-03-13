@@ -18,7 +18,7 @@ export default async function ProfilePage({ params, searchParams }: Props) {
   if (!Number.isFinite(profileId)) notFound();
 
   const profile = await fetchUserProfileSSR(profileId);
-  if (!profile) notFound();
+  // if (!profile) notFound();
 
   const posts = await fetchUserPostsSSR(profileId, {
     pageNumber: 1,

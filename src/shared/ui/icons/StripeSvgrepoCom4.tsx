@@ -1,21 +1,30 @@
-import type { SVGProps } from 'react';
-import { Ref, forwardRef, memo } from 'react';
+import type { Ref, SVGProps } from 'react';
+import { forwardRef, memo } from 'react';
+
+type StripeSvgrepoCom4Props = SVGProps<SVGSVGElement> & {
+  size?: number | string;
+  backgroundColor?: string;
+};
+
 const SvgStripeSvgrepoCom4 = (
-  props: SVGProps<SVGSVGElement>,
+  { size, width, height, backgroundColor, ...props }: StripeSvgrepoCom4Props,
   ref: Ref<SVGSVGElement>,
 ) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width={24}
-    height={16}
+    width={width ?? size ?? 24}
+    height={height ?? size ?? 16}
+    viewBox="0 0 24 16"
+    preserveAspectRatio="none"
     fill="none"
     ref={ref}
     {...props}
   >
     <g clipPath="url(#stripe-svgrepo-com-4_svg__a)">
       <path
-        fill="currentColor"
-        stroke="#F3F3F3"
+        fill={backgroundColor ?? 'currentColor'}
+        stroke="#8d9094"
+        strokeWidth={0.2}
         d="M1.913.5h20.174c.79 0 1.413.624 1.413 1.372v12.256c0 .748-.623 1.372-1.413 1.372H1.913C1.123 15.5.5 14.876.5 14.128V1.872C.5 1.124 1.123.5 1.913.5Z"
       />
       <path
@@ -32,6 +41,8 @@ const SvgStripeSvgrepoCom4 = (
     </defs>
   </svg>
 );
-const ForwardRef = forwardRef(SvgStripeSvgrepoCom4);
+const ForwardRef = forwardRef<SVGSVGElement, StripeSvgrepoCom4Props>(
+  SvgStripeSvgrepoCom4,
+);
 const Memo = memo(ForwardRef);
 export default Memo;

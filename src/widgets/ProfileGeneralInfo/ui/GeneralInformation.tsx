@@ -6,13 +6,13 @@ import { Button, TextField } from '@/shared/ui';
 import { useGetProfileQuery } from '@/pages_fsd/profile/api/profileApi';
 import { CITIES, COUNTRIES } from '@/pages_fsd/profile/modal/constants';
 import { AvatarUploader } from '@/pages_fsd/profile';
-import { TextAreaSection } from '@/pages_fsd/profile/ui/GeneralInformation/TextAreaSection/TextAreaSection';
+import { TextAreaSection } from '@/widgets/ProfileGeneralInfo/ui/TextAreaSection/TextAreaSection';
 import { useMeQuery } from '@/features/auth/api/authApi';
-import { useSubmitProfile } from '@/pages_fsd/profile/modal/hooks/useSubmitProfile';
-import { useGeneralInformationForm } from '@/pages_fsd/profile/modal/hooks/useGeneralInformationForm';
-import { DateOfBirthField } from '@/pages_fsd/profile/ui/GeneralInformation/DateOfBirthField/DateOfBirthField';
-import { mapProfileToForm } from '@/pages_fsd/profile/modal/utils/mapProfileToForm';
-import { SelectField } from '@/pages_fsd/profile/ui/GeneralInformation/SelectField/SelectField';
+import { useGeneralInformationForm } from '@/widgets/ProfileGeneralInfo/model/hooks/useGeneralInformationForm';
+import { DateOfBirthField } from '@/widgets/ProfileGeneralInfo/ui/DateOfBirthField/DateOfBirthField';
+import { mapProfileToForm } from '@/widgets/ProfileGeneralInfo/model/utils/mapProfileToForm';
+import { SelectField } from '@/widgets/ProfileGeneralInfo/ui/SelectField/SelectField';
+import { useSubmitProfile } from '@/widgets/ProfileGeneralInfo/model/hooks/useSubmitProfile';
 
 export function GeneralInformation() {
   const { data: me, isLoading: isMeLoading } = useMeQuery();

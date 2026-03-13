@@ -1,21 +1,30 @@
-import type { SVGProps } from 'react';
-import { Ref, forwardRef, memo } from 'react';
+import type { Ref, SVGProps } from 'react';
+import { forwardRef, memo } from 'react';
+
+type PaypalSvgrepoCom4Props = SVGProps<SVGSVGElement> & {
+  size?: number | string;
+  backgroundColor?: string;
+};
+
 const SvgPaypalSvgrepoCom4 = (
-  props: SVGProps<SVGSVGElement>,
+  { size, width, height, backgroundColor, ...props }: PaypalSvgrepoCom4Props,
   ref: Ref<SVGSVGElement>,
 ) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width={24}
-    height={16}
+    width={width ?? size ?? 24}
+    height={height ?? size ?? 16}
+    viewBox="0 0 24 16"
+    preserveAspectRatio="none"
     fill="none"
     ref={ref}
     {...props}
   >
     <g clipPath="url(#paypal-svgrepo-com-4_svg__a)">
       <path
-        fill="currentColor"
-        stroke="#F3F3F3"
+        fill={backgroundColor ?? 'currentColor'}
+        stroke="#8d9094"
+        strokeWidth={0.2}
         d="M1.474.5h21.052c.55 0 .974.431.974.936v13.128c0 .505-.424.936-.974.936H1.474c-.55 0-.974-.431-.974-.935V1.435C.5.932.924.5 1.474.5Z"
       />
       <path
@@ -56,6 +65,8 @@ const SvgPaypalSvgrepoCom4 = (
     </defs>
   </svg>
 );
-const ForwardRef = forwardRef(SvgPaypalSvgrepoCom4);
+const ForwardRef = forwardRef<SVGSVGElement, PaypalSvgrepoCom4Props>(
+  SvgPaypalSvgrepoCom4,
+);
 const Memo = memo(ForwardRef);
 export default Memo;

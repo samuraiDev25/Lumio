@@ -1,5 +1,5 @@
 import { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
-import { normalizeDateString } from '@/pages_fsd/profile/modal/utils/dateOfBirthUtil';
+import { normalizeDateString } from '@/widgets/ProfileGeneralInfo/model/utils/dateOfBirthUtil';
 
 export function mapProfileToForm(profile: UserProfile) {
   return {

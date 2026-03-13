@@ -1,0 +1,80 @@
+@use '../../../shared/styles/colors';
+@use '../../../shared/styles/typography';
+
+.profileAccount {
+  max-width: 972px;
+  width: 100%;
+}
+
+.section {
+  margin-top: 6px;
+}
+
+.sectionTitle {
+  @include typography.uik-h3-typography;
+  margin-top: 30px;
+  color: var(--color-light-100);
+}
+
+.card, .flexCard {
+  border: 1px solid var(--color-dark-300);
+  border-radius: 2px;
+  padding: 12px 6px;
+  background: var(--color-dark-500);
+}
+
+.flexCard {
+  display: flex;
+  gap: 45px;
+  padding: 12px 0 12px 24px;
+}
+
+.expireCard, .nextPayment {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header {
+  color: var(--color-light-900);
+}
+
+.autoRenewal {
+  margin-top: 16px;
+}
+
+.radioGroup {
+  display: flex;
+  padding: 6px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  @include typography.uik-regular-text-14;
+}
+
+.payment {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.or {
+  color: var(--color-light-100);
+  text-align: center;
+}
+
+
+.paymentIcon {
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    filter 0.2s ease;
+}
+
+.paymentIcon:hover {
+  transform: translateY(-5px);
+  filter: brightness(2);
+}
