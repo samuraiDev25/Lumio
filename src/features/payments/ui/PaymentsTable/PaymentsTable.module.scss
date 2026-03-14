@@ -1,0 +1,40 @@
+.wrapper {
+  width: 100%;
+  margin-top: 24px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.headRow {
+  background-color: #1f1f23;
+}
+
+.headCell {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 1px solid #2f2f33;
+}
+
+.row {
+  &:nth-child(even) {
+    background-color: #15151a;
+  }
+}
+
+.cell {
+  padding: 10px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid #2f2f33;
+}
+
+.empty,
+.error,
+.loading {
+  margin-top: 24px;
+}
+
