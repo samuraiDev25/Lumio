@@ -5,7 +5,7 @@ import s from './ProfileAccount.module.scss';
 import { PaypalSvgrepoCom4, StripeSvgrepoCom4 } from '@/shared/ui/icons';
 import {
   useCreateSubscriptionPaymentMutation,
-  useGetMyPaymentsQuery,
+  useGetMySubscriptionQuery,
   useUpdateAutoRenewalMutation,
 } from '@/features/payments/api/paymentsApi';
 import { Radio } from '@/shared/ui';
@@ -52,7 +52,7 @@ export const ProfileAccount = () => {
 
   const [createPayment, { isLoading }] = useCreateSubscriptionPaymentMutation();
   const { data: subscription, refetch: refetchSubscription } =
-    useGetMyPaymentsQuery();
+    useGetMySubscriptionQuery();
   const [updateAutoRenewal, { isLoading: isAutoRenewalUpdating }] =
     useUpdateAutoRenewalMutation();
   const { data: me, isLoading: isMeLoading } = useMeQuery();
