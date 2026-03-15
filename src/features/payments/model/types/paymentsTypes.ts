@@ -14,6 +14,7 @@ export type MySubscriptionResponse = {
   autoRenewal: boolean;
 };
 
+
 export type UpdateAutoRenewalRequest = {
   profileId: string;
   autoRenewal: boolean;

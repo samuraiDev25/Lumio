@@ -61,7 +61,8 @@ export const ProfileAccount = () => {
     skip: !userId || isMeLoading,
     refetchOnMountOrArgChange: false,
   });
-
+console.log('profileId: ' + profile?.id)
+console.log('userId: ' + userId)
   useEffect(() => {
     setAccountType(getActualAccountType(subscription));
   }, [subscription]);
@@ -83,6 +84,7 @@ export const ProfileAccount = () => {
     if (!profile?.id) return;
 
     try {
+      debugger
       await updateAutoRenewal({
         profileId: String(profile.id),
         autoRenewal: checked,
@@ -91,6 +93,7 @@ export const ProfileAccount = () => {
       toast.success('Auto-renewal updated');
       refetchSubscription();
     } catch (error) {
+      debugger
       handleNetworkError({
         error,
         dispatch,
@@ -182,15 +185,15 @@ export const ProfileAccount = () => {
     <div className={s.profileAccount}>
       {/*Расскоментировать когда протестируют все*/}
 
-      {/*{subscription && (*/}
-      {/*  <CurrentSubscription*/}
-      {/*    endDate={subscription?.endDate}*/}
-      {/*    nextPaymentDate={subscription?.nextPaymentDate}*/}
-      {/*    autoRenewal={subscription?.autoRenewal}*/}
-      {/*    isUpdating={isAutoRenewalUpdating}*/}
-      {/*    onToggleAutoRenewal={handleToggleAutoRenewal}*/}
-      {/*  />*/}
-      {/*)}*/}
+      {/* {subscription && (
+        <CurrentSubscription
+          endDate={subscription?.endDate}
+          nextPaymentDate={subscription?.nextPaymentDate}
+          autoRenewal={subscription?.autoRenewal}
+          accountType={accountType}
+          onAutoRenewalChange={handleToggleAutoRenewal}
+        />
+      )} */}
 
       {/*Для наглядного пособия*/}
       {1 && (
@@ -198,8 +201,8 @@ export const ProfileAccount = () => {
           endDate={subscription?.endDate}
           nextPaymentDate={subscription?.nextPaymentDate}
           autoRenewal={subscription?.autoRenewal}
-          isUpdating={isAutoRenewalUpdating}
-          onToggleAutoRenewal={handleToggleAutoRenewal}
+          accountType={accountType}
+          onAutoRenewalChange={handleToggleAutoRenewal}
         />
       )}
       <div className={s.section}>
