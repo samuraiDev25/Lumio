@@ -1,14 +1,13 @@
 import s from '@/widgets/ProfileAccount/ui/ProfileAccount.module.scss';
-import { UpdateAutoRenewal } from '@/features/payments/ui/UpdatingPayment/UpdateAutoRenewal';
+import { UpdateAutoRenewal } from '@/widgets/ProfileAccount/ui/UpdateAutoRenewal/UpdateAutoRenewal';
 import { AccountType } from '@/features/payments/model/types/paymentsTypes';
-import { Checkbox } from '@/shared/ui';
 
 type Props = {
   endDate?: string;
   nextPaymentDate?: string;
   autoRenewal?: boolean;
   accountType?: AccountType;
-  onAutoRenewalChange?: (autoRenewal: boolean, newAccountType?: AccountType) => void;
+  onAutoRenewalChange: (autoRenewal: boolean, newAccountType?: AccountType) => void;
 };
 
 export const CurrentSubscription = ({
@@ -34,7 +33,6 @@ export const CurrentSubscription = ({
       </div>
 
       <div className={s.autoRenewal}>
-        <Checkbox checked={autoRenewal} onChangeAction={onAutoRenewalChange!} label="Auto-Renewal"/>
         <UpdateAutoRenewal 
           autoRenewal={autoRenewal} 
           accountType={accountType}

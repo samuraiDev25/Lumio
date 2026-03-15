@@ -1,14 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { useUpdateAutoRenewalMutation } from '../../api/paymentsApi';
+import { useUpdateAutoRenewalMutation } from '../../../../features/payments/api/paymentsApi';
 import { Checkbox } from '@/shared/ui';
 import { toast } from 'react-toastify';
 import { useMeQuery } from '@/features/auth/api/authApi';
 import { useGetProfileQuery } from '@/pages_fsd/profile/api/profileApi';
 import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
-import { AccountType } from '../../model/types/paymentsTypes';
+import { AccountType } from '../../../../features/payments/model/types/paymentsTypes';
 
 type Props = {
     autoRenewal: boolean;
@@ -23,12 +23,12 @@ export const UpdateAutoRenewal = ({ autoRenewal, accountType, onAutoRenewalChang
 
     const { data: me, isLoading: isMeLoading } = useMeQuery();
     const userId = Number(me?.userId);
+
     const { data: profile } = useGetProfileQuery(userId!, {
         skip: !userId || isMeLoading,
         refetchOnMountOrArgChange: false,
     });
-console.log('ProfileId: ' + profile?.id)
-console.log('UserId: ' + userId)
+
     useEffect(() => {
         setIsAutoRenewal(autoRenewal);
     }, [autoRenewal]);
@@ -45,22 +45,20 @@ console.log('UserId: ' + userId)
         setIsAutoRenewal(newValue);
 
         try {
-            debugger
             await updateAutoRenewal({
-                profileId: String(profile.id),
+                profileId: String(profile?.id),
                 autoRenewal: newValue,
             }).unwrap();
             
             toast.success('Auto-renewal updated');
             
-            let newAccountType: AccountType | undefined = undefined;
-            if (!newValue && accountType === 'business') {
+            let newAccountType: AccountType | undefined = accountType;
+            if (accountType === 'business') {
                 newAccountType = 'personal';
             }
             
             onAutoRenewalChange?.(newValue, newAccountType);
         } catch (error) {
-            debugger
             setIsAutoRenewal(previousValue);
 
             handleNetworkError({
@@ -70,16 +68,16 @@ console.log('UserId: ' + userId)
                     toast.error('Invalid auto-renewal request. Please try again.');
                 },
                 handle401Error: () => {
-                    toast.error('You are not authorized to update auto-renewal settings.');
+                    toast.error('You are not authorized.');
                 },
                 handle429Error: () => {
-                    toast.error('Too many requests. Please wait a moment and try again.');
+                    toast.error('Too many requests.');
                 },
                 handle500Error: () => {
                     toast.error('Server error. Please try again later.');
                 },
                 handleUnknownError: () => {
-                    toast.error('An unexpected error occurred. Please try again.');
+                    toast.error('An unexpected error occurred.');
                 },
             });
         }
