@@ -167,3 +167,4 @@ export const fetchMainPageData = async (
 
   return res.json();
 };
+

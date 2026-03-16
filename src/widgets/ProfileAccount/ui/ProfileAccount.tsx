@@ -6,7 +6,6 @@ import { PaypalSvgrepoCom4, StripeSvgrepoCom4 } from '@/shared/ui/icons';
 import {
   useCreateSubscriptionPaymentMutation,
   useGetMySubscriptionQuery,
-  useUpdateAutoRenewalMutation,
 } from '@/features/payments/api/paymentsApi';
 import { Radio } from '@/shared/ui';
 import { useGetProfileQuery } from '@/pages_fsd/profile/api/profileApi';
@@ -53,18 +52,19 @@ export const ProfileAccount = () => {
   const [createPayment, { isLoading }] = useCreateSubscriptionPaymentMutation();
   const { data: subscription, refetch: refetchSubscription } =
     useGetMySubscriptionQuery();
-  const [updateAutoRenewal, { isLoading: isAutoRenewalUpdating }] =
-    useUpdateAutoRenewalMutation();
+
   const { data: me, isLoading: isMeLoading } = useMeQuery();
   const userId = me?.userId ? Number(me.userId) : null;
+
   const { data: profile } = useGetProfileQuery(userId!, {
     skip: !userId || isMeLoading,
     refetchOnMountOrArgChange: false,
   });
-
+  
   useEffect(() => {
     setAccountType(getActualAccountType(subscription));
   }, [subscription]);
+
 
   const dispatch = useAppDispatch();
   const searchParams = useSearchParams();
@@ -79,38 +79,11 @@ export const ProfileAccount = () => {
     }
   }, [searchParams, refetchSubscription]);
 
-  const handleToggleAutoRenewal = async (checked: boolean) => {
-    if (!profile?.id) return;
-
-    try {
-      await updateAutoRenewal({
-        profileId: String(profile.id),
-        autoRenewal: checked,
-      }).unwrap();
-
-      toast.success('Auto-renewal updated');
-      refetchSubscription();
-    } catch (error) {
-      handleNetworkError({
-        error,
-        dispatch,
-        handle400Error: () => {
-          toast.error('Invalid auto-renewal request');
-        },
-        handle401Error: () => {
-          toast.error('You are not authorized');
-        },
-        handle429Error: () => {
-          toast.error('Too many requests.');
-        },
-        handle500Error: () => {
-          toast.error('Internal server error');
-        },
-        handleUnknownError: () => {
-          toast.error('Unexpected error');
-        },
-      });
+  const handleAutoRenewalChange = async (autoRenewal: boolean, newAccountType?: AccountType) => {
+    if (newAccountType && newAccountType !== accountType) {
+      setAccountType(newAccountType);
     }
+    await refetchSubscription();
   };
 
   const handlePayment = async (provider: 'Stripe' | 'PayPal') => {
@@ -182,15 +155,15 @@ export const ProfileAccount = () => {
     <div className={s.profileAccount}>
       {/*Расскоментировать когда протестируют все*/}
 
-      {/*{subscription && (*/}
-      {/*  <CurrentSubscription*/}
-      {/*    endDate={subscription?.endDate}*/}
-      {/*    nextPaymentDate={subscription?.nextPaymentDate}*/}
-      {/*    autoRenewal={subscription?.autoRenewal}*/}
-      {/*    isUpdating={isAutoRenewalUpdating}*/}
-      {/*    onToggleAutoRenewal={handleToggleAutoRenewal}*/}
-      {/*  />*/}
-      {/*)}*/}
+      {/* {subscription && (
+        <CurrentSubscription
+          endDate={subscription?.endDate}
+          nextPaymentDate={subscription?.nextPaymentDate}
+          autoRenewal={subscription?.autoRenewal}
+          accountType={accountType}
+          onAutoRenewalChange={handleToggleAutoRenewal}
+        />
+      )} */}
 
       {/*Для наглядного пособия*/}
       {1 && (
@@ -198,8 +171,8 @@ export const ProfileAccount = () => {
           endDate={subscription?.endDate}
           nextPaymentDate={subscription?.nextPaymentDate}
           autoRenewal={subscription?.autoRenewal}
-          isUpdating={isAutoRenewalUpdating}
-          onToggleAutoRenewal={handleToggleAutoRenewal}
+          accountType={accountType}
+          onAutoRenewalChange={handleAutoRenewalChange}
         />
       )}
       <div className={s.section}>
