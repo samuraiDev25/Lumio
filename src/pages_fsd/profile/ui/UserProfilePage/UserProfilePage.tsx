@@ -22,6 +22,7 @@ type Props = {
   initialPost: Post | null;
 };
 
+
 const PAGE_SIZE = 8;
 
 export function UserProfilePage({

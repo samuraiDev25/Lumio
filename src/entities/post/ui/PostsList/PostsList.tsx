@@ -8,7 +8,7 @@ type Props = {
 export default function PostsList({ posts }: Props) {
   return (
     <div>
-      {posts.map((post) => (
+      {posts?.map((post) => (
         <div key={post.id} className="post-card">
           <Image
             src={post.postFiles?.[0]?.url || '/User03.png'}

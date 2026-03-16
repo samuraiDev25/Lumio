@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react';
 import s from './ProfileAccount.module.scss';
 import { PaypalSvgrepoCom4, StripeSvgrepoCom4 } from '@/shared/ui/icons';
-import { useCreateSubscriptionPaymentMutation } from '@/features/payments/api/paymentsApi';
+import {
+  useCreateSubscriptionPaymentMutation,
+  useGetMySubscriptionQuery,
+} from '@/features/payments/api/paymentsApi';
 import { Radio } from '@/shared/ui';
 import { useGetProfileQuery } from '@/pages_fsd/profile/api/profileApi';
 import { useMeQuery } from '@/features/auth/api/authApi';
@@ -13,8 +16,10 @@ import { toast } from 'react-toastify';
 import { useAppDispatch } from '@/shared/hooks';
 import { useSearchParams } from 'next/navigation';
 import { StripeAutoRenewalModal } from '@/widgets/ProfileAccount/ui/StripeAutoRenewalModal/StripeAutoRenewalModal';
+import { CurrentSubscription } from '@/widgets/ProfileAccount/ui/CurrentSubscription/CurrentSubscription';
+import { getActualAccountType } from '@/features/payments/model/hooks/getActualAccountType';
+import { AccountType } from '@/features/payments/model/types/paymentsTypes';
 
-type AccountType = 'personal' | 'business';
 type SubscriptionPlan = 'weekly10' | 'biweekly50' | 'monthly100';
 const accountOptions: {
   value: AccountType;
@@ -30,33 +35,57 @@ const subscriptionOptions: { value: SubscriptionPlan; label: string }[] = [
   { value: 'biweekly50', label: '$50 per 2 Weeks' },
   { value: 'monthly100', label: '$100 per month' },
 ];
+
 const subscriptionMap = {
   weekly10: '1 week',
   biweekly50: '2 weeks',
   monthly100: '1 month',
 } as const;
+
 export const ProfileAccount = () => {
   const [accountType, setAccountType] = useState<AccountType>('personal');
+
   const [plan, setPlan] = useState<SubscriptionPlan>('weekly10');
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
   const [stripeModalKey, setStripeModalKey] = useState(0);
+
   const [createPayment, { isLoading }] = useCreateSubscriptionPaymentMutation();
+  const { data: subscription, refetch: refetchSubscription } =
+    useGetMySubscriptionQuery();
+
   const { data: me, isLoading: isMeLoading } = useMeQuery();
   const userId = me?.userId ? Number(me.userId) : null;
+
   const { data: profile } = useGetProfileQuery(userId!, {
     skip: !userId || isMeLoading,
     refetchOnMountOrArgChange: false,
   });
+  
+  useEffect(() => {
+    setAccountType(getActualAccountType(subscription));
+  }, [subscription]);
+
+
   const dispatch = useAppDispatch();
+  const searchParams = useSearchParams();
+
   const isPaymentDisabled = !profile?.id || isLoading;
   const isBusinessAccount = accountType === 'business';
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (searchParams.get('payment') === 'success') {
       toast.success('Payment was successful!');
+      refetchSubscription();
     }
-  }, [searchParams]);
+  }, [searchParams, refetchSubscription]);
+
+  const handleAutoRenewalChange = async (autoRenewal: boolean, newAccountType?: AccountType) => {
+    if (newAccountType && newAccountType !== accountType) {
+      setAccountType(newAccountType);
+    }
+    await refetchSubscription();
+  };
+
   const handlePayment = async (provider: 'Stripe' | 'PayPal') => {
     if (!profile?.id) {
       return;
@@ -124,6 +153,28 @@ export const ProfileAccount = () => {
   };
   return (
     <div className={s.profileAccount}>
+      {/*Расскоментировать когда протестируют все*/}
+
+      {/* {subscription && (
+        <CurrentSubscription
+          endDate={subscription?.endDate}
+          nextPaymentDate={subscription?.nextPaymentDate}
+          autoRenewal={subscription?.autoRenewal}
+          accountType={accountType}
+          onAutoRenewalChange={handleToggleAutoRenewal}
+        />
+      )} */}
+
+      {/*Для наглядного пособия*/}
+      {1 && (
+        <CurrentSubscription
+          endDate={subscription?.endDate}
+          nextPaymentDate={subscription?.nextPaymentDate}
+          autoRenewal={subscription?.autoRenewal}
+          accountType={accountType}
+          onAutoRenewalChange={handleAutoRenewalChange}
+        />
+      )}
       <div className={s.section}>
         <p className={s.sectionTitle}>Account type:</p>
 
@@ -137,7 +188,6 @@ export const ProfileAccount = () => {
           />
         </div>
       </div>
-
       {isBusinessAccount && (
         <>
           <div className={s.section}>

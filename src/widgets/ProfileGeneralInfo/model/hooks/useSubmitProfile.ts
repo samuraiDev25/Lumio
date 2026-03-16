@@ -6,9 +6,9 @@ import {
 } from '@/pages_fsd/profile/api/profileApi';
 import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
-import { normalizeDateString } from '@/widgets/ProfileGeneralInfo/modal/utils/dateOfBirthUtil';
-import { GeneralInformationSchema } from '@/widgets/ProfileGeneralInfo/modal/validation/validationSchema';
+import { normalizeDateString } from '@/widgets/ProfileGeneralInfo/model/utils/dateOfBirthUtil';
 import { UseFormSetError } from 'react-hook-form';
+import { GeneralInformationSchema } from '@/widgets/ProfileGeneralInfo/model/validation/validationSchema';
 
 type Props = {
   userId: number | null;
