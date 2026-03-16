@@ -14,9 +14,11 @@ import { handleNetworkError } from '@/shared/lib';
 import { SignUpType } from '@/features/auth/model/validation';
 import { toast } from 'react-toastify';
 import { useAppDispatch } from '@/shared/hooks';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { StripeAutoRenewalModal } from '@/widgets/ProfileAccount/ui/StripeAutoRenewalModal/StripeAutoRenewalModal';
 import { CurrentSubscription } from '@/widgets/ProfileAccount/ui/CurrentSubscription/CurrentSubscription';
+import { PaymentSuccessDialog } from '@/widgets/ProfileAccount/ui/PaymentSuccessDialog/PaymentSuccessDialog';
+import { PaymentErrorDialog } from '@/widgets/ProfileAccount/ui/PaymentErrorDialog/PaymentErrorDialog';
 import { getActualAccountType } from '@/features/payments/model/hooks/getActualAccountType';
 import { AccountType } from '@/features/payments/model/types/paymentsTypes';
 
@@ -42,12 +44,16 @@ const subscriptionMap = {
   monthly100: '1 month',
 } as const;
 
+const PAYMENT_RETURN_URL_KEY = 'paymentReturnUrl';
+type PaymentResultStatus = 'success' | 'error' | null;
+
 export const ProfileAccount = () => {
   const [accountType, setAccountType] = useState<AccountType>('personal');
-
   const [plan, setPlan] = useState<SubscriptionPlan>('weekly10');
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
   const [stripeModalKey, setStripeModalKey] = useState(0);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isFailedModalOpen, setIsFailedModalOpen] = useState(false);
 
   const [createPayment, { isLoading }] = useCreateSubscriptionPaymentMutation();
   const { data: subscription, refetch: refetchSubscription } =
@@ -60,26 +66,70 @@ export const ProfileAccount = () => {
     skip: !userId || isMeLoading,
     refetchOnMountOrArgChange: false,
   });
-  
+
   useEffect(() => {
     setAccountType(getActualAccountType(subscription));
   }, [subscription]);
 
-
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const isPaymentDisabled = !profile?.id || isLoading;
   const isBusinessAccount = accountType === 'business';
 
   useEffect(() => {
-    if (searchParams.get('payment') === 'success') {
-      toast.success('Payment was successful!');
-      refetchSubscription();
-    }
-  }, [searchParams, refetchSubscription]);
+    const paymentStatus = searchParams.get('payment');
+    const normalizedStatus = paymentStatus?.toLowerCase();
 
-  const handleAutoRenewalChange = async (autoRenewal: boolean, newAccountType?: AccountType) => {
+    let paymentResultStatus: PaymentResultStatus = null;
+
+    if (normalizedStatus === 'success') {
+      paymentResultStatus = 'success';
+    } else if (normalizedStatus === 'error') {
+      paymentResultStatus = 'error';
+    }
+
+    if (!paymentResultStatus) {
+      return;
+    }
+
+    const storedReturnUrl = sessionStorage.getItem(PAYMENT_RETURN_URL_KEY);
+
+    if (storedReturnUrl) {
+      const targetUrl = new URL(storedReturnUrl);
+
+      targetUrl.searchParams.set('payment', paymentResultStatus);
+
+      if (targetUrl.toString() !== window.location.href) {
+        router.replace(
+          `${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}`,
+        );
+        return;
+      }
+    }
+
+    if (paymentResultStatus === 'success') {
+      setIsSuccessModalOpen(true);
+      refetchSubscription();
+    } else {
+      setIsFailedModalOpen(true);
+    }
+
+    sessionStorage.removeItem(PAYMENT_RETURN_URL_KEY);
+
+    const cleanedUrl = new URL(window.location.href);
+
+    cleanedUrl.searchParams.delete('payment');
+    router.replace(
+      `${cleanedUrl.pathname}${cleanedUrl.search}${cleanedUrl.hash}`,
+    );
+  }, [searchParams, refetchSubscription, router]);
+
+  const handleAutoRenewalChange = async (
+    autoRenewal: boolean,
+    newAccountType?: AccountType,
+  ) => {
     if (newAccountType && newAccountType !== accountType) {
       setAccountType(newAccountType);
     }
@@ -92,6 +142,8 @@ export const ProfileAccount = () => {
     }
 
     try {
+      sessionStorage.setItem(PAYMENT_RETURN_URL_KEY, window.location.href);
+
       const res = await createPayment({
         profileId: String(profile.id),
         currency: 'USD',
@@ -101,6 +153,8 @@ export const ProfileAccount = () => {
 
       window.location.href = res.url;
     } catch (error) {
+      sessionStorage.removeItem(PAYMENT_RETURN_URL_KEY);
+
       handleNetworkError({
         error,
         dispatch,
@@ -151,6 +205,15 @@ export const ProfileAccount = () => {
     setIsStripeModalOpen(false);
     await handlePayment('Stripe');
   };
+
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+  };
+
+  const handleCloseFailedModal = () => {
+    setIsFailedModalOpen(false);
+  };
+
   return (
     <div className={s.profileAccount}>
       {/*Расскоментировать когда протестируют все*/}
@@ -233,6 +296,14 @@ export const ProfileAccount = () => {
           </div>
         </>
       )}
+      <PaymentSuccessDialog
+        open={isSuccessModalOpen}
+        onCloseAction={handleCloseSuccessModal}
+      />
+      <PaymentErrorDialog
+        open={isFailedModalOpen}
+        onCloseAction={handleCloseFailedModal}
+      />
     </div>
   );
 };
