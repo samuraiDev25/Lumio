@@ -156,7 +156,7 @@ export const ProfileAccount = () => {
     <div className={s.profileAccount}>
       {/*Расскоментировать когда протестируют все*/}
 
-      {/* {subscription && (
+       {subscription && (
         <CurrentSubscription
           endDate={subscription?.endDate}
           nextPaymentDate={subscription?.nextPaymentDate}
@@ -164,10 +164,10 @@ export const ProfileAccount = () => {
           accountType={accountType}
           onAutoRenewalChange={handleToggleAutoRenewal}
         />
-      )} */}
+      )}
 
       {/*Для наглядного пособия*/}
-      {1 && (
+      {/* {1 && (
         <CurrentSubscription
           endDate={subscription?.endDate}
           nextPaymentDate={subscription?.nextPaymentDate}
@@ -175,7 +175,7 @@ export const ProfileAccount = () => {
           accountType={accountType}
           onAutoRenewalChange={handleAutoRenewalChange}
         />
-      )}
+      )} */}
       <div className={s.section}>
         <p className={s.sectionTitle}>Account type:</p>
 
