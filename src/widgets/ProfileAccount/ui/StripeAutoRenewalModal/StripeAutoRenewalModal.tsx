@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import s from './StripeAutoRenewalModal.module.scss';
-import { CloseOutline } from '@/shared/ui/icons';
-import { Button, Checkbox } from '@/shared/ui';
+import { Checkbox, Dialog } from '@/shared/ui';
+import s from '../PaymentDialogs.module.scss';
 
 type Props = {
   open: boolean;
@@ -20,50 +19,39 @@ export const StripeAutoRenewalModal = ({
 }: Props) => {
   const [isChecked, setIsChecked] = useState(false);
 
-  if (!open) {
-    return null;
-  }
-
   const handleConfirm = async () => {
     if (!isChecked || isLoading) return;
     await onConfirmAction();
   };
 
   return (
-    <div className={s.overlay} onClick={onCloseAction}>
-      <div
-        className={s.modal}
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-      >
-        <div className={s.modalHeader}>
-          <h3 className={s.title}>Create payment</h3>
-          <button className={s.closeEditPost} onClick={onCloseAction}>
-            <CloseOutline />
-          </button>
-        </div>
-
-        <p className={s.text}>
+    <Dialog
+      open={open}
+      title={'Create payment'}
+      size={'sm'}
+      className={s.dialog}
+      confirmButtonText={'OK'}
+      confirmButtonClass={s.singleButton}
+      buttonsMarginTop={'18px'}
+      confirmButtonDisabled={!isChecked || isLoading}
+      buttonsClass={s.stripeFooter}
+      footerContent={
+        <Checkbox
+          className={s.checkbox}
+          label="I agree"
+          checked={isChecked}
+          onChangeAction={(checked: boolean) => setIsChecked(checked)}
+        />
+      }
+      onClose={onCloseAction}
+      onConfirmButtonClick={handleConfirm}
+    >
+      <div className={s.stripeContent}>
+        <p className={s.bodyText}>
           Auto-renewal will be enabled with this payment. You can disable it
           anytime in your profile settings.
         </p>
-        <div className={s.actions}>
-          <Checkbox
-            label="I аgree"
-            checked={isChecked}
-            onChangeAction={(checked: boolean) => setIsChecked(checked)}
-          />
-          <Button
-            size={'sm'}
-            className={s.okButton}
-            onClick={handleConfirm}
-            disabled={!isChecked || isLoading}
-          >
-            OK
-          </Button>
-        </div>
       </div>
-    </div>
+    </Dialog>
   );
 };

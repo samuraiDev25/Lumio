@@ -7,7 +7,10 @@ type Props = {
   nextPaymentDate?: string;
   autoRenewal?: boolean;
   accountType?: AccountType;
-  onAutoRenewalChange: (autoRenewal: boolean, newAccountType?: AccountType) => void;
+  onAutoRenewalChange: (
+    autoRenewal: boolean,
+    newAccountType?: AccountType,
+  ) => void;
 };
 
 export const CurrentSubscription = ({
@@ -33,8 +36,8 @@ export const CurrentSubscription = ({
       </div>
 
       <div className={s.autoRenewal}>
-        <UpdateAutoRenewal 
-          autoRenewal={autoRenewal} 
+        <UpdateAutoRenewal
+          autoRenewal={autoRenewal}
           accountType={accountType}
           onAutoRenewalChange={onAutoRenewalChange}
         />
