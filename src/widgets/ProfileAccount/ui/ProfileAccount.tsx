@@ -162,7 +162,7 @@ export const ProfileAccount = () => {
           nextPaymentDate={subscription?.nextPaymentDate}
           autoRenewal={subscription?.autoRenewal}
           accountType={accountType}
-          onAutoRenewalChange={handleToggleAutoRenewal}
+          onAutoRenewalChange={handleAutoRenewalChange}
         />
       )}
 
