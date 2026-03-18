@@ -1,71 +1,58 @@
-'use client';
-
-import { useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import {
   PAYMENT_RETURN_URL_KEY,
-  PaymentResultStatus,
+  PAYMENT_STATUS_HANDLED_KEY,
 } from '@/widgets/ProfileAccount/model/constants';
 
 type UsePaymentStatusHandlerParams = {
-  onSuccess: () => void;
-  onError: () => void;
-  refetchSubscription: () => Promise<unknown>;
+  onSuccessAction: () => void;
+  onErrorAction: () => void;
 };
 
 export const usePaymentStatusHandler = ({
-  onSuccess,
-  onError,
-  refetchSubscription,
+  onSuccessAction,
+  onErrorAction,
 }: UsePaymentStatusHandlerParams) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const handledRef = useRef(false);
 
   useEffect(() => {
-    const paymentStatus = searchParams.get('payment');
-    const normalizedStatus = paymentStatus?.toLowerCase();
+    if (handledRef.current) return;
+    if (typeof window === 'undefined') return;
 
-    let paymentResultStatus: PaymentResultStatus = null;
+    const url = new URL(window.location.href);
+    const paymentStatus = url.searchParams.get('payment');
 
-    if (normalizedStatus === 'success') {
-      paymentResultStatus = 'success';
-    } else if (normalizedStatus === 'error') {
-      paymentResultStatus = 'error';
-    }
-
-    if (!paymentResultStatus) {
+    if (!paymentStatus) {
+      sessionStorage.removeItem(PAYMENT_STATUS_HANDLED_KEY);
       return;
     }
 
-    const storedReturnUrl = sessionStorage.getItem(PAYMENT_RETURN_URL_KEY);
+    const handledStatus = sessionStorage.getItem(PAYMENT_STATUS_HANDLED_KEY);
 
-    if (storedReturnUrl) {
-      const targetUrl = new URL(storedReturnUrl);
-
-      targetUrl.searchParams.set('payment', paymentResultStatus);
-
-      if (targetUrl.toString() !== window.location.href) {
-        router.replace(
-          `${targetUrl.pathname}${targetUrl.search}${targetUrl.hash}`,
-        );
-        return;
-      }
+    if (handledStatus === paymentStatus) {
+      handledRef.current = true;
+      return;
     }
 
-    if (paymentResultStatus === 'success') {
-      onSuccess();
-      void refetchSubscription();
-    } else {
-      onError();
-    }
+    handledRef.current = true;
+    sessionStorage.setItem(PAYMENT_STATUS_HANDLED_KEY, paymentStatus);
 
+    url.searchParams.delete('payment');
+
+    const nextUrl = url.searchParams.toString()
+      ? `${url.pathname}?${url.searchParams.toString()}`
+      : url.pathname;
+
+    window.history.replaceState({}, '', nextUrl);
     sessionStorage.removeItem(PAYMENT_RETURN_URL_KEY);
 
-    const cleanedUrl = new URL(window.location.href);
+    if (paymentStatus === 'success') {
+      onSuccessAction();
+      return;
+    }
 
-    cleanedUrl.searchParams.delete('payment');
-    router.replace(
-      `${cleanedUrl.pathname}${cleanedUrl.search}${cleanedUrl.hash}`,
-    );
-  }, [onError, onSuccess, refetchSubscription, router, searchParams]);
+    if (paymentStatus === 'error') {
+      onErrorAction();
+    }
+  }, [onErrorAction, onSuccessAction]);
 };

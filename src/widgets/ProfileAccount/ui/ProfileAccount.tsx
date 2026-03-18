@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import s from './ProfileAccount.module.scss';
 import { PaypalSvgrepoCom4, StripeSvgrepoCom4 } from '@/shared/ui/icons';
 import {
@@ -39,7 +39,9 @@ export const ProfileAccount = () => {
 
   const [createPayment, { isLoading }] = useCreateSubscriptionPaymentMutation();
   const { data: subscription, refetch: refetchSubscription } =
-    useGetMySubscriptionQuery();
+    useGetMySubscriptionQuery(undefined, {
+      refetchOnMountOrArgChange: false,
+    });
 
   const { data: me, isLoading: isMeLoading } = useMeQuery();
   const userId = me?.userId ? Number(me.userId) : null;
@@ -58,10 +60,17 @@ export const ProfileAccount = () => {
   const isPaymentDisabled = !profile?.id || isLoading;
   const isBusinessAccount = accountType === 'business';
 
+  const handleOpenSuccessModal = useCallback(() => {
+    setIsSuccessModalOpen(true);
+  }, []);
+
+  const handleOpenFailedModal = useCallback(() => {
+    setIsFailedModalOpen(true);
+  }, []);
+
   usePaymentStatusHandler({
-    onSuccess: () => setIsSuccessModalOpen(true),
-    onError: () => setIsFailedModalOpen(true),
-    refetchSubscription,
+    onSuccessAction: handleOpenSuccessModal,
+    onErrorAction: handleOpenFailedModal,
   });
 
   const handleAutoRenewalChange = async (
@@ -156,7 +165,7 @@ export const ProfileAccount = () => {
     <div className={s.profileAccount}>
       {/*Расскоментировать когда протестируют все*/}
 
-       {subscription && (
+      {subscription && (
         <CurrentSubscription
           endDate={subscription?.endDate}
           nextPaymentDate={subscription?.nextPaymentDate}

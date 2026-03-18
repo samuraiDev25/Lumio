@@ -39,7 +39,7 @@ export const CurrentSubscription = ({
         <UpdateAutoRenewal
           autoRenewal={autoRenewal}
           accountType={accountType}
-          onAutoRenewalChange={onAutoRenewalChange}
+          onAutoRenewalChangeAction={onAutoRenewalChange}
         />
       </div>
     </div>
