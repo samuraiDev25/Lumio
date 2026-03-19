@@ -27,11 +27,17 @@ export const CurrentSubscription = ({
       <div className={s.flexCard}>
         <div className={s.expireCard}>
           <div className={s.header}>Expire at</div>
-          <div className={s.date}>{endDate || '--.--.----'}</div>
+          <div className={s.date}>
+            {endDate ? new Date(endDate).toLocaleDateString() : '--.--.----'}
+          </div>
         </div>
         <div className={s.nextPayment}>
           <div className={s.header}>Next payment</div>
-          <div className={s.date}>{nextPaymentDate || '--.--.----'}</div>
+          <div className={s.date}>
+            {nextPaymentDate
+              ? new Date(nextPaymentDate).toLocaleDateString()
+              : '--.--.----'}
+          </div>
         </div>
       </div>
 

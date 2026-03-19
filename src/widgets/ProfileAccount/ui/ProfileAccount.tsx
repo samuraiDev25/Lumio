@@ -163,8 +163,6 @@ export const ProfileAccount = () => {
 
   return (
     <div className={s.profileAccount}>
-      {/*Расскоментировать когда протестируют все*/}
-
       {subscription && (
         <CurrentSubscription
           endDate={subscription?.endDate}
@@ -175,16 +173,6 @@ export const ProfileAccount = () => {
         />
       )}
 
-      {/*Для наглядного пособия*/}
-      {/* {1 && (
-        <CurrentSubscription
-          endDate={subscription?.endDate}
-          nextPaymentDate={subscription?.nextPaymentDate}
-          autoRenewal={subscription?.autoRenewal}
-          accountType={accountType}
-          onAutoRenewalChange={handleAutoRenewalChange}
-        />
-      )} */}
       <div className={s.section}>
         <p className={s.sectionTitle}>Account type:</p>
 

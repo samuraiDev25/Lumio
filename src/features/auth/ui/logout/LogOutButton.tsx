@@ -4,12 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/shared/ui';
 import { Modal } from '@/shared/ui/modal/Modal';
-import { useLogoutMutation } from '@/features/auth/api/authApi';
+import { useLogoutMutation, useMeQuery } from '@/features/auth/api/authApi';
 import { clearAuthData, getUserEmail } from '@/features/auth/api/authUtils';
 import clsx from 'clsx';
 import s from './LogOutButton.module.scss';
 import { baseApi } from '@/shared/api';
-import { AUTH_ROUTES } from '@/shared/lib/routes';
+import { APP_ROUTES } from '@/shared/lib/routes';
 import { useAppDispatch } from '@/shared/hooks';
 
 export type LogOutButtonProps = {
@@ -39,6 +39,7 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [logout, { isLoading }] = useLogoutMutation();
+  const { data: me } = useMeQuery();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string>('');
   const [showErrorMessage, setShowErrorMessage] = useState(false);
@@ -47,7 +48,7 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
   // Обновляем email при монтировании и при открытии модалки
   useEffect(() => {
     const updateEmail = () => {
-      setUserEmail(getUserEmail());
+      setUserEmail(me?.email || getUserEmail());
     };
 
     updateEmail();
@@ -55,7 +56,7 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
     if (isModalOpen) {
       updateEmail();
     }
-  }, [isModalOpen]);
+  }, [isModalOpen, me?.email]);
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -89,12 +90,12 @@ export const LogOutButton: React.FC<LogOutButtonProps> = ({
       // Редирект на страницу логина
       // Используем replace вместо push, чтобы нельзя было вернуться назад
       try {
-        router.replace(AUTH_ROUTES.SIGN_IN);
+        router.replace(APP_ROUTES.ROOT);
       } catch (routerError) {
         console.error('Router error:', routerError);
         // Fallback на window.location если router не работает
         if (typeof window !== 'undefined') {
-          window.location.replace(AUTH_ROUTES.SIGN_IN);
+          window.location.replace(APP_ROUTES.ROOT);
         }
       }
     } catch (err: any) {

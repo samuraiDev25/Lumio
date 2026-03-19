@@ -12,9 +12,10 @@ import { authApi, useLoginMutation } from '@/features/auth/api/authApi';
 import { useAppDispatch } from '@/shared/hooks/useAppDispatch';
 import { setCredentials } from '@/features/auth/model/authSlice';
 import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
-import { APP_ROUTES, AUTH_ROUTES, SIDEBAR_ROUTES } from '@/shared/lib/routes';
+import { AUTH_ROUTES } from '@/shared/lib/routes';
 import { signInSchema, SignInType } from '@/features/auth/model/validation';
 import { handleNetworkError } from '@/shared/lib';
+import { toast } from 'react-toastify';
 
 /**
  * LoginForm component for user authentication.
@@ -81,6 +82,9 @@ export const LoginForm = () => {
               setError('root', { message: err.message });
             }
           });
+        },
+        handle500Error: () => {
+          toast.error('Some error occurred');
         },
       });
     }

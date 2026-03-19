@@ -8,12 +8,12 @@ import {
 import { jwtDecode } from 'jwt-decode';
 import { clearAuthData } from '@/features/auth/api/authUtils';
 import { logout } from '@/features/auth/model/authSlice';
+import { APP_ROUTES } from '@/shared/lib/routes/routes';
 
 const mutex = new Mutex();
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
 
-// С токеном — для обычных запросов
 const baseQuery = fetchBaseQuery({
   baseUrl,
   prepareHeaders: (headers) => {
@@ -26,7 +26,6 @@ const baseQuery = fetchBaseQuery({
   credentials: 'include',
 });
 
-// Без токена — только для рефреша
 const baseQueryWithoutAuth = fetchBaseQuery({
   baseUrl,
   credentials: 'include',
@@ -57,6 +56,13 @@ const handleUnauthorized = (api: { dispatch: (action: unknown) => void }) => {
   api.dispatch(logout());
 };
 
+const handleRefreshFailure = (api: { dispatch: (action: unknown) => void }) => {
+  handleUnauthorized(api);
+  if (typeof window !== 'undefined') {
+    window.location.replace(APP_ROUTES.ROOT);
+  }
+};
+
 export const baseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
   unknown,
@@ -66,7 +72,6 @@ export const baseQueryWithReauth: BaseQueryFn<
   const token =
     typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
 
-  // Do not hit /auth/me when logged out - prevents request storms after logout.
   if (!token && requestUrl.includes('/api/v1/auth/me')) {
     return {
       error: {
@@ -86,22 +91,22 @@ export const baseQueryWithReauth: BaseQueryFn<
       } else {
         const release = await mutex.acquire();
         try {
-          // Double-check после захвата mutex
           if (isTokenExpired(localStorage.getItem('accessToken'))) {
             const refreshResult = await baseQueryWithoutAuth(
               { url: '/api/v1/auth/refresh-token', method: 'POST' },
               api,
               extraOptions,
             );
+
             if (refreshResult.data) {
               const data = refreshResult.data as { accessToken?: string };
-              if (data?.accessToken) {
+              if (data.accessToken) {
                 localStorage.setItem('accessToken', data.accessToken);
               } else {
-                handleUnauthorized(api);
+                handleRefreshFailure(api);
               }
             } else {
-              handleUnauthorized(api);
+              handleRefreshFailure(api);
             }
           }
         } finally {
@@ -114,7 +119,6 @@ export const baseQueryWithReauth: BaseQueryFn<
   await mutex.waitForUnlock();
   let result = await baseQuery(args, api, extraOptions);
 
-  // Реактивная обработка — если всё равно получили 401
   if (result.error && result.error.status === 401 && !isAuthUrl(args)) {
     if (mutex.isLocked()) {
       await mutex.waitForUnlock();
@@ -130,16 +134,14 @@ export const baseQueryWithReauth: BaseQueryFn<
 
         if (refreshResult.data) {
           const data = refreshResult.data as { accessToken?: string };
-          if (data?.accessToken) {
+          if (data.accessToken) {
             localStorage.setItem('accessToken', data.accessToken);
-            // Повторяем оригинальный запрос один раз
             result = await baseQuery(args, api, extraOptions);
           } else {
-            handleUnauthorized(api);
+            handleRefreshFailure(api);
           }
         } else {
-          // Рефреш не удался — чистим токен, редирект через middleware
-          handleUnauthorized(api);
+          handleRefreshFailure(api);
         }
       } finally {
         release();
