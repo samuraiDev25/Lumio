@@ -25,6 +25,27 @@
     padding: 0 15px;
   }
 }
+.logo {
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--color-light-100);
+  text-decoration: none;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.6),
+    0 0 12px rgba(0, 224, 255, 0.6),
+    0 0 24px rgba(138, 92, 246, 0.5);
+  transition: transform 0.3s ease, text-shadow 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.15);
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.8),
+    0 0 18px rgba(0, 224, 255, 0.8),
+    0 0 32px rgba(138, 92, 246, 0.7);
+}
+
 .bell {
   margin-right: 45px;
   padding: 4px;

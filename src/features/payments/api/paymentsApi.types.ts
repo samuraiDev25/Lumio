@@ -16,11 +16,18 @@ export type GetMyPaymentsRequest = {
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
 };
-
+export type DataOfPayment = {
+  datePayment: string;
+  endDate: string;
+  amount: number;
+  currency: string;
+  paymentType: string;
+  subscriptionType: string;
+};
 export type GetMyPaymentsResponse = {
   pagesCount: number;
   page: number;
   pageSize: number;
   totalCount: number;
-  items: Payment[];
+  items: DataOfPayment[];
 };

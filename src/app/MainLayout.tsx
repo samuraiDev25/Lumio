@@ -16,7 +16,7 @@ export default function MainLayout({ children }: PropsWithChildren) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && false && (isError || !user)) {
+    if (!isLoading && (isError || !user)) {
       router.replace(APP_ROUTES.ROOT);
     }
   }, [isLoading, isError, user, router]);
