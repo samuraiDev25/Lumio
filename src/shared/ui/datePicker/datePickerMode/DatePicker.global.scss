@@ -85,10 +85,34 @@
 .rdp-chevron {
   fill: var(--color-light-100);
 }
-.rdp-selected .rdp-day_button {
-  border-radius: 0;
-  background-color: var(--color-accent-700);
+
+.rdp-day_button {
   border: none;
+  border-radius: 50%;
+  color: var(--color-light-100);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.rdp-day_button:hover:not([disabled]) {
+  background-color: var(--color-accent-900);
+  color: var(--color-light-100);
+}
+
+.rdp-today:not(.rdp-selected) .rdp-day_button {
+  color: var(--color-accent-100);
+}
+
+.rdp-selected .rdp-day_button {
+  border-radius: 50%;
+  background-color: var(--color-accent-500);
+  border: none;
+  color: var(--color-light-100);
+}
+
+.rdp-selected .rdp-day_button:hover:not([disabled]) {
+  background-color: var(--color-accent-500);
 }
 // убираю белый фон
 .rdp-range_start, .rdp-range_end, .rdp-range_middle {
