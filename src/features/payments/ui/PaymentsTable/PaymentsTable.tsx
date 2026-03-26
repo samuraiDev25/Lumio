@@ -1,9 +1,9 @@
-import { Payment } from '@/features/payments/api/paymentsApi.types';
+import { DataOfPayment } from '@/features/payments/api/paymentsApi.types';
 import { Typography } from '@/shared/ui';
 import s from './PaymentsTable.module.scss';
 
 type PaymentsTableProps = {
-  payments: Payment[];
+  payments: DataOfPayment[];
 };
 
 export const PaymentsTable = ({ payments }: PaymentsTableProps) => {
@@ -22,21 +22,25 @@ export const PaymentsTable = ({ payments }: PaymentsTableProps) => {
       <table className={s.table}>
         <thead>
           <tr className={s.headRow}>
-            <th className={s.headCell}>Date</th>
-            <th className={s.headCell}>Amount</th>
-            <th className={s.headCell}>Subscription type</th>
-            <th className={s.headCell}>Payment service</th>
+            <th className={s.headCell}>Date of Payment</th>
+            <th className={s.headCell}>End date of subscription</th>
+            <th className={s.headCell}>Prise</th>
+            <th className={s.headCell}>Currency</th>
+            <th className={s.headCell}>Subscription Type</th>
           </tr>
         </thead>
         <tbody>
           {payments.map((payment) => (
-            <tr key={payment.id} className={s.row}>
+            <tr key={payment.datePayment} className={s.row}>
               <td className={s.cell}>
-                {new Date(payment.createdAt).toLocaleDateString()}
+                {new Date(payment.datePayment).toLocaleDateString()}
+              </td>
+              <td className={s.cell}>
+                {new Date(payment.endDate).toLocaleDateString()}
               </td>
               <td className={s.cell}>{payment.amount}</td>
+              <td className={s.cell}>{payment.currency}</td>
               <td className={s.cell}>{payment.subscriptionType}</td>
-              <td className={s.cell}>{payment.paymentService}</td>
             </tr>
           ))}
         </tbody>

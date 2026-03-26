@@ -2,13 +2,16 @@ import { Button, Modal } from '@/shared/ui';
 
 import s from './Dialog.module.scss';
 import { clsx } from 'clsx';
-import { CSSProperties, FC } from 'react';
+import { CSSProperties, FC, ReactNode } from 'react';
 import { ModalProps } from '@/shared/ui/modal/Modal';
 import { ButtonVariant } from '@/shared/ui/button/Button';
 
 export type DialogProps = {
   cancelButtonText?: string;
   confirmButtonText?: string;
+  confirmButtonDisabled?: boolean;
+  confirmButtonClass?: string;
+  footerContent?: ReactNode;
   invertButtons?: boolean;
   onCancelButtonClick?: () => void;
   onConfirmButtonClick: () => void;
@@ -20,6 +23,9 @@ export const Dialog: FC<DialogProps> = ({
   cancelButtonText,
   children,
   confirmButtonText,
+  confirmButtonDisabled,
+  confirmButtonClass,
+  footerContent,
   invertButtons = true,
   onConfirmButtonClick,
   onCancelButtonClick,
@@ -48,7 +54,7 @@ export const Dialog: FC<DialogProps> = ({
       showCancelButton && s.hasCancelButton,
       buttonsClass,
     ),
-    button: s.button,
+    button: clsx(s.button, confirmButtonClass),
   };
 
   const confirmButtonVariant: ButtonVariant = getConfirmButtonVariant(
@@ -66,11 +72,13 @@ export const Dialog: FC<DialogProps> = ({
         style={{ marginTop: buttonsMarginTop }}
         className={classnames.buttonsBox}
       >
+        {footerContent}
         {
           <Button
             onClick={handleConfirmButtonClick}
             variant={confirmButtonVariant}
             className={classnames.button}
+            disabled={confirmButtonDisabled}
           >
             {confirmButtonText}
           </Button>

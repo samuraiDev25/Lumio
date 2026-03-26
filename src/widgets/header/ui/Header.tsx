@@ -17,25 +17,24 @@ export const Header = () => {
       <Container>
         <div className={s.headerWrapper}>
           <Link href={'/'}>
-            <Typography variant={'large'} as={'span'}>
-              Inctagram
+            <Typography variant={'large'} as={'span'} className={s.logo}>
+              L U M I O
+              <span
+                onClick={() => {
+                  fetch('https://lumio.su/api/v1/testing/all-data', {
+                    method: 'DELETE',
+                  }).then((responce) => {
+                    if (responce.status === 204) {
+                      console.log('Данные успешно удалены');
+                    }
+                  });
+                }}
+              >
+                .
+              </span>
             </Typography>
           </Link>
-          <Button
-            variant={'outline'}
-            style={{ marginLeft: '15px' }}
-            onClick={() => {
-              fetch('https://lumio.su/api/v1/testing/all-data', {
-                method: 'DELETE',
-              }).then((responce) => {
-                if (responce.status === 204) {
-                  console.log('Данные успешно удалены');
-                }
-              });
-            }}
-          >
-            Clean BD
-          </Button>
+
           <div className={s.selectBox}>
             {data && (
               <div className={s.bell}>
@@ -54,11 +53,11 @@ export const Header = () => {
                   </Button>
                 </>
               )}
-              {data?.email && (
-                <Link href="/posts/999999999" scroll={false}>
-                  Open missing post
-                </Link>
-              )}
+              {/*{data?.email && (*/}
+              {/*  <Link href="/posts/999999999" scroll={false}>*/}
+              {/*    Open missing post*/}
+              {/*  </Link>*/}
+              {/*)}*/}
             </div>
           </div>
         </div>

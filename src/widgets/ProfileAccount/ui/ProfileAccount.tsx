@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import s from './ProfileAccount.module.scss';
 import { PaypalSvgrepoCom4, StripeSvgrepoCom4 } from '@/shared/ui/icons';
 import {
   useCreateSubscriptionPaymentMutation,
   useGetMySubscriptionQuery,
-  useUpdateAutoRenewalMutation,
 } from '@/features/payments/api/paymentsApi';
 import { Radio } from '@/shared/ui';
 import { useGetProfileQuery } from '@/pages_fsd/profile/api/profileApi';
@@ -15,48 +14,38 @@ import { handleNetworkError } from '@/shared/lib';
 import { SignUpType } from '@/features/auth/model/validation';
 import { toast } from 'react-toastify';
 import { useAppDispatch } from '@/shared/hooks';
-import { useSearchParams } from 'next/navigation';
 import { StripeAutoRenewalModal } from '@/widgets/ProfileAccount/ui/StripeAutoRenewalModal/StripeAutoRenewalModal';
 import { CurrentSubscription } from '@/widgets/ProfileAccount/ui/CurrentSubscription/CurrentSubscription';
+import { PaymentSuccessDialog } from '@/widgets/ProfileAccount/ui/PaymentSuccessDialog/PaymentSuccessDialog';
+import { PaymentErrorDialog } from '@/widgets/ProfileAccount/ui/PaymentErrorDialog/PaymentErrorDialog';
 import { getActualAccountType } from '@/features/payments/model/hooks/getActualAccountType';
 import { AccountType } from '@/features/payments/model/types/paymentsTypes';
-
-type SubscriptionPlan = 'weekly10' | 'biweekly50' | 'monthly100';
-const accountOptions: {
-  value: AccountType;
-  label: string;
-  disabled?: boolean;
-}[] = [
-  { value: 'personal', label: 'Personal' },
-  { value: 'business', label: 'Business' },
-];
-
-const subscriptionOptions: { value: SubscriptionPlan; label: string }[] = [
-  { value: 'weekly10', label: '$10 per 1 Week' },
-  { value: 'biweekly50', label: '$50 per 2 Weeks' },
-  { value: 'monthly100', label: '$100 per month' },
-];
-
-const subscriptionMap = {
-  weekly10: '1 week',
-  biweekly50: '2 weeks',
-  monthly100: '1 month',
-} as const;
+import {
+  accountOptions,
+  PAYMENT_RETURN_URL_KEY,
+  SubscriptionPlan,
+  subscriptionMap,
+  subscriptionOptions,
+} from '@/widgets/ProfileAccount/model/constants';
+import { usePaymentStatusHandler } from '@/widgets/ProfileAccount/model/hooks/usePaymentStatusHandler';
 
 export const ProfileAccount = () => {
   const [accountType, setAccountType] = useState<AccountType>('personal');
-
   const [plan, setPlan] = useState<SubscriptionPlan>('weekly10');
   const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
   const [stripeModalKey, setStripeModalKey] = useState(0);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isFailedModalOpen, setIsFailedModalOpen] = useState(false);
 
   const [createPayment, { isLoading }] = useCreateSubscriptionPaymentMutation();
   const { data: subscription, refetch: refetchSubscription } =
-    useGetMySubscriptionQuery();
-  const [updateAutoRenewal, { isLoading: isAutoRenewalUpdating }] =
-    useUpdateAutoRenewalMutation();
+    useGetMySubscriptionQuery(undefined, {
+      refetchOnMountOrArgChange: false,
+    });
+
   const { data: me, isLoading: isMeLoading } = useMeQuery();
   const userId = me?.userId ? Number(me.userId) : null;
+
   const { data: profile } = useGetProfileQuery(userId!, {
     skip: !userId || isMeLoading,
     refetchOnMountOrArgChange: false,
@@ -67,50 +56,31 @@ export const ProfileAccount = () => {
   }, [subscription]);
 
   const dispatch = useAppDispatch();
-  const searchParams = useSearchParams();
 
   const isPaymentDisabled = !profile?.id || isLoading;
   const isBusinessAccount = accountType === 'business';
 
-  useEffect(() => {
-    if (searchParams.get('payment') === 'success') {
-      toast.success('Payment was successful!');
-      refetchSubscription();
+  const handleOpenSuccessModal = useCallback(() => {
+    setIsSuccessModalOpen(true);
+  }, []);
+
+  const handleOpenFailedModal = useCallback(() => {
+    setIsFailedModalOpen(true);
+  }, []);
+
+  usePaymentStatusHandler({
+    onSuccessAction: handleOpenSuccessModal,
+    onErrorAction: handleOpenFailedModal,
+  });
+
+  const handleAutoRenewalChange = async (
+    autoRenewal: boolean,
+    newAccountType?: AccountType,
+  ) => {
+    if (newAccountType && newAccountType !== accountType) {
+      setAccountType(newAccountType);
     }
-  }, [searchParams, refetchSubscription]);
-
-  const handleToggleAutoRenewal = async (checked: boolean) => {
-    if (!profile?.id) return;
-
-    try {
-      await updateAutoRenewal({
-        profileId: String(profile.id),
-        autoRenewal: checked,
-      }).unwrap();
-
-      toast.success('Auto-renewal updated');
-      refetchSubscription();
-    } catch (error) {
-      handleNetworkError({
-        error,
-        dispatch,
-        handle400Error: () => {
-          toast.error('Invalid auto-renewal request');
-        },
-        handle401Error: () => {
-          toast.error('You are not authorized');
-        },
-        handle429Error: () => {
-          toast.error('Too many requests.');
-        },
-        handle500Error: () => {
-          toast.error('Internal server error');
-        },
-        handleUnknownError: () => {
-          toast.error('Unexpected error');
-        },
-      });
-    }
+    await refetchSubscription();
   };
 
   const handlePayment = async (provider: 'Stripe' | 'PayPal') => {
@@ -119,6 +89,8 @@ export const ProfileAccount = () => {
     }
 
     try {
+      sessionStorage.setItem(PAYMENT_RETURN_URL_KEY, window.location.href);
+
       const res = await createPayment({
         profileId: String(profile.id),
         currency: 'USD',
@@ -128,6 +100,8 @@ export const ProfileAccount = () => {
 
       window.location.href = res.url;
     } catch (error) {
+      sessionStorage.removeItem(PAYMENT_RETURN_URL_KEY);
+
       handleNetworkError({
         error,
         dispatch,
@@ -178,30 +152,27 @@ export const ProfileAccount = () => {
     setIsStripeModalOpen(false);
     await handlePayment('Stripe');
   };
+
+  const handleCloseSuccessModal = () => {
+    setIsSuccessModalOpen(false);
+  };
+
+  const handleCloseFailedModal = () => {
+    setIsFailedModalOpen(false);
+  };
+
   return (
     <div className={s.profileAccount}>
-      {/*Расскоментировать когда протестируют все*/}
-
-      {/*{subscription && (*/}
-      {/*  <CurrentSubscription*/}
-      {/*    endDate={subscription?.endDate}*/}
-      {/*    nextPaymentDate={subscription?.nextPaymentDate}*/}
-      {/*    autoRenewal={subscription?.autoRenewal}*/}
-      {/*    isUpdating={isAutoRenewalUpdating}*/}
-      {/*    onToggleAutoRenewal={handleToggleAutoRenewal}*/}
-      {/*  />*/}
-      {/*)}*/}
-
-      {/*Для наглядного пособия*/}
-      {1 && (
+      {subscription && (
         <CurrentSubscription
           endDate={subscription?.endDate}
           nextPaymentDate={subscription?.nextPaymentDate}
           autoRenewal={subscription?.autoRenewal}
-          isUpdating={isAutoRenewalUpdating}
-          onToggleAutoRenewal={handleToggleAutoRenewal}
+          accountType={accountType}
+          onAutoRenewalChange={handleAutoRenewalChange}
         />
       )}
+
       <div className={s.section}>
         <p className={s.sectionTitle}>Account type:</p>
 
@@ -238,7 +209,7 @@ export const ProfileAccount = () => {
               width={96}
               height={64}
               onClick={
-                isPaymentDisabled ? undefined : () => handlePayment('PayPal')
+                isPaymentDisabled ? undefined : () => alert('Not available')
               }
             />
             <span className={s.or}>Or</span>
@@ -260,6 +231,14 @@ export const ProfileAccount = () => {
           </div>
         </>
       )}
+      <PaymentSuccessDialog
+        open={isSuccessModalOpen}
+        onCloseAction={handleCloseSuccessModal}
+      />
+      <PaymentErrorDialog
+        open={isFailedModalOpen}
+        onCloseAction={handleCloseFailedModal}
+      />
     </div>
   );
 };
