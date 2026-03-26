@@ -7,7 +7,6 @@ import { useMeQuery } from '@/features/auth/api/authApi';
 import { useGetProfileQuery } from '@/pages_fsd/profile/api/profileApi';
 import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
-import { AccountType } from '@/features/payments/model/types/paymentsTypes';
 import { useUpdateAutoRenewalMutation } from '@/features/payments/api/paymentsApi';
 
 type Props = {
