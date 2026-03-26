@@ -2,6 +2,7 @@ import s from '@/widgets/ProfileAccount/ui/ProfileAccount.module.scss';
 import { UpdateAutoRenewal } from '@/widgets/ProfileAccount/ui/UpdateAutoRenewal/UpdateAutoRenewal';
 import { AccountType } from '@/features/payments/model/types/paymentsTypes';
 
+
 type Props = {
   endDate?: string;
   nextPaymentDate?: string;
