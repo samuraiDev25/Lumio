@@ -51,9 +51,10 @@ export const ProfileAccount = () => {
     refetchOnMountOrArgChange: false,
   });
 
-  useEffect(() => {
+    useEffect(() => {
     setAccountType(getActualAccountType(subscription));
   }, [subscription]);
+
 
   const dispatch = useAppDispatch();
 
@@ -73,10 +74,8 @@ export const ProfileAccount = () => {
     onErrorAction: handleOpenFailedModal,
   });
 
-  const handleAutoRenewalChange = async (
-    autoRenewal: boolean,
-    newAccountType?: AccountType,
-  ) => {
+
+  const handleAutoRenewalChange = async (autoRenewal: boolean, newAccountType?: AccountType) => {
     if (newAccountType && newAccountType !== accountType) {
       setAccountType(newAccountType);
     }
@@ -168,7 +167,6 @@ export const ProfileAccount = () => {
           endDate={subscription?.endDate}
           nextPaymentDate={subscription?.nextPaymentDate}
           autoRenewal={subscription?.autoRenewal}
-          accountType={accountType}
           onAutoRenewalChange={handleAutoRenewalChange}
         />
       )}

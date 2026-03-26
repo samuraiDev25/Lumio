@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useEffect, useState } from 'react';
 import { Checkbox } from '@/shared/ui';
@@ -7,25 +7,22 @@ import { useMeQuery } from '@/features/auth/api/authApi';
 import { useGetProfileQuery } from '@/pages_fsd/profile/api/profileApi';
 import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
-import { AccountType } from '@/features/payments/model/types/paymentsTypes';
 import { useUpdateAutoRenewalMutation } from '@/features/payments/api/paymentsApi';
 
 type Props = {
   autoRenewal: boolean;
-  accountType?: AccountType;
   onAutoRenewalChangeAction?: (
     autoRenewal: boolean,
-    newAccountType?: AccountType,
   ) => void;
 };
 
 export const UpdateAutoRenewal = ({
   autoRenewal,
-  accountType,
   onAutoRenewalChangeAction,
 }: Props) => {
   const [isAutoRenewal, setIsAutoRenewal] = useState(autoRenewal);
   const [updateAutoRenewal, { isLoading }] = useUpdateAutoRenewalMutation();
+
   const dispatch = useAppDispatch();
 
   const { data: me, isLoading: isMeLoading } = useMeQuery();
@@ -55,20 +52,15 @@ export const UpdateAutoRenewal = ({
       await updateAutoRenewal({
         profileId: String(profile?.id),
         autoRenewal: newValue,
-      }).unwrap();
+    }).unwrap();
 
-      toast.success('Auto-renewal updated');
+    toast.success('Auto-renewal updated');
 
-      let newAccountType: AccountType | undefined = accountType;
-      if (accountType === 'business') {
-        newAccountType = 'personal';
-      }
-
-      onAutoRenewalChangeAction?.(newValue, newAccountType);
+    onAutoRenewalChangeAction?.(newValue);
     } catch (error) {
       setIsAutoRenewal(previousValue);
 
-      handleNetworkError({
+    handleNetworkError({
         error,
         dispatch,
         handle400Error: () => {
@@ -86,7 +78,7 @@ export const UpdateAutoRenewal = ({
         handleUnknownError: () => {
           toast.error('An unexpected error occurred.');
         },
-      });
+    });
     }
   };
 
@@ -98,4 +90,4 @@ export const UpdateAutoRenewal = ({
       disabled={isLoading}
     />
   );
-};
+}
