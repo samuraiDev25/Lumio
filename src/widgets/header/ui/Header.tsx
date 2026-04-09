@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Typography } from '@/shared/ui/';
 import { useMeQuery } from '@/features/auth/api/authApi';
 import { AUTH_ROUTES } from '@/shared/lib/routes';
-import { OutlineBell } from '@/shared/ui/icons';
+import { Notifications } from '@/features/notifications/ui/Notifications';
 
 export const Header = () => {
   const { data } = useMeQuery();
@@ -36,9 +36,9 @@ export const Header = () => {
           </Link>
 
           <div className={s.selectBox}>
-            {data && (
+            {data?.email && (
               <div className={s.bell}>
-                <OutlineBell />
+                <Notifications />
               </div>
             )}
             <HeaderSelect />
