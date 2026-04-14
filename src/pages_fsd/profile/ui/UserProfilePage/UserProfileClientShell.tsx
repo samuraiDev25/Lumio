@@ -13,6 +13,7 @@ import { useEffect, useMemo } from 'react';
 import { useAppDispatch } from '@/shared/hooks';
 import { profileApi } from '@/pages_fsd/profile/api/profileApi';
 import { postsApi } from '@/entities/post/api/postApi';
+import { PROFILE_ROUTES } from '@/shared/lib/routes';
 
 type Props = {
   userId: number;
@@ -70,7 +71,7 @@ export function UserProfileClientShell({
 
   useEffect(() => {
     if (!isLoading && isAuth && initialProfile === null) {
-      router.push(`/settings?part=info`);
+      router.push(PROFILE_ROUTES.SETTINGS_PART('info'));
     }
   }, [isLoading, isAuth, initialProfile, router]);
 

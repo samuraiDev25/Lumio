@@ -8,11 +8,11 @@ import Link from 'next/link';
 import SvgYandex from '@/shared/ui/icons/YandexSvg';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { authApi, useLoginMutation } from '@/features/auth/api/authApi';
+import { useLoginMutation } from '@/features/auth/api/authApi';
 import { useAppDispatch } from '@/shared/hooks/useAppDispatch';
 import { setCredentials } from '@/features/auth/model/authSlice';
 import { EyeOffOutline, EyeOutline } from '@/shared/ui/icons';
-import { AUTH_ROUTES } from '@/shared/lib/routes';
+import { APP_ROUTES, AUTH_ROUTES } from '@/shared/lib/routes';
 import { signInSchema, SignInType } from '@/features/auth/model/validation';
 import { handleNetworkError } from '@/shared/lib';
 import { toast } from 'react-toastify';
@@ -56,10 +56,10 @@ export const LoginForm = () => {
       dispatch(setCredentials({ accessToken: response.accessToken }));
       // Fetch current user data to obtain the userId
       // Use dispatch to initiate the 'me' endpoint and wait for the result
-      const user = await dispatch(authApi.endpoints.me.initiate()).unwrap();
-      const userId = user.userId;
+      //const user = await dispatch(authApi.endpoints.me.initiate()).unwrap();
+      //const userId = user.userId;
 
-      router.push(`/profile/${userId}`);
+      router.push(APP_ROUTES.ROOT);
       router.refresh();
     } catch (error: unknown) {
       handleNetworkError({

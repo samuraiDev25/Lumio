@@ -14,7 +14,7 @@ export async function fetchUserProfileSSR(
   userId: number,
 ): Promise<UserProfile | null> {
   const baseUrl = getBaseUrl();
-  const url = new URL(`api/v1/profile/${userId}`, baseUrl);
+  const url = new URL(`/api/v1/profile/${userId}`, baseUrl);
   const res = await fetch(url.toString(), { cache: 'no-store' });
 
   if (res.status === 404) return null;
