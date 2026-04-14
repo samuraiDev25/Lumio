@@ -1,5 +1,7 @@
 import s from './NotificationItem.module.scss';
 import { Typography } from '@/shared/ui';
+import { formatDistanceToNow } from 'date-fns';
+import { ru } from 'date-fns/locale';
 
 type NotificationItemProps = {
   title: string;
@@ -14,6 +16,11 @@ export const NotificationItem = ({
   isRead,
   createdAt,
 }: NotificationItemProps) => {
+  const timeAgo = formatDistanceToNow(new Date(createdAt), {
+    addSuffix: true,
+    locale: ru,
+  });
+
   return (
     <div className={`${s.item} ${!isRead ? s.unread : ''}`}>
       <div className={s.header}>
@@ -32,7 +39,7 @@ export const NotificationItem = ({
       </Typography>
 
       <Typography variant="small_text" className={s.date}>
-        {createdAt}
+        {timeAgo}
       </Typography>
     </div>
   );
