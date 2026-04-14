@@ -4,9 +4,10 @@ import type { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.typ
 import { MainPage } from '@/widgets/mainContent/ui/MainContent';
 
 export const revalidate = 60;
+const PAGE_SIZE = 8;
 
 export default async function HomePage() {
-  const data = await fetchMainPageData(4);
+  const data = await fetchMainPageData(1, PAGE_SIZE);
   const posts = data?.posts?.items || [];
 
   const uniqueUserIds = Array.from(new Set(posts.map((post) => post.userId)));
@@ -24,6 +25,7 @@ export default async function HomePage() {
   return (
     <MainPage
       serverPosts={posts}
+      serverPagesCount={data?.posts?.pagesCount || 1}
       serverUsersCount={data?.allRegisteredUsersCount || 0}
       profileByUserId={profileByUserId}
     />
