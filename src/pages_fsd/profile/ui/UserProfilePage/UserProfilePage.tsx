@@ -22,7 +22,6 @@ type Props = {
   initialPost: Post | null;
 };
 
-
 const PAGE_SIZE = 8;
 
 export function UserProfilePage({
@@ -157,12 +156,6 @@ export function UserProfilePage({
               {displayProfile.username}
             </Typography>
 
-            {displayProfile.aboutMe && (
-              <Typography variant="regular_text_16" className={s.aboutMe}>
-                {displayProfile.aboutMe}
-              </Typography>
-            )}
-
             {isOwnProfile && (
               <Button
                 variant="secondary"
@@ -191,6 +184,13 @@ export function UserProfilePage({
               <div className={s.statLabel}>Publications</div>
             </div>
           </div>
+          {displayProfile.aboutMe && (
+            <div>
+              <Typography variant="regular_text_16" className={s.aboutMe}>
+                {displayProfile.aboutMe}
+              </Typography>
+            </div>
+          )}
         </div>
       </div>
 

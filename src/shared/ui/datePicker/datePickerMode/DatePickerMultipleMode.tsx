@@ -2,14 +2,12 @@
 
 import s from '../DatePicker.module.scss';
 import { ClassNames, DayPicker, ModifiersClassNames } from 'react-day-picker';
-import React from 'react';
-import { getWeekForDay } from '@/shared/ui/datePicker/utilsDate';
 import { CaptionLayout } from '../types';
 
 type Props = {
   today: Date;
-  selectedWeek?: Date[];
-  onSelectAction: (day: Date, week: Date[]) => void;
+  selectedDay?: Date;
+  onSelectAction: (day: Date) => void;
   onErrorAction: (error: string | null) => void;
   allowPastDates: boolean;
   dayPickerClassNames?: Partial<ClassNames>;
@@ -21,7 +19,7 @@ type Props = {
 };
 export const DatePickerMultipleMode = ({
   today,
-  selectedWeek = [],
+  selectedDay,
   onSelectAction,
   onErrorAction,
   allowPastDates,
@@ -32,27 +30,14 @@ export const DatePickerMultipleMode = ({
   endMonth,
   reverseYears,
 }: Props) => {
-  const validateDays = (day: Date, week: Date[]) => {
-    const lastDayOfWeek = week[6];
-    if (!allowPastDates && lastDayOfWeek <= today) {
+  const validateDays = (day: Date) => {
+    if (!allowPastDates) {
       onErrorAction('Error!!');
-      onSelectAction(day, week);
+      onSelectAction(day);
     } else {
       onErrorAction?.(null);
-      onSelectAction(day, week);
+      onSelectAction(day);
     }
-  };
-
-  const handleDayClick = (day: Date) => {
-    const week = getWeekForDay(day);
-    validateDays(day, week);
-  };
-
-  const handleSelect = (value: Date[] | undefined) => {
-    if (!value || value.length === 0) return;
-    const day = value[0];
-    const week = getWeekForDay(day);
-    validateDays(day, week);
   };
 
   const defaultClassNames: Partial<ClassNames> = {
@@ -85,10 +70,13 @@ export const DatePickerMultipleMode = ({
 
   return (
     <DayPicker
-      mode="multiple"
-      selected={selectedWeek}
-      onSelect={handleSelect}
-      onDayClick={handleDayClick}
+      mode="single"
+      selected={selectedDay}
+      onSelect={(day) => {
+        if (day) {
+          validateDays(day);
+        }
+      }}
       numberOfMonths={1}
       weekStartsOn={1}
       showOutsideDays

@@ -29,10 +29,13 @@ export const postsApi = baseApi.injectEndpoints({
         { type: 'Posts', id: 'MAIN' },
       ],
     }),
-    getMainPageData: builder.query<MainPageResponse, { pageSize: number }>({
-      query: ({ pageSize }) => ({
+    getMainPageData: builder.query<
+      MainPageResponse,
+      { pageNumber?: number; pageSize: number }
+    >({
+      query: ({ pageNumber = 1, pageSize }) => ({
         url: '/api/v1',
-        params: { pageSize },
+        params: { pageNumber, pageSize },
       }),
       providesTags: () => [{ type: 'Posts', id: 'MAIN' }],
     }),
@@ -136,6 +139,8 @@ export const postsApi = baseApi.injectEndpoints({
 export const {
   useCreateNewPostMutation,
   useDeletePostMutation,
+  useGetMainPageDataQuery,
+  useLazyGetMainPageDataQuery,
   useUpdatePostUserMutation,
   useGetUserPostsQuery,
   useGetProfilePostQuery,
@@ -153,13 +158,17 @@ export const {
  * @returns Promise with MainPageResponse data.
  */
 export const fetchMainPageData = async (
+  pageNumber: number = 1,
   pageSize: number = 4,
 ): Promise<MainPageResponse> => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_API_URL;
 
-  const res = await fetch(`${baseUrl}api/v1?pageSize=${pageSize}`, {
-    next: { revalidate: 60 },
-  });
+  const res = await fetch(
+    `${baseUrl}api/v1?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+    {
+      next: { revalidate: 60 },
+    },
+  );
 
   if (!res.ok) {
     throw new Error('Failed to fetch main page data');
@@ -167,4 +176,3 @@ export const fetchMainPageData = async (
 
   return res.json();
 };
-

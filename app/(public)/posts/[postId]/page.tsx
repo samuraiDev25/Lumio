@@ -40,7 +40,7 @@ export default async function PostPage({ params, searchParams }: Props) {
 
   // if (!Array.isArray(data?.posts?.items)) notFound();
 
-  const data = await fetchMainPageData(100);
+  const data = await fetchMainPageData(1, 100);
   const post = data.posts.items.find((p) => p.id.toString() === postId);
   if (!post) notFound();
   const profile = await fetchUserProfileSSR(post.userId);

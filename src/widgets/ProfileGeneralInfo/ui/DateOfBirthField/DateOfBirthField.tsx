@@ -5,12 +5,14 @@ import {
   UseFormTrigger,
 } from 'react-hook-form';
 import { DatePicker } from '@/shared/ui';
+import { formatDateToLocalIso } from '@/shared/ui/datePicker/utilsDate';
 import { parseDateString } from '@/widgets/ProfileGeneralInfo/model/utils/dateOfBirthUtil';
 import { AUTH_ROUTES } from '@/shared/lib/routes';
 import { usePathname } from 'next/navigation';
 import s from '@/widgets/ProfileGeneralInfo/ui/GeneralInformation.module.scss';
 import Link from 'next/link';
 import { GeneralInformationSchema } from '@/widgets/ProfileGeneralInfo/model/validation/validationSchema';
+
 type Props = {
   control: Control<GeneralInformationSchema>;
   errors: FieldErrors<GeneralInformationSchema>;
@@ -44,7 +46,7 @@ export function DateOfBirthField({ control, errors, trigger }: Props) {
                   return;
                 }
 
-                const iso = date.toISOString().slice(0, 10);
+                const iso = formatDateToLocalIso(date);
                 field.onChange(iso);
                 await trigger('dateOfBirth');
               }}

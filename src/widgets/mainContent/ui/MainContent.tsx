@@ -13,6 +13,7 @@ import { PostsFeed } from './PostsFeed';
 
 type MainPageProps = {
   serverPosts: Post[];
+  serverPagesCount: number;
   serverUsersCount: number;
   profileByUserId: Record<number, UserProfile | null>;
 };
@@ -33,6 +34,7 @@ function PageLayout({
 
 export function MainPage({
   serverPosts,
+  serverPagesCount,
   serverUsersCount,
   profileByUserId,
 }: MainPageProps) {
@@ -57,6 +59,7 @@ export function MainPage({
     <PageLayout isAuthorized={isAuthorized}>
       <PostsFeed
         posts={serverPosts}
+        pagesCount={serverPagesCount}
         usersCount={serverUsersCount}
         profileByUserId={profileByUserId}
       />

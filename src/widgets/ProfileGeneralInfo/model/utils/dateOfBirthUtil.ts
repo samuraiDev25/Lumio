@@ -10,7 +10,8 @@ export const normalizeDateString = (value: string | null | undefined) => {
 export const parseDateString = (value: string | null | undefined) => {
   const normalized = normalizeDateString(value);
   if (!normalized) return undefined;
-  const date = new Date(normalized);
+  const [year, month, day] = normalized.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
   if (Number.isNaN(date.getTime())) return undefined;
   return date;
 };

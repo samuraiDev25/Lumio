@@ -24,7 +24,7 @@ export default async function InterceptedPostModal({
   const profileIdCurrent = Number(profileId);
 
   // const post = await fetchProfilePostSSR(profileIdCurrent, postId);
-  const data = await fetchMainPageData(100);
+  const data = await fetchMainPageData(1, 100);
   const post = data.posts.items.find((p) => p.id.toString() === postId);
 
   if (!post) notFound();

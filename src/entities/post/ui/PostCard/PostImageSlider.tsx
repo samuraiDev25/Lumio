@@ -52,7 +52,7 @@ export const PostImageSlider = ({
         {imagesCount > 0 ? (
           <Link href={href} scroll={false} className={s['image-link']}>
             <Image
-              src={images[currentSlideIndex].url}
+              src={images[currentSlideIndex]?.url ?? images[0].url}
               alt="Post image"
               fill
               sizes="234px"
@@ -67,12 +67,14 @@ export const PostImageSlider = ({
         {hasMultipleImages && isHovered && (
           <>
             <button
+              type="button"
               onClick={prevSlide}
               className={clsx(s['nav-button'], s.left)}
             >
               <ArrowIosBackOutline />
             </button>
             <button
+              type="button"
               onClick={nextSlide}
               className={clsx(s['nav-button'], s.right)}
             >
@@ -88,6 +90,7 @@ export const PostImageSlider = ({
         >
           {images.map((_, index) => (
             <button
+              type="button"
               key={index}
               className={clsx(
                 s.dot,

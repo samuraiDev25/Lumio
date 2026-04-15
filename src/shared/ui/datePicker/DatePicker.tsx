@@ -7,7 +7,7 @@ import s from './DatePicker.module.scss';
 import 'react-day-picker/dist/style.css';
 import { Calendar, CalendarOutline } from '@/shared/ui/icons';
 import './datePickerMode/DatePicker.global.scss';
-import { formatDate, formatRange, getWeekForDay } from './utilsDate';
+import { formatDate, formatRange } from './utilsDate';
 import { DatePickerRangeMode } from './datePickerMode/DatePickerRangeMode';
 import { DatePickerMultipleMode } from './datePickerMode/DatePickerMultipleMode';
 import { CaptionLayout } from './types';
@@ -61,7 +61,6 @@ export const DatePicker = ({
 }: DatePickerProps) => {
   const [open, setOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<Date | undefined>();
-  const [selectedWeek, setSelectedWeek] = useState<Date[]>([]);
   const [selectedRange, setSelectedRange] = useState<DateRange | undefined>();
   const [error, setError] = useState<string | null>(null);
   const displayError = errorMessage ?? error;
@@ -70,17 +69,12 @@ export const DatePicker = ({
   const isMultipleControlled = mode === 'multiple' && !!onChangeAction;
   const isRangeControlled = mode === 'range' && !!onRangeChangeAction;
   const effectiveSelectedDay = isMultipleControlled ? value : selectedDay;
-  const effectiveSelectedWeek = isMultipleControlled
-    ? value
-      ? getWeekForDay(value)
-      : []
-    : selectedWeek;
+
   const effectiveSelectedRange = isRangeControlled ? rangeValue : selectedRange;
 
-  const handleMultipleSelect = (day: Date, week: Date[]) => {
+  const handleMultipleSelect = (day: Date) => {
     if (!isMultipleControlled) {
       setSelectedDay(day);
-      setSelectedWeek(week);
     }
     onChangeAction?.(day);
   };
@@ -136,7 +130,7 @@ export const DatePicker = ({
               (mode === 'multiple' ? (
                 <DatePickerMultipleMode
                   today={today}
-                  selectedWeek={effectiveSelectedWeek}
+                  selectedDay={effectiveSelectedDay}
                   onSelectAction={handleMultipleSelect}
                   onErrorAction={setError}
                   allowPastDates={allowPastDates}
