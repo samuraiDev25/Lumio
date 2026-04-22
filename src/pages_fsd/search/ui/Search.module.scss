@@ -1,0 +1,139 @@
+@use '../../../shared/styles/typography' as t;
+
+.search-page {
+  display: flex;
+  flex-direction: column;
+
+  min-height: calc(100vh - var(--header-height));
+  padding: 36px 24px;
+}
+
+.search-field {
+  width: min(100%, 972px);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.content {
+  width: min(100%, 972px);
+  margin-top: 30px;
+}
+
+.section-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+}
+
+.empty-state {
+  margin-top: 132px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.recent-list,
+.user-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.recent-button {
+  cursor: pointer;
+
+  width: fit-content;
+  max-width: 100%;
+  padding: 0;
+  border: none;
+
+  @include t.uik-regular-text-14;
+
+  color: var(--color-light-900);
+  text-align: left;
+  overflow-wrap: anywhere;
+
+  background: transparent;
+
+  &:hover {
+    color: var(--color-accent-100);
+  }
+
+  &:focus-visible {
+    border-radius: 2px;
+    color: var(--color-light-100);
+    outline: 2px solid var(--color-accent-700);
+    outline-offset: 2px;
+  }
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.user-link {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  min-height: 60px;
+  padding: 8px 0;
+
+  color: var(--color-light-100);
+  text-decoration: none;
+
+  &:hover {
+    .user-info span:first-child {
+      color: var(--color-accent-100);
+    }
+  }
+
+  &:focus-visible {
+    border-radius: 2px;
+    outline: 2px solid var(--color-accent-700);
+    outline-offset: 2px;
+  }
+}
+
+.avatar,
+.avatar-placeholder {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.avatar {
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  @include t.uik-h2-typography;
+
+  color: var(--color-light-100);
+
+  background-color: var(--color-dark-100);
+}
