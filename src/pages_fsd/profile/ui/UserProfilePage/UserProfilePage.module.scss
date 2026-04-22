@@ -80,6 +80,14 @@
   align-self: flex-start;
   margin-top: 1rem;
 }
+
+.profile-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
 .text {
   font-size: 0.875rem;
   line-height: 1.6;
@@ -128,4 +136,3 @@
   align-items: center;
   min-height: 400px;
 }
-
