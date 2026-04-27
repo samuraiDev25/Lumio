@@ -17,7 +17,7 @@ export const SidebarItem = memo(
   }: SidebarItemProps) => {
     const IconComponent = isActive && IconFilled ? IconFilled : IconOutline;
 
-    const isAction = id === 'create' || id === 'search';
+    const isAction = id === 'create';
 
     const classNames = clsx(
       s['nav-link'],

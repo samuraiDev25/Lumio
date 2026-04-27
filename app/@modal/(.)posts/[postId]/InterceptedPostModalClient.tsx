@@ -11,6 +11,7 @@ type Props = {
   profile: UserProfile | null;
   from?: 'main' | 'profile';
   profileId: number;
+  returnTo?: string;
 };
 
 export function InterceptedPostModalClient({
@@ -18,12 +19,18 @@ export function InterceptedPostModalClient({
   profile,
   from,
   profileId,
+  returnTo,
 }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(true);
 
   const handleClose = () => {
     setOpen(false);
+    if (returnTo?.startsWith('/')) {
+      router.push(returnTo, { scroll: false });
+      return;
+    }
+
     if (from === 'main') {
       router.push('/', { scroll: false });
       return;

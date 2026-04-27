@@ -1,0 +1,116 @@
+import { baseApi } from '@/shared/api/baseApi';
+
+export type SearchUser = {
+  id: number;
+  userName: string;
+  avatarUrl: string | null;
+};
+
+export type UserDetailedProfile = {
+  id: number;
+  username: string;
+  aboutMe: string | null;
+  avatarUrl: string | null;
+  followersCount: number;
+  followingCount: number;
+  postsCount: number;
+  isFollowing: boolean;
+  isCurrentUser: boolean;
+};
+
+export type FollowUserResponse = {
+  isFollowing: boolean;
+  followersCount: number;
+  followingCount: number;
+};
+
+type SearchUsersArgs = {
+  username: string;
+  pageNumber?: number;
+  pageSize?: number;
+};
+
+type UsersApiItem = {
+  id?: number;
+  userId?: number;
+  userName?: string;
+  username?: string;
+  avatarUrl?: string | null;
+  avatar?: string | null;
+  avatars?: Array<{ url?: string | null }>;
+};
+
+type UsersApiResponse = {
+  items?: UsersApiItem[];
+  users?: UsersApiItem[];
+};
+
+const normalizeUser = (user: UsersApiItem): SearchUser | null => {
+  const id = user.id ?? user.userId;
+  const userName = user.userName ?? user.username;
+
+  if (!id || !userName) {
+    return null;
+  }
+
+  return {
+    id,
+    userName,
+    avatarUrl: user.avatarUrl ?? user.avatar ?? user.avatars?.[0]?.url ?? null,
+  };
+};
+
+const getItems = (response: UsersApiResponse | UsersApiItem[]) => {
+  if (Array.isArray(response)) {
+    return response;
+  }
+
+  return response.items ?? response.users ?? [];
+};
+
+export const usersApi = baseApi.injectEndpoints({
+  endpoints: (builder) => ({
+    getUserProfile: builder.query<UserDetailedProfile, number>({
+      query: (userId) => ({
+        url: `/api/v1/users/${userId}/profile`,
+        method: 'GET',
+      }),
+      providesTags: (_result, _error, userId) => [
+        { type: 'Profile', id: userId },
+      ],
+    }),
+    searchUsers: builder.query<SearchUser[], SearchUsersArgs>({
+      query: ({ username, pageNumber = 1, pageSize = 10 }) => ({
+        url: '/api/v1/users/search',
+        params: {
+          username,
+          pageNumber,
+          pageSize,
+        },
+      }),
+      transformResponse: (response: UsersApiResponse | UsersApiItem[]) =>
+        getItems(response).map(normalizeUser).filter(Boolean) as SearchUser[],
+    }),
+    followUser: builder.mutation<
+      FollowUserResponse,
+      { userId: number; currentUserId: number | null }
+    >({
+      query: ({ userId }) => ({
+        url: `/api/v1/users/${userId}/follow`,
+        method: 'POST',
+      }),
+      invalidatesTags: (_result, _error, { userId, currentUserId }) => [
+        { type: 'Profile', id: userId },
+        ...(currentUserId
+          ? [{ type: 'Profile' as const, id: currentUserId }]
+          : []),
+      ],
+    }),
+  }),
+});
+
+export const {
+  useGetUserProfileQuery,
+  useSearchUsersQuery,
+  useFollowUserMutation,
+} = usersApi;
