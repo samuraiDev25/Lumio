@@ -1,6 +1,6 @@
 @use '../../../shared/styles/typography' as t;
 
-.search-page {
+.searchPage {
   display: flex;
   flex-direction: column;
 
@@ -8,7 +8,7 @@
   padding: 36px 24px;
 }
 
-.search-field {
+.searchField {
   width: min(100%, 972px);
 }
 
@@ -23,14 +23,13 @@
   margin-top: 30px;
 }
 
-.section-block {
+.sectionBlock {
   display: flex;
   flex-direction: column;
   gap: 12px;
-
 }
 
-.empty-state {
+.emptyState {
   margin-top: 132px;
   display: flex;
   flex-direction: column;
@@ -38,8 +37,8 @@
   justify-content: center;
 }
 
-.recent-list,
-.user-list {
+.recentList,
+.userList {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -50,7 +49,7 @@
   list-style: none;
 }
 
-.recent-button {
+.recentButton {
   cursor: pointer;
 
   width: fit-content;
@@ -78,7 +77,7 @@
   }
 }
 
-.user-info {
+.userInfo {
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -90,7 +89,7 @@
   }
 }
 
-.user-link {
+.userLink {
   display: flex;
   gap: 12px;
   align-items: center;
@@ -102,7 +101,7 @@
   text-decoration: none;
 
   &:hover {
-    .user-info span:first-child {
+    .userInfo span:first-child {
       color: var(--color-accent-100);
     }
   }
@@ -115,7 +114,7 @@
 }
 
 .avatar,
-.avatar-placeholder {
+.avatarPlaceholder {
   flex: 0 0 48px;
   width: 48px;
   height: 48px;
@@ -126,7 +125,7 @@
   object-fit: cover;
 }
 
-.avatar-placeholder {
+.avatarPlaceholder {
   display: inline-flex;
   align-items: center;
   justify-content: center;
