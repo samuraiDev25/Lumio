@@ -11,6 +11,7 @@ type Props = {
   searchParams?: Promise<{
     from?: 'main' | 'profile';
     profileId?: string;
+    returnTo?: string;
   }>;
 };
 
@@ -20,6 +21,7 @@ export default async function PostPage({ params, searchParams }: Props) {
   const postId = resoledPostId.postId;
   const profileId = Number(currentProfileId?.profileId);
   const from = currentProfileId?.from;
+  const returnTo = currentProfileId?.returnTo;
 
   if (!postId) notFound();
 
@@ -34,6 +36,7 @@ export default async function PostPage({ params, searchParams }: Props) {
         profile={profile}
         profileId={profileId}
         from={from}
+        returnTo={returnTo}
       />
     );
   }
@@ -51,6 +54,7 @@ export default async function PostPage({ params, searchParams }: Props) {
       profile={profile}
       from={from ?? 'main'}
       profileId={profileId}
+      returnTo={returnTo}
     />
   );
 }

@@ -11,14 +11,26 @@ type Props = {
   profile: UserProfile | null;
   profileId: number;
   from?: 'main' | 'profile';
+  returnTo?: string;
 };
 
-export function PostPageClient({ post, profile, profileId, from }: Props) {
+export function PostPageClient({
+  post,
+  profile,
+  profileId,
+  from,
+  returnTo,
+}: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(true);
 
   const handleClose = () => {
     setOpen(false);
+    if (returnTo?.startsWith('/')) {
+      router.push(returnTo, { scroll: false });
+      return;
+    }
+
     if (from === 'main') {
       router.push('/', { scroll: false });
       return;

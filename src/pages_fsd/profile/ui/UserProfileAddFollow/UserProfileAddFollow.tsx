@@ -17,6 +17,7 @@ import {
   Post,
 } from '@/entities/post/model/types/postApi.types';
 import { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
+import { getUserProfileRoute } from '@/shared/lib/routes/routes';
 import s from '../UserProfilePage/UserProfilePage.module.scss';
 
 type Props = {
@@ -282,6 +283,7 @@ export function UserProfileAddFollow({
               posts={allPosts}
               profileId={Number(userId)}
               from="profile"
+              returnTo={getUserProfileRoute(String(userId))}
             />
 
             {isFetching && (

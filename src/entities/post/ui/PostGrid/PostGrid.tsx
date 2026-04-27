@@ -9,20 +9,32 @@ type PostGridProps = {
   posts: Post[];
   profileId?: number;
   from?: 'main' | 'profile';
+  returnTo?: string;
 };
 
 export function PostGrid({
   posts,
   profileId,
   from = 'profile',
+  returnTo,
 }: PostGridProps) {
   return (
     <div className={s.postGrid}>
       {posts.map((post) => {
-        const href =
-          from === 'profile' && profileId
-            ? `/posts/${post.id}?from=profile&profileId=${profileId}`
-            : `/posts/${post.id}?from=main`;
+        const searchParams = new URLSearchParams();
+
+        if (from === 'profile' && profileId) {
+          searchParams.set('from', 'profile');
+          searchParams.set('profileId', String(profileId));
+        } else {
+          searchParams.set('from', 'main');
+        }
+
+        if (returnTo) {
+          searchParams.set('returnTo', returnTo);
+        }
+
+        const href = `/posts/${post.id}?${searchParams.toString()}`;
 
         return (
           <div key={post.id} className={s.postItem}>

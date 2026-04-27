@@ -8,6 +8,7 @@ type Props = {
   searchParams?: Promise<{
     from?: 'main' | 'profile';
     profileId?: string;
+    returnTo?: string;
   }>;
 };
 
@@ -20,6 +21,7 @@ export default async function InterceptedPostModal({
   const postId = resolvedParams.postId;
   const profileId = currentProfileId?.profileId;
   const from = currentProfileId?.from;
+  const returnTo = currentProfileId?.returnTo;
 
   const profileIdCurrent = Number(profileId);
 
@@ -36,6 +38,7 @@ export default async function InterceptedPostModal({
       profile={profile}
       from={from}
       profileId={profileIdCurrent}
+      returnTo={returnTo}
     />
   );
 }
