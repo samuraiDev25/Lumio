@@ -106,6 +106,15 @@ export const usersApi = baseApi.injectEndpoints({
           : []),
       ],
     }),
+    unfollowUser: builder.mutation<void, { userId: number }>({
+      query: ({ userId }) => ({
+        url: `/api/v1/users/${userId}/follow`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (_result, _error, { userId }) => [
+        { type: 'Profile', id: userId },
+      ],
+    }),
   }),
 });
 
@@ -113,4 +122,5 @@ export const {
   useGetUserProfileQuery,
   useSearchUsersQuery,
   useFollowUserMutation,
+  useUnfollowUserMutation,
 } = usersApi;
