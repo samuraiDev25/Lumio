@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import clsx from 'clsx';
@@ -11,6 +11,7 @@ type PostImageSliderProps = {
   images: { url: string }[];
   postId: number;
   isExpanded: boolean;
+  objectFit?: 'cover' | 'contain';
 
   // Для условия ТЗ
   from?: 'main' | 'profile';
