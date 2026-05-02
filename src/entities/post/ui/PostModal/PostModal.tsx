@@ -238,7 +238,7 @@ export const PostModal = ({
                       </div>
                     </div>
                   </div>
-                  <PostActions likes={likes} isAuthorized={isAuthorized} />
+                  <PostActions likes={likes} isAuthorized={isAuthorized} postId={post.id.toString()}/>
                 </>
               )}
             </div>

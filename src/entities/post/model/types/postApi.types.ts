@@ -38,3 +38,16 @@ export type GetMyPostsResponse = {
   totalCount: number;
   items: Post[];
 };
+
+export type CommentResponse = {
+  id: number,
+  content: string,
+  likeCount: number,
+  dislikeCount: number,
+  createdAt: string,
+  userId: number,
+  username: string,
+  avatarUrl: string,
+  userReaction: string,
+  replies: []
+}

@@ -25,7 +25,7 @@ export function handleNetworkError({
   handle500Error?: () => void;
   handleUnknownError?: (error: unknown) => void;
 }) {
-  console.error('handleNetworkError', error);
+  // console.error('handleNetworkError', error);
   const fetchError = error as FetchBaseQueryError;
 
   if ('status' in fetchError) {
