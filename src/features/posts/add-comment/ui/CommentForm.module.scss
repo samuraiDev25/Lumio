@@ -3,7 +3,8 @@
 
 .inputWrapper {
   display: flex;
-  padding: 18px 24px;
+  padding: 0 10px ;
+  justify-content: space-between;
 }
 
 .input {
@@ -13,7 +14,7 @@
 }
 
 .submitButton {
-  padding: 8px 12px;
+  padding: 5px 10px;
   border: none;
   cursor: pointer;
 }

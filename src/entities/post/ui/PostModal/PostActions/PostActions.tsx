@@ -7,14 +7,16 @@ import {
 import { CommentForm } from '@/features/posts/add-comment/ui/CommentForm';
 import { formatDateFull } from '@/entities/post/lib/formatDate';
 import { useAddComment } from '@/features/posts/add-comment/model/useAddComment';
+import { AddComment } from '@/features/posts/add-comment/ui/AddComment';
 
 type Props = {
   likes: number;
   isAuthorized: boolean;
+  postId: string;
 };
-export const PostActions = ({ likes, isAuthorized }: Props) => {
+export const PostActions = ({ likes, isAuthorized, postId }: Props) => {
   const timeReal = formatDateFull(new Date());
-  const { comments, newComment, addComment, updateComment } = useAddComment();
+  // const { comments, newComment, addComment, updateComment } = useAddComment();
   return (
     <div className={s.footer}>
       <div className={s.actions}>
@@ -40,12 +42,13 @@ export const PostActions = ({ likes, isAuthorized }: Props) => {
 
       {/* Поле ввода комментария */}
       {isAuthorized && (
-        <CommentForm
-          value={newComment}
-          onChangeAction={updateComment}
-          onSubmitAction={addComment}
-          placeholder={'Add a Comment...'}
-        />
+        // <CommentForm
+        //   value={newComment}
+        //   onChangeAction={updateComment}
+        //   onSubmitAction={addComment}
+        //   placeholder={'Add a Comment...'}
+        // />
+        <AddComment postId={postId}/>
       )}
     </div>
   );

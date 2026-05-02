@@ -1,5 +1,6 @@
 import { baseApi } from '@/shared/api';
 import {
+  CommentResponse,
   GetMyPostsRequest,
   GetMyPostsResponse,
   MainPageResponse,
@@ -133,6 +134,18 @@ export const postsApi = baseApi.injectEndpoints({
         { type: 'Posts', id: `USER_${arg.userId}` },
       ],
     }),
+    addComment: builder.mutation<CommentResponse, {postId: string, content: string}>({
+      query: ({postId, content}) => ({
+        method: 'POST',
+        url: `/api/v1/posts/${postId}/comments`,
+        body: {content},
+      }),
+      invalidatesTags: (_result, _error, { postId }) => [
+    { type: 'Posts', id: `POST_${postId}` }, 
+    { type: 'Posts', id: 'MAIN' }, 
+    { type: 'Posts', id: 'MY' }, 
+  ],
+    }),
   }),
 });
 
@@ -145,6 +158,7 @@ export const {
   useGetUserPostsQuery,
   useGetProfilePostQuery,
   useGetMyPostsQuery,
+  useAddCommentMutation,
 } = postsApi;
 
 /**
