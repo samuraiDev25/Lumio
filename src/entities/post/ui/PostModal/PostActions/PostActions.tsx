@@ -1,28 +1,38 @@
+'use client';
+
 import s from './PostActions.module.scss';
 import {
   BookmarkOutline,
+  Heart,
   HeartOutline,
   PaperPlaneOutline,
 } from '@/shared/ui/icons';
-import { CommentForm } from '@/features/posts/add-comment/ui/CommentForm';
 import { formatDateFull } from '@/entities/post/lib/formatDate';
-import { useAddComment } from '@/features/posts/add-comment/model/useAddComment';
 import { AddComment } from '@/features/posts/add-comment/ui/AddComment';
+import type { Post } from '@/entities/post/model/types/postApi.types';
+import { usePostLike } from '@/entities/post/model/hooks/usePostLike';
 
 type Props = {
-  likes: number;
+  post: Post;
   isAuthorized: boolean;
-  postId: string;
 };
-export const PostActions = ({ likes, isAuthorized, postId }: Props) => {
+export const PostActions = ({ post, isAuthorized }: Props) => {
   const timeReal = formatDateFull(new Date());
-  // const { comments, newComment, addComment, updateComment } = useAddComment();
+  const { likesCount, isLiked, isSubmitting, toggleLike } = usePostLike(post);
+
   return (
     <div className={s.footer}>
       <div className={s.actions}>
         <div className={s.actionsLeft}>
-          <button className={s.actionButton} aria-label="Like">
-            <HeartOutline />
+          <button
+            type="button"
+            className={`${s.actionButton} ${isLiked ? s.liked : ''}`}
+            aria-label={isLiked ? 'Unlike' : 'Like'}
+            aria-pressed={isLiked}
+            disabled={isSubmitting}
+            onClick={() => void toggleLike()}
+          >
+            {isLiked ? <Heart /> : <HeartOutline />}
           </button>
           <button className={s.actionButton} aria-label="Share">
             <PaperPlaneOutline />
@@ -34,22 +44,14 @@ export const PostActions = ({ likes, isAuthorized, postId }: Props) => {
       </div>
 
       <div className={s.likes}>
-        <span className={s.likesCount}>{likes} Likes</span>
+        <span className={s.likesCount}>{likesCount} Likes</span>
       </div>
       <div className={s.timeReal}>
         <div>{timeReal}</div>
       </div>
 
       {/* Поле ввода комментария */}
-      {isAuthorized && (
-        // <CommentForm
-        //   value={newComment}
-        //   onChangeAction={updateComment}
-        //   onSubmitAction={addComment}
-        //   placeholder={'Add a Comment...'}
-        // />
-        <AddComment postId={postId}/>
-      )}
+      {isAuthorized && <AddComment postId={String(post.id)} />}
     </div>
   );
 };

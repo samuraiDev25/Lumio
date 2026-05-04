@@ -20,6 +20,15 @@
   background: none;
   border: none;
   cursor: pointer;
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.6;
+  }
+
+  &.liked {
+    color: #ff3040;
+  }
 }
 
 .likes {

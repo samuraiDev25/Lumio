@@ -1,15 +1,18 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+// Временно отключаем Google Fonts через next/font из-за проблемы с Turbopack
+// import { Inter } from 'next/font/google';
 import './globals.scss';
 import { Providers } from '@/app/Providers';
 import { BaseLayout } from '@/app/BaseLayout';
 import { ReactNode } from 'react';
 
-const inter = Inter({
-  subsets: ['latin', 'cyrillic'],
-  weight: ['300', '400', '500', '600', '700'],
+// Временный объект вместо шрифта
+const inter = {
   variable: '--font-family-primary',
-});
+};
+
+// Альтернативный вариант: если нужен Inter через обычный CSS link, раскомментировать ниже
+// и добавить в head: <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
 export const metadata: Metadata = {
   title: 'Lumio',

@@ -12,7 +12,7 @@ import { APP_ROUTES } from '@/shared/lib/routes';
 type DeletePostModalProps = {
   isOpenModal: boolean;
   onCloseModalAction: () => void;
-  postId: number;
+  postId: string;
 };
 
 export const DeletePostModal = ({

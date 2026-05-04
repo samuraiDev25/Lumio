@@ -6,6 +6,7 @@ import s from './PostPage.module.scss';
 import {
   BookmarkOutline,
   Edit2Outline,
+  Heart,
   HeartOutline,
   MoreHorizontalOutline,
   PaperPlaneOutline,
@@ -24,6 +25,7 @@ import { PostImage } from '@/entities/post/ui/PostModal/PostImage/PostImage';
 import { DeletePostModal } from '@/entities/post';
 import { useMeQuery } from '@/features/auth/api/authApi';
 import { useUpdatePostUserMutation } from '@/entities/post/api/postApi';
+import { usePostLike } from '@/entities/post/model/hooks/usePostLike';
 
 type Props = {
   post: Post;
@@ -36,8 +38,6 @@ export const PostPage = ({ post }: Props) => {
   const [comments, setComments] = useState<string[]>([]);
   const [newComment, setNewComment] = useState('');
   const dispatch = useAppDispatch();
-  const [likes, setLikes] = useState<number>(0);
-  const [isLiked, setIsLiked] = useState<boolean>(false);
   const [postDescription, setPostDescription] = useState(
     post.description || '',
   );
@@ -46,6 +46,7 @@ export const PostPage = ({ post }: Props) => {
   const { data: currentUser } = useMeQuery();
   const isOwnPost = currentUser?.userId?.toString() === post.userId?.toString();
   const [updatePost] = useUpdatePostUserMutation();
+  const { likesCount, isLiked, isSubmitting, toggleLike } = usePostLike(post);
   const images = post.postFiles || [];
 
   const { currentIndex, nextImage, prevImage, selectImage } =
@@ -56,17 +57,12 @@ export const PostPage = ({ post }: Props) => {
     setIsMenuOpen(false);
   };
 
-  const handleCountLikesPost = () => {
-    setLikes((prev) => prev + 1);
-    setIsLiked((prev) => !prev);
-  };
-
   const handleSaveEdit = async () => {
     const previousDescription = post.description;
     try {
       setIsEditing(false);
       await updatePost({
-        postId: post.id!!,
+        postId: post.id!,
         description: postDescription,
       }).unwrap();
     } catch (error) {
@@ -243,7 +239,7 @@ export const PostPage = ({ post }: Props) => {
                     </div>
                   </div>
                   <div className={s.timestamp}>
-                    {formatDate(post.createdAt!!)}
+                    {formatDate(post.createdAt!)}
                   </div>
                 </div>
 
@@ -279,11 +275,14 @@ export const PostPage = ({ post }: Props) => {
                 <div className={s.actions}>
                   <div className={s.actionsLeft}>
                     <button
+                      type="button"
                       className={`${s.actionButton} ${isLiked ? s.liked : ''}`}
-                      onClick={handleCountLikesPost}
-                      aria-label="Like"
+                      onClick={() => void toggleLike()}
+                      aria-label={isLiked ? 'Unlike' : 'Like'}
+                      aria-pressed={isLiked}
+                      disabled={isSubmitting}
                     >
-                      <HeartOutline />
+                      {isLiked ? <Heart /> : <HeartOutline />}
                     </button>
                     <button className={s.actionButton} aria-label="Share">
                       <PaperPlaneOutline />
@@ -295,10 +294,10 @@ export const PostPage = ({ post }: Props) => {
                 </div>
 
                 <div className={s.likes}>
-                  <span className={s.likesCount}>{likes} Likes</span>
+                  <span className={s.likesCount}>{likesCount} Likes</span>
                 </div>
 
-                <div className={s.postDate}>{formatDate(post.createdAt!!)}</div>
+                <div className={s.postDate}>{formatDate(post.createdAt!)}</div>
 
                 {/* Поле ввода комментария */}
                 {isAuthorized && (
@@ -332,7 +331,7 @@ export const PostPage = ({ post }: Props) => {
       </div>
 
       <DeletePostModal
-        postId={post.id!!}
+        postId={post.id!}
         isOpenModal={isDeletePost}
         onCloseModalAction={() => setIsDeletePost(false)}
       />
