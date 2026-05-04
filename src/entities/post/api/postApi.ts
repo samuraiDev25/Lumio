@@ -5,6 +5,7 @@ import {
   GetMyPostsResponse,
   MainPageResponse,
   Post,
+  PostLikeMutationResponse,
 } from '@/entities/post/model/types/postApi.types';
 
 export const postsApi = baseApi.injectEndpoints({
@@ -20,7 +21,7 @@ export const postsApi = baseApi.injectEndpoints({
         { type: 'Posts', id: 'MAIN' },
       ],
     }),
-    deletePost: builder.mutation<void, number>({
+    deletePost: builder.mutation<void, string>({
       query: (postId) => ({
         url: `/api/v1/posts/${postId}`,
         method: 'DELETE',
@@ -42,7 +43,7 @@ export const postsApi = baseApi.injectEndpoints({
     }),
     updatePostUser: builder.mutation<
       Post,
-      { postId: number; description: string }
+      { postId: string; description: string }
     >({
       query: ({ postId, description }) => ({
         url: `/api/v1/posts/${postId}`,
@@ -96,7 +97,7 @@ export const postsApi = baseApi.injectEndpoints({
       },
       providesTags: () => [{ type: 'Posts', id: 'MY' }],
     }),
-    getProfilePost: builder.query<Post, { profileId: number; postId: string }>({
+    getProfilePost: builder.query<Post, { profileId: string; postId: string }>({
       query: ({ profileId, postId }) => ({
         url: `/api/v1/posts/${profileId}`,
         params: { postId },
@@ -108,7 +109,7 @@ export const postsApi = baseApi.injectEndpoints({
     getUserPosts: builder.query<
       GetMyPostsResponse,
       {
-        userId: number;
+        userId: string;
         pageNumber?: number;
         pageSize?: number;
         sortBy?: string;
@@ -134,17 +135,34 @@ export const postsApi = baseApi.injectEndpoints({
         { type: 'Posts', id: `USER_${arg.userId}` },
       ],
     }),
-    addComment: builder.mutation<CommentResponse, {postId: string, content: string}>({
-      query: ({postId, content}) => ({
+    addComment: builder.mutation<
+      CommentResponse,
+      { postId: string; content: string }
+    >({
+      query: ({ postId, content }) => ({
         method: 'POST',
         url: `/api/v1/posts/${postId}/comments`,
-        body: {content},
+        body: { content },
       }),
       invalidatesTags: (_result, _error, { postId }) => [
-    { type: 'Posts', id: `POST_${postId}` }, 
-    { type: 'Posts', id: 'MAIN' }, 
-    { type: 'Posts', id: 'MY' }, 
-  ],
+        { type: 'Posts', id: `POST_${postId}` },
+        { type: 'Posts', id: 'MAIN' },
+        { type: 'Posts', id: 'MY' },
+      ],
+    }),
+    likePost: builder.mutation<PostLikeMutationResponse, { postId: string }>({
+      query: ({ postId }) => ({
+        url: `/api/v1/posts/${postId}/Like`,
+        method: 'POST',
+        body: { reaction: 'like' as const },
+      }),
+    }),
+    unlikePost: builder.mutation<PostLikeMutationResponse, { postId: string }>({
+      query: ({ postId }) => ({
+        url: `/api/v1/posts/${postId}/Like`,
+        method: 'POST',
+        body: { reaction: 'none' as const },
+      }),
     }),
   }),
 });
@@ -159,6 +177,8 @@ export const {
   useGetProfilePostQuery,
   useGetMyPostsQuery,
   useAddCommentMutation,
+  useLikePostMutation,
+  useUnlikePostMutation,
 } = postsApi;
 
 /**

@@ -14,6 +14,7 @@ import {
   PersonRemoveOutline,
   PersonAddOutline,
   CopyOutline,
+  Heart,
   HeartOutline,
   MessageCircleOutline,
   PaperPlaneOutline,
@@ -22,6 +23,7 @@ import {
 import s from './FeedPostCard.module.scss';
 import { useUnfollowUserMutation } from '@/entities/user/api/usersApi';
 import { FeedPostSlider } from './FeedPostSlider';
+import { usePostLike } from '@/entities/post/model/hooks/usePostLike';
 
 type Props = {
   post: Post;
@@ -29,6 +31,7 @@ type Props = {
 
 export const FeedPostCard = ({ post }: Props) => {
   const { data: me } = useMeQuery();
+  const { likesCount, isLiked, isSubmitting, toggleLike } = usePostLike(post);
   const currentUserId = me?.userId ? Number(me.userId) : null;
 
   /** Если пост мой — скрываем кнопку отписки (нельзя отписаться от себя) */
@@ -174,9 +177,15 @@ export const FeedPostCard = ({ post }: Props) => {
       <footer className={s.footer}>
         <div className={s['actions-row']}>
           <div className={s['left-actions']}>
-            {/* Место для UC-5: лайк публикации */}
-            <button className={s['icon-btn']}>
-              <HeartOutline />
+            <button
+              type="button"
+              className={`${s['icon-btn']} ${isLiked ? s.liked : ''}`}
+              aria-label={isLiked ? 'Unlike' : 'Like'}
+              aria-pressed={isLiked}
+              disabled={isSubmitting}
+              onClick={() => void toggleLike()}
+            >
+              {isLiked ? <Heart /> : <HeartOutline />}
             </button>
             <button className={s['icon-btn']}>
               <MessageCircleOutline />
@@ -214,9 +223,12 @@ export const FeedPostCard = ({ post }: Props) => {
                 <span className={s['mini-letter']}>C</span>
               </div>
             </div>
-            {/* Место для UC-5: счетчик лайков */}
-            <Typography variant="regular_text_14">
-              <strong>2 243</strong> `Like`
+            <Typography
+              variant="regular_text_14"
+              className={s['likes-count-text']}
+            >
+              <strong>{likesCount.toLocaleString()}</strong>{' '}
+              {likesCount === 1 ? 'like' : 'likes'}
             </Typography>
           </div>
 

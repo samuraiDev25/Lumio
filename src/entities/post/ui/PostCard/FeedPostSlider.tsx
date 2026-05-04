@@ -8,7 +8,7 @@ import s from './FeedPostSlider.module.scss';
 
 type Props = {
   images: { url: string }[];
-  postId: number;
+  postId: string;
 };
 
 export const FeedPostSlider = ({ images, postId }: Props) => {

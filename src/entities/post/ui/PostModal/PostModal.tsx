@@ -25,7 +25,6 @@ type Props = {
   post: Post;
   profile: UserProfile | null;
   initialImageIndex?: number;
-  likesPost?: number;
   isOpen?: boolean;
   onCloseAction?: () => void;
 };
@@ -35,7 +34,6 @@ export const PostModal = ({
   post,
   profile,
   initialImageIndex,
-  likesPost = 0,
   isOpen: externalOpen,
   onCloseAction: externalOnClose,
 }: Props) => {
@@ -47,8 +45,6 @@ export const PostModal = ({
   const [isDeletePost, setIsDeletePost] = useState(false);
 
   const [isClosePost, setIsClosePost] = useState(false);
-  const [likes, setLikes] = useState<number>(likesPost);
-  const [isLiked, setIsLiked] = useState<boolean>(false);
   const {
     isEditing,
     description,
@@ -86,11 +82,6 @@ export const PostModal = ({
   const onCloseOpenDeleteModal = () => {
     setIsMenuOpen(false);
     setIsDeletePost(true);
-  };
-
-  const handleCountLikesPost = () => {
-    setLikes((prev) => prev + 1);
-    setIsLiked((prev) => !prev);
   };
 
   const handleCloseEditing = () => {
@@ -222,7 +213,6 @@ export const PostModal = ({
                           createdAt={post.createdAt}
                           likes={12}
                           isLiked={false}
-                          onLikeAction={handleCountLikesPost}
                         />
                         <CommentItem
                           userName={'anotherUserName2'}
@@ -233,12 +223,11 @@ export const PostModal = ({
                           createdAt={post.createdAt}
                           likes={5}
                           isLiked={false}
-                          onLikeAction={handleCountLikesPost}
                         />
                       </div>
                     </div>
                   </div>
-                  <PostActions likes={likes} isAuthorized={isAuthorized} postId={post.id.toString()}/>
+                  <PostActions post={post} isAuthorized={isAuthorized} />
                 </>
               )}
             </div>

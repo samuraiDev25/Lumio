@@ -9,13 +9,13 @@ import s from './PostCard.module.scss';
 
 type PostImageSliderProps = {
   images: { url: string }[];
-  postId: number;
+  postId: string;
   isExpanded: boolean;
   objectFit?: 'cover' | 'contain';
 
   // Для условия ТЗ
   from?: 'main' | 'profile';
-  profileId?: number;
+  profileId?: string;
 };
 
 export const PostImageSlider = ({

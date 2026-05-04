@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import s from './GeneralInformation.module.scss';
 import { Button, TextField } from '@/shared/ui';
 import { useGetProfileQuery } from '@/pages_fsd/profile/api/profileApi';
@@ -13,8 +14,10 @@ import { DateOfBirthField } from '@/widgets/ProfileGeneralInfo/ui/DateOfBirthFie
 import { mapProfileToForm } from '@/widgets/ProfileGeneralInfo/model/utils/mapProfileToForm';
 import { SelectField } from '@/widgets/ProfileGeneralInfo/ui/SelectField/SelectField';
 import { useSubmitProfile } from '@/widgets/ProfileGeneralInfo/model/hooks/useSubmitProfile';
+import { APP_ROUTES } from '@/shared/lib/routes';
 
 export function GeneralInformation() {
+  const router = useRouter();
   const { data: me, isLoading: isMeLoading } = useMeQuery();
   const userId = me?.userId ? Number(me.userId) : null;
   const { data: profile } = useGetProfileQuery(userId!, {
@@ -113,6 +116,14 @@ export function GeneralInformation() {
         </div>
       </div>
       <footer className={s.pageFooter}>
+        <Button
+          variant={'secondary'}
+          size={'md'}
+          className={s.btnBack}
+          onClick={() => router.push(APP_ROUTES.PROFILE)}
+        >
+          Back to Profile
+        </Button>
         <Button
           variant={'primary'}
           size={'md'}

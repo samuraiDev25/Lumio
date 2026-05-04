@@ -5,7 +5,7 @@ import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
 import { SignUpType } from '@/features/auth/model/validation';
 
-export const useEditPost = (postId: number, initialDescription: string) => {
+export const useEditPost = (postId: string, initialDescription: string) => {
   const [isEditing, setIsEditing] = useState(false);
   const [description, setDescription] = useState(initialDescription);
   const [updatePost] = useUpdatePostUserMutation();

@@ -1,17 +1,19 @@
 export type PostFile = {
   id: number;
   url: string;
-  postId: number;
+  postId: string;
 };
 
 export type Post = {
-  id: number;
+  id: string;
   description: string;
   createdAt: string;
   userId: number;
   userName: string;
   avatarUrl?: string;
   postFiles: PostFile[];
+  likesCount?: number;
+  isLiked?: boolean;
 };
 
 export type MainPageResponse = {
@@ -40,14 +42,20 @@ export type GetMyPostsResponse = {
 };
 
 export type CommentResponse = {
-  id: number,
-  content: string,
-  likeCount: number,
-  dislikeCount: number,
-  createdAt: string,
-  userId: number,
-  username: string,
-  avatarUrl: string,
-  userReaction: string,
-  replies: []
-}
+  id: number;
+  content: string;
+  likeCount: number;
+  dislikeCount: number;
+  createdAt: string;
+  userId: number;
+  username: string;
+  avatarUrl: string;
+  userReaction: string;
+  replies: [];
+};
+
+export type PostLikeMutationResponse = {
+  postId: string;
+  likesCount: number;
+  isLiked: boolean;
+};
