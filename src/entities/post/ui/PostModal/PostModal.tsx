@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect, useMemo, useCallback } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import Image from 'next/image';
 import s from './PostModal.module.scss';
@@ -19,6 +19,12 @@ import { PostHeader } from '@/entities/post/ui/PostModal/PostHeader/PostHeader';
 import { CommentItem } from '@/entities/post/ui/PostModal/CommentItem/CommentItem';
 import { PostActions } from '@/entities/post/ui/PostModal/PostActions/PostActions';
 import { MenuDropdown } from '@/entities/post/ui/PostModal/MenuDropdown/MenuDropdown';
+import {
+  useGetPostCommentsQuery,
+  useLikeCommentMutation,
+} from '@/entities/post/api/postApi';
+import type { Comment } from '@/entities/post/model/types/postApi.types';
+import { AddComment } from '@/features/posts/add-comment/ui/AddComment';
 
 type Props = {
   children?: ReactNode;
@@ -59,7 +65,97 @@ export const PostModal = ({
   const isOwnPost = currentUser?.userId?.toString() === post.userId?.toString();
   const images = post.postFiles || [];
   const userName = profile?.username || `User ${post.userId}`;
-  const avatarUrl = profile?.avatarUrl || '/User 03.jpg';
+  const avatarUrl = profile?.avatarUrl ?? '/User 03.jpg';
+
+  const { data: commentsData, isLoading: commentsLoading } =
+    useGetPostCommentsQuery({
+      postId: post.id,
+      pageNumber: 1,
+      pageSize: 20,
+      sortBy: 'createdAt',
+      sortDirection: 'desc',
+    });
+  const [replyTo, setReplyTo] = useState<number | null>(null);
+  const [likeComment, { isLoading: isLiking }] = useLikeCommentMutation();
+
+  const handleLike = useCallback(
+    async (comment: Comment) => {
+      if (isLiking) return;
+      const newReaction = comment.userReaction === 'like' ? 'none' : 'like';
+
+      try {
+        await likeComment({
+          postId: post.id,
+          commentId: comment.id,
+          reaction: newReaction,
+        }).unwrap();
+      } catch (error) {
+        console.error('Like failed:', error);
+      }
+    },
+    [post.id, likeComment, isLiking],
+  );
+
+  const isLikingComment = useCallback((commentId: number) => {
+    return false;
+  }, []);
+
+  const renderComments = (
+    comments: Comment[],
+    parentId: number | null = null,
+  ) => {
+    return comments.map((comment) => (
+      <div key={comment.id}>
+        <CommentItem
+          userName={comment.username}
+          avatarUrl={comment.avatarUrl || '/User 03.jpg'}
+          text={comment.content}
+          createdAt={comment.createdAt}
+          likes={comment.likeCount}
+          isLiked={comment.userReaction === 'like'}
+          onLikeAction={() => handleLike(comment)}
+          onAnswerAction={() => setReplyTo(comment.id)}
+          isLiking={isLikingComment(comment.id)}
+        />
+
+        {replyTo === comment.id && parentId === null && (
+          <AddComment
+            postId={post.id}
+            parentId={comment.id}
+            onSuccess={() => setReplyTo(null)}
+          />
+        )}
+
+        {comment.replies.length > 0 && (
+          <div style={{ marginLeft: 40 }}>
+            {renderComments(comment.replies, comment.id)}
+          </div>
+        )}
+      </div>
+    ));
+  };
+
+  const currentUserId = currentUser?.userId ? Number(currentUser.userId) : null;
+
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
+  const sortedComments = useMemo(() => {
+    if (!commentsData?.items) return [];
+    return [...commentsData.items].sort((a, b) => {
+      if (currentUserId === null) return 0;
+
+      if (a.userId === currentUserId) return -1;
+      if (b.userId === currentUserId) return 1;
+
+      return 0;
+    });
+  }, [commentsData?.items, currentUserId]);
+
+  useEffect(() => {
+    if (replyTo && !commentsData?.items.find((c) => c.id === replyTo)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setReplyTo(null);
+    }
+  }, [replyTo, commentsData]);
 
   const handleRequestClose = () => {
     // Если в режиме редактирования и есть несохранённые изменения
@@ -202,28 +298,15 @@ export const PostModal = ({
                           <div>{formatDate(post.createdAt)}</div>
                         </div>
                       </div>
+
                       <div className={s.commentsList}>
-                        <CommentItem
-                          userName={'anotherUserName1'}
-                          avatarUrl={'/User 07.jpg'}
-                          text={
-                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, metus eu tincidunt consequat, ' +
-                            'metus purus tincidunt metus, vel gravida metus metus vel risus.'
-                          }
-                          createdAt={post.createdAt}
-                          likes={12}
-                          isLiked={false}
-                        />
-                        <CommentItem
-                          userName={'anotherUserName2'}
-                          avatarUrl={'/User 18.jpg'}
-                          text={
-                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, metus eu tincidunt consequat'
-                          }
-                          createdAt={post.createdAt}
-                          likes={5}
-                          isLiked={false}
-                        />
+                        {commentsLoading && <div>Loading...</div>}
+
+                        {!commentsLoading && sortedComments.length === 0 && (
+                          <div>No comments</div>
+                        )}
+
+                        {!commentsLoading && renderComments(sortedComments)}
                       </div>
                     </div>
                   </div>
