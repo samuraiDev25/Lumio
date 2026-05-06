@@ -1,10 +1,11 @@
 import { baseApi } from '@/shared/api';
 import {
-  CommentResponse,
+  CommentsResponse,
   GetMyPostsRequest,
   GetMyPostsResponse,
   MainPageResponse,
   Post,
+  PostCommentsParams,
   PostLikeMutationResponse,
 } from '@/entities/post/model/types/postApi.types';
 
@@ -136,13 +137,13 @@ export const postsApi = baseApi.injectEndpoints({
       ],
     }),
     addComment: builder.mutation<
-      CommentResponse,
-      { postId: string; content: string }
+      Comment,
+      { postId: string; content: string; parentCommentId?: number }
     >({
-      query: ({ postId, content }) => ({
+      query: ({ postId, content, parentCommentId }) => ({
         method: 'POST',
         url: `/api/v1/posts/${postId}/comments`,
-        body: { content },
+        body: { content, parentCommentId },
       }),
       invalidatesTags: (_result, _error, { postId }) => [
         { type: 'Posts', id: `POST_${postId}` },
@@ -157,12 +158,89 @@ export const postsApi = baseApi.injectEndpoints({
         body: { reaction: 'like' as const },
       }),
     }),
+    likeComment: builder.mutation<
+      void,
+      {
+        postId: string;
+        commentId: number;
+        reaction: 'like' | 'none' | 'dislike';
+      }
+    >({
+      query: ({ commentId, reaction }) => ({
+        url: `/api/v1/posts/comments/${commentId}/like`,
+        method: 'POST',
+        body: { status: reaction },
+      }),
+      async onQueryStarted(
+        { postId, commentId, reaction },
+        { dispatch, queryFulfilled },
+      ) {
+        const patchResult = dispatch(
+          postsApi.util.updateQueryData(
+            'getPostComments',
+            { postId, pageNumber: 1, pageSize: 20 },
+            (draft) => {
+              const comment = draft.items.find((c) => c.id === commentId);
+              if (comment) {
+                const wasLiked = comment.userReaction === 'like';
+                const isLikeAction = reaction === 'like';
+
+                comment.userReaction = reaction;
+
+                comment.likeCount += isLikeAction ? 1 : -1;
+
+                if (wasLiked && !isLikeAction) {
+                  comment.dislikeCount = Math.max(0, comment.dislikeCount);
+                }
+              }
+            },
+          ),
+        );
+
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+      invalidatesTags: (_result, _error, { postId, commentId }) => [
+        { type: 'PostComments', id: `POST_${postId}` },
+        { type: 'PostComments', id: `COMMENT_${commentId}` },
+      ],
+    }),
     unlikePost: builder.mutation<PostLikeMutationResponse, { postId: string }>({
       query: ({ postId }) => ({
         url: `/api/v1/posts/${postId}/Like`,
         method: 'POST',
         body: { reaction: 'none' as const },
       }),
+    }),
+    getPostComments: builder.query<CommentsResponse, PostCommentsParams>({
+      query: ({
+        postId,
+        pageNumber = 1,
+        pageSize = 20,
+        sortBy,
+        sortDirection,
+      }) => ({
+        url: `/api/v1/posts/${postId}/comments`,
+        params: {
+          pageNumber,
+          pageSize,
+          ...(sortBy && { sortBy }),
+          ...(sortDirection && { sortDirection }),
+        },
+      }),
+      providesTags: (result, error, arg) =>
+        result
+          ? [
+              { type: 'PostComments', id: `POST_${arg.postId || 'LIST'}` },
+              ...result.items.map(({ id }) => ({
+                type: 'PostComments' as const,
+                id: `COMMENT_${id}` as const,
+              })),
+            ]
+          : [{ type: 'PostComments', id: 'LIST' }],
     }),
   }),
 });
@@ -179,6 +257,8 @@ export const {
   useAddCommentMutation,
   useLikePostMutation,
   useUnlikePostMutation,
+  useGetPostCommentsQuery,
+  useLikeCommentMutation,
 } = postsApi;
 
 /**

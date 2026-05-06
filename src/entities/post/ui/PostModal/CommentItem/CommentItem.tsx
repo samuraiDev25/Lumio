@@ -11,8 +11,11 @@ type Props = {
   likes?: number;
   isLiked?: boolean;
   onLikeAction?: () => void;
+  onAnswerAction?: () => void;
   showActions?: boolean;
+  isLiking?: boolean;
 };
+
 export const CommentItem = ({
   userName,
   avatarUrl,
@@ -21,7 +24,9 @@ export const CommentItem = ({
   isLiked,
   likes = 0,
   onLikeAction,
+  onAnswerAction,
   showActions = true,
+  isLiking = false,
 }: Props) => {
   return (
     <div className={s.commentsContainer}>
@@ -41,12 +46,19 @@ export const CommentItem = ({
           </div>
 
           {showActions && onLikeAction && (
-            <span
+            <button
               className={`${s.heartBeating} ${isLiked ? s.heartLiked : ''}`}
               onClick={onLikeAction}
+              disabled={isLiking}
+              aria-label={isLiked ? 'Убрать лайк' : 'Поставить лайк'}
             >
-              <HeartOutline />
-            </span>
+              {isLiking ? (
+                <HeartOutline className={s.heartLoading} />
+              ) : (
+                <HeartOutline />
+              )}
+              {isLiking && <span className={s.loadingText}>...</span>}
+            </button>
           )}
         </div>
       </div>
@@ -54,7 +66,9 @@ export const CommentItem = ({
         <div className={s.timestamp}>
           <div>{formatDate(createdAt)}</div>
           <div>Like: {likes}</div>
-          <div>Answer</div>
+          <div>
+            <span onClick={onAnswerAction}>Answer</span>
+          </div>
         </div>
       )}
     </div>
