@@ -8,7 +8,6 @@ import {
 import { jwtDecode } from 'jwt-decode';
 import { clearAuthData } from '@/features/auth/api/authUtils';
 import { logout } from '@/features/auth/model/authSlice';
-import { APP_ROUTES } from '@/shared/lib/routes/routes';
 
 const mutex = new Mutex();
 
@@ -58,9 +57,6 @@ const handleUnauthorized = (api: { dispatch: (action: unknown) => void }) => {
 
 const handleRefreshFailure = (api: { dispatch: (action: unknown) => void }) => {
   handleUnauthorized(api);
-  if (typeof window !== 'undefined') {
-    window.location.replace(APP_ROUTES.ROOT);
-  }
 };
 
 export const baseQueryWithReauth: BaseQueryFn<
@@ -120,6 +116,12 @@ export const baseQueryWithReauth: BaseQueryFn<
   let result = await baseQuery(args, api, extraOptions);
 
   if (result.error && result.error.status === 401 && !isAuthUrl(args)) {
+    const token = localStorage.getItem('accessToken');
+
+    if (!token) {
+      return result;
+    }
+
     if (mutex.isLocked()) {
       await mutex.waitForUnlock();
       result = await baseQuery(args, api, extraOptions);

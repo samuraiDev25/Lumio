@@ -2,7 +2,6 @@
 
 import { useMeQuery } from '@/features/auth/api/authApi';
 import { UserProfilePage } from '@/pages_fsd/profile';
-import { BaseLayout } from '@/app/BaseLayout';
 import {
   GetMyPostsResponse,
   Post,
@@ -36,7 +35,7 @@ export function UserProfileClientShell({
 
   const firstPageArgs = useMemo(
     () => ({
-      userId,
+      userId: String(userId),
       pageNumber: 1,
       pageSize: PAGE_SIZE,
       sortBy: 'createdAt',
@@ -85,15 +84,14 @@ export function UserProfileClientShell({
       />
     );
   }
-
   return (
-    <BaseLayout>
+    <>
       <UserProfilePage
         userId={userId}
         initialProfile={initialProfile}
         initialPosts={initialPosts}
         initialPost={initialPost}
       />
-    </BaseLayout>
+    </>
   );
 }

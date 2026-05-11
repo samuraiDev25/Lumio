@@ -32,4 +32,4 @@ export const PROFILE_ROUTES = {
 };
 
 // example
-export const getUserProfileRoute = (id: string) => `/users/${id}`;
+export const getUserProfileRoute = (id: string) => `/profile/${id}`;
