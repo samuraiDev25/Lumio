@@ -5,7 +5,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
 import { Post } from '@/entities/post/model/types/postApi.types';
-import { useFollowUserMutation, useGetUserProfileQuery } from '@/entities/user';
+import {
+  useFollowUserMutation,
+  useGetUserDetailedProfileQuery,
+} from '@/entities/user';
 import { useMeQuery } from '@/features/auth/api/authApi';
 import { getRelativeTime } from '@/shared/lib';
 import { Typography } from '@/shared/ui';
@@ -21,7 +24,7 @@ import {
   BookmarkOutline,
 } from '@/shared/ui/icons';
 import s from './FeedPostCard.module.scss';
-import { useUnfollowUserMutation } from '@/entities/user/api/usersApi';
+import { useUnfollowUserMutation } from '@/entities/user/api/userFollowsApi';
 import { FeedPostSlider } from './FeedPostSlider';
 import { usePostLike } from '@/entities/post/model/hooks/usePostLike';
 
@@ -41,7 +44,7 @@ export const FeedPostCard = ({ post }: Props) => {
    * Запрос профиля автора для получения статуса подписки (isFollowing).
    * skip: оптимизация — не запрашиваем профиль, если это наш собственный пост, чтобы не грузить сервер
    */
-  const { data: profile } = useGetUserProfileQuery(post.userId, {
+  const { data: profile } = useGetUserDetailedProfileQuery(post.userId, {
     skip: !post.userId || isMyPost,
   });
 

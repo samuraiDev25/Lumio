@@ -24,6 +24,11 @@ export type FollowUserResponse = {
   followingCount: number;
 };
 
+export type UserFollowInfo = {
+  followersCount: number;
+  followingCount: number;
+};
+
 type SearchUsersArgs = {
   username: string;
   pageNumber?: number;
@@ -68,12 +73,25 @@ const getItems = (response: UsersApiResponse | UsersApiItem[]) => {
   return response.items ?? response.users ?? [];
 };
 
-export const usersApi = baseApi.injectEndpoints({
+export const userFollowsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getUserProfile: builder.query<UserDetailedProfile, number>({
+    getUserDetailedProfile: builder.query<UserDetailedProfile, number>({
       query: (userId) => ({
         url: `/api/v1/users/${userId}/profile`,
         method: 'GET',
+      }),
+      providesTags: (_result, _error, userId) => [
+        { type: 'Profile', id: userId },
+      ],
+    }),
+    getUserFollowInfo: builder.query<UserFollowInfo, number>({
+      query: (userId) => ({
+        url: `/api/v1/users/${userId}/profile`,
+        method: 'GET',
+      }),
+      transformResponse: (response: UserDetailedProfile) => ({
+        followersCount: response.followersCount,
+        followingCount: response.followingCount,
       }),
       providesTags: (_result, _error, userId) => [
         { type: 'Profile', id: userId },
@@ -119,8 +137,9 @@ export const usersApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useGetUserProfileQuery,
+  useGetUserDetailedProfileQuery,
+  useGetUserFollowInfoQuery,
   useSearchUsersQuery,
   useFollowUserMutation,
   useUnfollowUserMutation,
-} = usersApi;
+} = userFollowsApi;

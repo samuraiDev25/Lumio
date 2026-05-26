@@ -24,6 +24,7 @@ export function usePostLike(post: Post) {
   const [unlikePost] = useUnlikePostMutation();
 
   const cachedPost = useAppSelector((s) => findPostInCaches(s, post.id));
+  console.log('cachedPost', cachedPost);
   const [likesCount, setLikesCount] = useState<number>(post.likesCount ?? 0);
   const [isLiked, setIsLiked] = useState<boolean>(post.isLiked ?? false);
   const [isSubmitting, setIsSubmitting] = useState(false);

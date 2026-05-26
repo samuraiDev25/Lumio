@@ -127,7 +127,7 @@ export const PostModal = ({
         )}
 
         {comment.replies.length > 0 && (
-          <div style={{ marginLeft: 40 }}>
+          <div style={{ marginLeft: 50 }}>
             {renderComments(comment.replies, comment.id)}
           </div>
         )}
