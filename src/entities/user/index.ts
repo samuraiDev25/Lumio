@@ -1,11 +1,14 @@
 export {
-  usersApi,
+  userFollowsApi,
   useFollowUserMutation,
-  useGetUserProfileQuery,
+  useGetUserDetailedProfileQuery,
+  useGetUserFollowInfoQuery,
   useSearchUsersQuery,
-} from './api/usersApi';
+  useUnfollowUserMutation,
+} from './api/userFollowsApi';
 export type {
   FollowUserResponse,
   SearchUser,
+  UserFollowInfo,
   UserDetailedProfile,
-} from './api/usersApi';
+} from './api/userFollowsApi';

@@ -1,13 +1,15 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useMeQuery } from '@/features/auth/api/authApi';
 import { Button, Typography } from '@/shared/ui';
 import { PostGrid } from '@/entities/post/ui/PostGrid/PostGrid';
 import { Loading } from '@/shared/ui/loading/Loading';
-import { useGetUserPostsQuery } from '@/entities/post/api/postApi';
+import { useLazyGetUserPostsQuery } from '@/entities/post/api/postApi';
 import { useGetUserProfileQuery } from '@/pages_fsd/profile/api/profileApi';
+import { useGetUserDetailedProfileQuery } from '@/entities/user';
 import {
   GetMyPostsResponse,
   Post,
@@ -30,14 +32,24 @@ export function UserProfilePage({
   initialPosts,
   initialPost,
 }: Props) {
+  return (
+    <UserProfilePageContent
+      key={userId}
+      userId={userId}
+      initialProfile={initialProfile}
+      initialPosts={initialPosts}
+      initialPost={initialPost}
+    />
+  );
+}
+
+function UserProfilePageContent({
+  userId,
+  initialProfile,
+  initialPosts,
+}: Props) {
   const router = useRouter();
   const { data: currentUser } = useMeQuery();
-
-  const [isPostOpen, setIsPostOpen] = useState(!!initialPost);
-
-  useEffect(() => {
-    setIsPostOpen(!!initialPost);
-  }, [initialPost]);
 
   const isValidUserId = Number.isFinite(userId);
   const isOwnProfile = currentUser?.userId?.toString() === userId.toString();
@@ -48,56 +60,51 @@ export function UserProfilePage({
       refetchOnMountOrArgChange: false,
     });
 
-  const displayProfile = profileFromApi ?? initialProfile;
-
-  const [page, setPage] = useState(1);
-  const [allPosts, setAllPosts] = useState<Post[]>(initialPosts?.items ?? []);
-
-  const queryArgs = useMemo(
-    () => ({
-      userId,
-      pageNumber: page,
-      pageSize: PAGE_SIZE,
-      sortBy: 'createdAt',
-      sortDirection: 'desc' as const,
-    }),
-    [userId, page],
-  );
-
-  const {
-    data: postsData,
-    isLoading: isPostsLoading,
-    isFetching,
-  } = useGetUserPostsQuery(queryArgs, {
+  const { data: detailedProfile } = useGetUserDetailedProfileQuery(userId, {
     skip: !isValidUserId,
     refetchOnMountOrArgChange: false,
   });
 
-  const pagesCount = postsData?.pagesCount ?? initialPosts?.pagesCount ?? 1;
+  const displayProfile = detailedProfile ?? profileFromApi ?? initialProfile;
+  const followingCount =
+    detailedProfile?.followingCount ?? displayProfile?.followingCount ?? 0;
+  const followersCount =
+    detailedProfile?.followersCount ?? displayProfile?.followersCount ?? 0;
+  const [page, setPage] = useState(1);
+  const [allPosts, setAllPosts] = useState<Post[]>(initialPosts?.items ?? []);
+  const [pagesCount, setPagesCount] = useState(initialPosts?.pagesCount ?? 1);
+  const [getUserPosts, { isFetching }] = useLazyGetUserPostsQuery();
 
   const hasMore = page < pagesCount;
-
-  useEffect(() => {
-    setPage(1);
-    setAllPosts(initialPosts?.items ?? []);
-  }, [userId, initialPosts]);
-
-  useEffect(() => {
-    if (!postsData?.items) return;
-
-    if (page === 1) {
-      setAllPosts(postsData.items);
-    } else {
-      setAllPosts((prev) => [...prev, ...postsData.items]);
-    }
-  }, [postsData, page]);
 
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const lockRef = useRef(false);
 
-  useEffect(() => {
-    if (!isFetching) lockRef.current = false;
-  }, [isFetching]);
+  const loadMore = useCallback(async () => {
+    if (!isValidUserId) return;
+    if (!hasMore) return;
+    if (isFetching) return;
+    if (lockRef.current) return;
+
+    lockRef.current = true;
+    const nextPage = page + 1;
+
+    try {
+      const result = await getUserPosts({
+        userId: String(userId),
+        pageNumber: nextPage,
+        pageSize: PAGE_SIZE,
+        sortBy: 'createdAt',
+        sortDirection: 'desc',
+      }).unwrap();
+
+      setPage(nextPage);
+      setPagesCount(result.pagesCount);
+      setAllPosts((prev) => [...prev, ...result.items]);
+    } finally {
+      lockRef.current = false;
+    }
+  }, [getUserPosts, hasMore, isFetching, isValidUserId, page, userId]);
 
   useEffect(() => {
     const el = loadMoreRef.current;
@@ -107,19 +114,14 @@ export function UserProfilePage({
       (entries) => {
         const first = entries[0];
         if (!first?.isIntersecting) return;
-        if (!hasMore) return;
-        if (isFetching) return;
-        if (lockRef.current) return;
-
-        lockRef.current = true;
-        setPage((prev) => prev + 1);
+        void loadMore();
       },
       { threshold: 0.1 },
     );
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [hasMore, isFetching]);
+  }, [loadMore]);
 
   if (!displayProfile) {
     if (isProfileLoading) return <Loading />;
@@ -138,9 +140,11 @@ export function UserProfilePage({
       <div className={s.profileHeader}>
         <div className={s.avatarContainer}>
           {avatarUrl ? (
-            <img
+            <Image
               src={avatarUrl}
               alt={displayProfile.username}
+              width={200}
+              height={200}
               className={s.avatar}
             />
           ) : (
@@ -170,11 +174,11 @@ export function UserProfilePage({
 
           <div className={s.stats}>
             <div className={s.statItem}>
-              <div className={s.statNumber}>Заглушка</div>
+              <div className={s.statNumber}>{followingCount}</div>
               <div className={s.statLabel}>Following</div>
             </div>
             <div className={s.statItem}>
-              <div className={s.statNumber}>Заглушка</div>
+              <div className={s.statNumber}>{followersCount}</div>
               <div className={s.statLabel}>Followers</div>
             </div>
             <div className={s.statItem}>
@@ -211,10 +215,6 @@ export function UserProfilePage({
 
             {hasMore && <div ref={loadMoreRef} className={s.loadMoreTrigger} />}
           </>
-        ) : isPostsLoading ? (
-          <div className={s.loading}>
-            <Loading />
-          </div>
         ) : (
           <Typography variant="regular_text_16" className={s.noPosts}>
             No posts yet

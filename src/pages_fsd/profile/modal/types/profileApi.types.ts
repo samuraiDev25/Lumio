@@ -19,4 +19,6 @@ export type UserProfile = {
   city: Nullable<string>;
   aboutMe: Nullable<string>;
   avatarUrl: Nullable<string>;
+  followersCount?: number;
+  followingCount?: number;
 };

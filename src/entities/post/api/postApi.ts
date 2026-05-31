@@ -252,6 +252,7 @@ export const {
   useLazyGetMainPageDataQuery,
   useUpdatePostUserMutation,
   useGetUserPostsQuery,
+  useLazyGetUserPostsQuery,
   useGetProfilePostQuery,
   useGetMyPostsQuery,
   useAddCommentMutation,

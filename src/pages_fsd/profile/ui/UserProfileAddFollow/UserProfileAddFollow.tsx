@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useMeQuery } from '@/features/auth/api/authApi';
 import {
   useFollowUserMutation,
-  useGetUserProfileQuery,
+  useGetUserDetailedProfileQuery,
+  useUnfollowUserMutation,
   UserDetailedProfile,
 } from '@/entities/user';
 import { Button, Typography } from '@/shared/ui';
@@ -66,13 +67,15 @@ export function UserProfileAddFollow({
 }: Props) {
   const router = useRouter();
   const { data: currentUser } = useMeQuery();
-  const [followUser] = useFollowUserMutation();
+  const [followUser, { isLoading: isFollowLoading }] = useFollowUserMutation();
+  const [unfollowUser, { isLoading: isUnfollowLoading }] =
+    useUnfollowUserMutation();
 
   const isValidUserId = Number.isFinite(userId);
   const currentUserId = currentUser?.userId ? Number(currentUser.userId) : null;
 
   const { data: profileFromApi, isLoading: isProfileLoading } =
-    useGetUserProfileQuery(userId, {
+    useGetUserDetailedProfileQuery(userId, {
       skip: !isValidUserId,
       refetchOnMountOrArgChange: false,
     });
@@ -104,7 +107,7 @@ export function UserProfileAddFollow({
 
   const queryArgs = useMemo(
     () => ({
-      userId,
+      userId: String(userId),
       pageNumber: page,
       pageSize: PAGE_SIZE,
       sortBy: 'createdAt',
@@ -171,20 +174,21 @@ export function UserProfileAddFollow({
 
   const handleFollowClick = async () => {
     if (isOwnProfile || !currentUserId) return;
+    if (isFollowLoading || isUnfollowLoading) return;
 
     try {
       if (isFollowing) {
-        const nextIsFollowing = false;
-        setIsFollowing(nextIsFollowing);
+        await unfollowUser({ userId }).unwrap();
+        setIsFollowing(false);
         setFollowersCount((count: number) => Math.max(count - 1, 0));
         return;
       }
 
       const followResult = await followUser({ userId, currentUserId }).unwrap();
 
-      setIsFollowing(followResult.isFollowing);
-      setFollowersCount(followResult.followersCount);
-      setFollowingCount(followResult.followingCount);
+      setIsFollowing(followResult?.isFollowing ?? true);
+      setFollowersCount(followResult?.followersCount ?? followersCount + 1);
+      setFollowingCount(followResult?.followingCount ?? followingCount);
     } catch {
       setIsFollowing(isFollowing);
       setFollowersCount(getFollowersCount(displayProfile));
@@ -233,7 +237,9 @@ export function UserProfileAddFollow({
                   variant={isFollowing ? 'outline' : 'primary'}
                   size="sm"
                   onClick={handleFollowClick}
-                  disabled={!currentUserId}
+                  disabled={
+                    !currentUserId || isFollowLoading || isUnfollowLoading
+                  }
                 >
                   {isFollowing ? 'Unfollow' : 'Follow'}
                 </Button>

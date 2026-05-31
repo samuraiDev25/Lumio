@@ -32,4 +32,5 @@ export const PROFILE_ROUTES = {
 };
 
 // example
-export const getUserProfileRoute = (id: string) => `/users/${id}`;
+export const getUserProfileRoute = (id: string) => `/profile/${id}`;
+export const getUserProfileFollowRoute = (id: string) => `/users/${id}`;

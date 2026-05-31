@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { SearchUser } from '@/entities/user';
-import { getUserProfileRoute } from '@/shared/lib/routes/routes';
+import { getUserProfileFollowRoute } from '@/shared/lib/routes/routes';
 import { Typography } from '@/shared/ui';
 import s from '../../Search.module.scss';
 
@@ -15,7 +15,10 @@ type Props = {
 
 export const UserItem = ({ user }: Props) => (
   <li>
-    <Link className={s.userLink} href={getUserProfileRoute(String(user.id))}>
+    <Link
+      className={s.userLink}
+      href={getUserProfileFollowRoute(String(user.id))}
+    >
       {user.avatarUrl ? (
         <Image
           className={s.avatar}

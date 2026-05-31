@@ -8,5 +8,5 @@ export default function Layout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  return <MainLayout>{children}</MainLayout>;
+  return <MainLayout requireAuth={false}>{children}</MainLayout>;
 }
