@@ -9,7 +9,7 @@ import { PostGrid } from '@/entities/post/ui/PostGrid/PostGrid';
 import { Loading } from '@/shared/ui/loading/Loading';
 import { useLazyGetUserPostsQuery } from '@/entities/post/api/postApi';
 import { useGetUserProfileQuery } from '@/pages_fsd/profile/api/profileApi';
-import { useGetUserFollowInfoQuery } from '@/entities/user';
+import { useGetUserDetailedProfileQuery } from '@/entities/user';
 import {
   GetMyPostsResponse,
   Post,
@@ -60,16 +60,16 @@ function UserProfilePageContent({
       refetchOnMountOrArgChange: false,
     });
 
-  const { data: followInfo } = useGetUserFollowInfoQuery(userId, {
-    skip: !isValidUserId || !currentUser,
+  const { data: detailedProfile } = useGetUserDetailedProfileQuery(userId, {
+    skip: !isValidUserId,
     refetchOnMountOrArgChange: false,
   });
 
-  const displayProfile = profileFromApi ?? initialProfile;
+  const displayProfile = detailedProfile ?? profileFromApi ?? initialProfile;
   const followingCount =
-    followInfo?.followingCount ?? displayProfile?.followingCount ?? 0;
+    detailedProfile?.followingCount ?? displayProfile?.followingCount ?? 0;
   const followersCount =
-    followInfo?.followersCount ?? displayProfile?.followersCount ?? 0;
+    detailedProfile?.followersCount ?? displayProfile?.followersCount ?? 0;
   const [page, setPage] = useState(1);
   const [allPosts, setAllPosts] = useState<Post[]>(initialPosts?.items ?? []);
   const [pagesCount, setPagesCount] = useState(initialPosts?.pagesCount ?? 1);
