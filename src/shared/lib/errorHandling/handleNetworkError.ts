@@ -13,6 +13,7 @@ export function handleNetworkError({
   handle429Error,
   handle401Error,
   handle403Error,
+  handle404Error,
   handle500Error,
   handleUnknownError,
 }: {
@@ -22,6 +23,7 @@ export function handleNetworkError({
   handle429Error?: () => void;
   handle401Error?: (error: BaseResponseError) => void;
   handle403Error?: (error: BaseResponseError) => void;
+  handle404Error?: (error: BaseResponseError) => void;
   handle500Error?: () => void;
   handleUnknownError?: (error: unknown) => void;
 }) {
@@ -55,6 +57,12 @@ export function handleNetworkError({
         baseResponseError.errorsMessages?.[0]?.message ?? 'Forbidden access';
       dispatch(changeError({ error: message }));
       handle403Error?.(baseResponseError);
+    } else if (fetchError.status === 404) {
+      const baseResponseError = fetchError.data as BaseResponseError;
+      const message =
+        baseResponseError.errorsMessages?.[0]?.message ?? 'Not found';
+      dispatch(changeError({ error: message }));
+      handle404Error?.(baseResponseError);
     } else if (fetchError.status === 500) {
       dispatch(changeError({ error: 'Internal server error' }));
       handle500Error?.();
