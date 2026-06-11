@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
-import { Post } from '@/entities/post/model/types/postApi.types';
+import { PostWithReaction } from '@/entities/post/model/types/postApi.types';
 import {
   useFollowUserMutation,
   useGetUserDetailedProfileQuery,
@@ -29,12 +29,16 @@ import { FeedPostSlider } from './FeedPostSlider';
 import { usePostLike } from '@/entities/post/model/hooks/usePostLike';
 
 type Props = {
-  post: Post;
+  post: PostWithReaction;
 };
 
 export const FeedPostCard = ({ post }: Props) => {
   const { data: me } = useMeQuery();
-  const { likesCount, isLiked, isSubmitting, toggleLike } = usePostLike(post);
+  const { likeCount, isLiked, isSubmitting, toggleLike } = usePostLike({
+    postId: post.id,
+    initialLikeCount: post.likeCount,
+    initialReaction: post.userReaction,
+  });
   const currentUserId = me?.userId ? Number(me.userId) : null;
 
   /** Если пост мой — скрываем кнопку отписки (нельзя отписаться от себя) */
@@ -230,8 +234,8 @@ export const FeedPostCard = ({ post }: Props) => {
               variant="regular_text_14"
               className={s['likes-count-text']}
             >
-              <strong>{likesCount.toLocaleString()}</strong>{' '}
-              {likesCount === 1 ? 'like' : 'likes'}
+              <strong>{likeCount.toLocaleString()}</strong>{' '}
+              {likeCount === 1 ? 'like' : 'likes'}
             </Typography>
           </div>
 

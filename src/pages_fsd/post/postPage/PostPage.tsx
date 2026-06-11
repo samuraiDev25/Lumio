@@ -46,7 +46,10 @@ export const PostPage = ({ post }: Props) => {
   const { data: currentUser } = useMeQuery();
   const isOwnPost = currentUser?.userId?.toString() === post.userId?.toString();
   const [updatePost] = useUpdatePostUserMutation();
-  const { likesCount, isLiked, isSubmitting, toggleLike } = usePostLike(post);
+  const postId = post.id;
+  const { likeCount, isLiked, isSubmitting, toggleLike } = usePostLike({
+    postId,
+  });
   const images = post.postFiles || [];
 
   const { currentIndex, nextImage, prevImage, selectImage } =
@@ -294,7 +297,7 @@ export const PostPage = ({ post }: Props) => {
                 </div>
 
                 <div className={s.likes}>
-                  <span className={s.likesCount}>{likesCount} Likes</span>
+                  <span className={s.likesCount}>{likeCount} Likes</span>
                 </div>
 
                 <div className={s.postDate}>{formatDate(post.createdAt!)}</div>

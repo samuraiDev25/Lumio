@@ -1,6 +1,6 @@
 import {
   GetMyPostsResponse,
-  Post,
+  PostWithReaction,
 } from '@/entities/post/model/types/postApi.types';
 import { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
 
@@ -53,16 +53,16 @@ export async function fetchUserPostsSSR(
 export async function fetchProfilePostSSR(
   profileId: number,
   postId: string,
-): Promise<Post | null> {
+): Promise<PostWithReaction | null> {
   const baseUrl = getBaseUrl();
 
   const url = new URL(`api/v1/posts/${profileId}`, baseUrl);
   url.searchParams.set('postId', postId);
 
   const res = await fetch(url.toString(), { cache: 'no-store' });
-  console.log('res', res);
   if (res.status === 404) return null;
   if (!res.ok) return null;
 
-  return res.json();
+  const response = (await res.json()) as GetMyPostsResponse;
+  return response.items.find((post) => post.id === postId) ?? null;
 }

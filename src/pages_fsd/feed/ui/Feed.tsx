@@ -3,7 +3,7 @@
 import s from './Feed.module.scss';
 import { useEffect, useRef, useState } from 'react';
 import { useGetMainPageDataQuery } from '@/entities/post/api/postApi';
-import { Post } from '@/entities/post/model/types/postApi.types';
+import { PostWithReaction } from '@/entities/post/model/types/postApi.types';
 import { FeedPostCard } from '@/entities/post/ui/PostCard/FeedPostCard';
 import { Loading } from '@/shared/ui/loading/Loading';
 
@@ -14,8 +14,8 @@ const PAGE_SIZE = 8;
  * Вынесена за пределы компонента, чтобы код был человеческим и понятным.
  */
 const getUpdatedPosts = (
-  prev: Post[],
-  newItems: Post[],
+  prev: PostWithReaction[],
+  newItems: PostWithReaction[],
   isFirstPage: boolean,
 ) => {
   if (isFirstPage) return newItems;
@@ -28,7 +28,7 @@ const getUpdatedPosts = (
 
 export function Feed() {
   const [page, setPage] = useState(1);
-  const [allPosts, setAllPosts] = useState<Post[]>([]);
+  const [allPosts, setAllPosts] = useState<PostWithReaction[]>([]);
 
   const { data, isLoading, isFetching } = useGetMainPageDataQuery({
     pageNumber: page,

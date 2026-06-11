@@ -1,6 +1,6 @@
 import s from './CommentItem.module.scss';
 import Image from 'next/image';
-import { HeartOutline } from '@/shared/ui/icons';
+import { Heart, HeartOutline } from '@/shared/ui/icons';
 import { formatDate } from '@/entities/post/lib/formatDate';
 
 type Props = {
@@ -52,10 +52,12 @@ export const CommentItem = ({
               disabled={isLiking}
               aria-label={isLiked ? 'Убрать лайк' : 'Поставить лайк'}
             >
-              {isLiking ? (
-                <HeartOutline className={s.heartLoading} />
+              {isLiked ? (
+                <Heart className={isLiking ? s.heartLoading : undefined} />
               ) : (
-                <HeartOutline />
+                <HeartOutline
+                  className={isLiking ? s.heartLoading : undefined}
+                />
               )}
               {isLiking && <span className={s.loadingText}>...</span>}
             </button>
@@ -65,7 +67,7 @@ export const CommentItem = ({
       {showActions && (
         <div className={s.timestamp}>
           <div>{formatDate(createdAt)}</div>
-          <div>Like: {likes}</div>
+          <div>{likes === 1 ? '1 like' : `${likes} likes`}</div>
           <div>
             <span onClick={onAnswerAction}>Answer</span>
           </div>
