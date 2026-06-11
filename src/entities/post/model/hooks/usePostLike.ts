@@ -4,41 +4,37 @@ import { useCallback, useEffect, useState } from 'react';
 import { useStore } from 'react-redux';
 import { toast } from 'react-toastify';
 import type { AppDispatch, RootState } from '@/app/store';
-import {
-  useLikePostMutation,
-  useUnlikePostMutation,
-} from '@/entities/post/api/postApi';
-import {
-  findPostInCaches,
-  patchPostLikeInCaches,
-} from '@/entities/post/lib/patchPostLikeInCaches';
-import type { Post } from '@/entities/post/model/types/postApi.types';
+import { useUpdatePostReactionMutation } from '@/entities/post/api/postApi';
+import { patchPostLikeInCaches } from '@/entities/post/lib/patchPostLikeInCaches';
+import type { Reaction } from '@/entities/post/model/types/postApi.types';
 import { useMeQuery } from '@/features/auth/api/authApi';
-import { useAppDispatch, useAppSelector } from '@/shared/hooks';
+import { useAppDispatch } from '@/shared/hooks';
 
-export function usePostLike(post: Post) {
+type UsePostLikeParams = {
+  postId: string;
+  initialLikeCount?: number;
+  initialReaction?: Reaction;
+};
+
+export function usePostLike({
+  postId,
+  initialLikeCount = 0,
+  initialReaction = 'none',
+}: UsePostLikeParams) {
   const dispatch = useAppDispatch() as AppDispatch;
   const store = useStore<RootState>();
   const { data: me } = useMeQuery();
-  const [likePost] = useLikePostMutation();
-  const [unlikePost] = useUnlikePostMutation();
-
-  const cachedPost = useAppSelector((s) => findPostInCaches(s, post.id));
-  console.log('cachedPost', cachedPost);
-  const [likesCount, setLikesCount] = useState<number>(post.likesCount ?? 0);
-  const [isLiked, setIsLiked] = useState<boolean>(post.isLiked ?? false);
+  const [updatePostReaction] = useUpdatePostReactionMutation();
+  const [likeCount, setLikeCount] = useState(initialLikeCount);
+  const [userReaction, setUserReaction] = useState<Reaction>(initialReaction);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    setLikesCount(post.likesCount ?? 0);
-    setIsLiked(post.isLiked ?? false);
-  }, [post.id, post.likesCount, post.isLiked]);
+    setLikeCount(initialLikeCount);
+    setUserReaction(initialReaction);
+  }, [postId, initialLikeCount, initialReaction]);
 
-  useEffect(() => {
-    if (!cachedPost) return;
-    setLikesCount(cachedPost.likesCount ?? 0);
-    setIsLiked(cachedPost.isLiked ?? false);
-  }, [cachedPost]);
+  const isLiked = userReaction === 'like';
 
   const toggleLike = useCallback(async () => {
     if (!me) {
@@ -47,34 +43,27 @@ export function usePostLike(post: Post) {
     }
     if (isSubmitting) return;
 
-    const snapshot = { likesCount, isLiked };
-    const nextIsLiked = !isLiked;
-    const nextCount = Math.max(0, likesCount + (nextIsLiked ? 1 : -1));
-    const optimistic = { likesCount: nextCount, isLiked: nextIsLiked };
+    const snapshot = { likeCount, userReaction };
+    const nextReaction: Reaction = isLiked ? 'none' : 'like';
+    const optimistic = {
+      likeCount: Math.max(0, likeCount + (nextReaction === 'like' ? 1 : -1)),
+      userReaction: nextReaction,
+    };
 
     setIsSubmitting(true);
-    setLikesCount(optimistic.likesCount);
-    setIsLiked(optimistic.isLiked);
-    patchPostLikeInCaches(dispatch, store.getState(), post.id, optimistic);
+    setLikeCount(optimistic.likeCount);
+    setUserReaction(optimistic.userReaction);
+    patchPostLikeInCaches(dispatch, store.getState(), postId, optimistic);
 
     try {
-      const response = await (
-        nextIsLiked
-          ? likePost({ postId: String(post.id) })
-          : unlikePost({ postId: String(post.id) })
-      ).unwrap();
-
-      const server = {
-        likesCount: response.likesCount,
-        isLiked: response.isLiked,
-      };
-      setLikesCount(server.likesCount);
-      setIsLiked(server.isLiked);
-      patchPostLikeInCaches(dispatch, store.getState(), post.id, server);
+      await updatePostReaction({
+        postId,
+        status: nextReaction,
+      }).unwrap();
     } catch {
-      setLikesCount(snapshot.likesCount);
-      setIsLiked(snapshot.isLiked);
-      patchPostLikeInCaches(dispatch, store.getState(), post.id, snapshot);
+      setLikeCount(snapshot.likeCount);
+      setUserReaction(snapshot.userReaction);
+      patchPostLikeInCaches(dispatch, store.getState(), postId, snapshot);
       toast.error('Could not update like');
     } finally {
       setIsSubmitting(false);
@@ -83,13 +72,19 @@ export function usePostLike(post: Post) {
     dispatch,
     isLiked,
     isSubmitting,
-    likePost,
-    likesCount,
+    likeCount,
     me,
-    post.id,
+    postId,
     store,
-    unlikePost,
+    updatePostReaction,
+    userReaction,
   ]);
 
-  return { likesCount, isLiked, isSubmitting, toggleLike };
+  return {
+    likeCount,
+    userReaction,
+    isLiked,
+    isSubmitting,
+    toggleLike,
+  };
 }

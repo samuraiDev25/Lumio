@@ -4,7 +4,7 @@ import { useEffect, ReactNode } from 'react';
 import { useMeQuery } from '@/features/auth/api/authApi';
 import { BaseLayout } from '@/app/BaseLayout';
 import MainLayout from '@/app/MainLayout';
-import { Post } from '@/entities/post/model/types/postApi.types';
+import { PostWithReaction } from '@/entities/post/model/types/postApi.types';
 import type { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
 import { handleNetworkError } from '@/shared/lib';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
@@ -12,7 +12,7 @@ import { useAppDispatch } from '@/shared/hooks';
 import { PostsFeed } from './PostsFeed';
 
 type MainPageProps = {
-  serverPosts: Post[];
+  serverPosts: PostWithReaction[];
   serverPagesCount: number;
   serverUsersCount: number;
   profileByUserId: Record<number, UserProfile | null>;

@@ -3,6 +3,7 @@
 import { ReactNode, useState, useEffect, useMemo, useCallback } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import Image from 'next/image';
+import { toast } from 'react-toastify';
 import s from './PostModal.module.scss';
 import { CloseOutline } from '@/shared/ui/icons';
 import { Post } from '@/entities/post/model/types/postApi.types';
@@ -20,11 +21,18 @@ import { CommentItem } from '@/entities/post/ui/PostModal/CommentItem/CommentIte
 import { PostActions } from '@/entities/post/ui/PostModal/PostActions/PostActions';
 import { MenuDropdown } from '@/entities/post/ui/PostModal/MenuDropdown/MenuDropdown';
 import {
+  useGetPostByIdQuery,
   useGetPostCommentsQuery,
   useLikeCommentMutation,
 } from '@/entities/post/api/postApi';
 import type { Comment } from '@/entities/post/model/types/postApi.types';
 import { AddComment } from '@/features/posts/add-comment/ui/AddComment';
+import { handleNetworkError } from '@/shared/lib';
+import { useAppDispatch } from '@/shared/hooks';
+import {
+  COMMENTS_UPDATED_EVENT,
+  getPersistedComments,
+} from '@/features/posts/add-comment/model/persistedComments';
 
 type Props = {
   children?: ReactNode;
@@ -34,6 +42,63 @@ type Props = {
   isOpen?: boolean;
   onCloseAction?: () => void;
 };
+
+function mergeComments(
+  serverComments: Comment[],
+  persistedComments: Comment[],
+): Comment[] {
+  const serverById = new Map(
+    serverComments.map((comment) => [comment.id, comment]),
+  );
+  const persistedById = new Map(
+    persistedComments.map((comment) => [comment.id, comment]),
+  );
+  const orderedIds = [
+    ...persistedComments.map((comment) => comment.id),
+    ...serverComments.map((comment) => comment.id),
+  ];
+
+  return Array.from(new Set(orderedIds)).map((commentId) => {
+    const serverComment = serverById.get(commentId);
+    const persistedComment = persistedById.get(commentId);
+
+    if (!serverComment) return persistedComment!;
+    if (!persistedComment) return serverComment;
+
+    return {
+      ...persistedComment,
+      ...serverComment,
+      replies: mergeComments(serverComment.replies, persistedComment.replies),
+    };
+  });
+}
+
+function updateCommentReaction(
+  comments: Comment[],
+  commentId: number,
+  reaction: Comment['userReaction'],
+): Comment[] {
+  return comments.map((comment) => {
+    if (comment.id === commentId) {
+      const wasLiked = comment.userReaction === 'like';
+      const isLiked = reaction === 'like';
+
+      return {
+        ...comment,
+        likeCount: Math.max(
+          0,
+          comment.likeCount + (isLiked ? 1 : 0) - (wasLiked ? 1 : 0),
+        ),
+        userReaction: reaction,
+      };
+    }
+
+    return {
+      ...comment,
+      replies: updateCommentReaction(comment.replies, commentId, reaction),
+    };
+  });
+}
 
 export const PostModal = ({
   children,
@@ -64,41 +129,114 @@ export const PostModal = ({
   const { data: currentUser } = useMeQuery();
   const isOwnPost = currentUser?.userId?.toString() === post.userId?.toString();
   const images = post.postFiles || [];
+  const postId = post.id;
   const userName = profile?.username || `User ${post.userId}`;
   const avatarUrl = profile?.avatarUrl ?? '/User 03.jpg';
 
+  const { data: postData } = useGetPostByIdQuery(postId, {
+    skip: !postId,
+    refetchOnMountOrArgChange: true,
+  });
+
   const { data: commentsData, isLoading: commentsLoading } =
-    useGetPostCommentsQuery({
-      postId: post.id,
-      pageNumber: 1,
-      pageSize: 20,
-      sortBy: 'createdAt',
-      sortDirection: 'desc',
-    });
+    useGetPostCommentsQuery(
+      {
+        postId,
+        pageNumber: 1,
+        pageSize: 20,
+        sortBy: 'createdAt',
+        sortDirection: 'desc',
+      },
+      {
+        skip: !postId,
+        refetchOnMountOrArgChange: true,
+      },
+    );
   const [replyTo, setReplyTo] = useState<number | null>(null);
-  const [likeComment, { isLoading: isLiking }] = useLikeCommentMutation();
+  const [likeComment] = useLikeCommentMutation();
+  const dispatch = useAppDispatch();
+  const [persistedComments, setPersistedComments] = useState<Comment[]>(() =>
+    postId ? getPersistedComments(postId) : [],
+  );
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [likingCommentIds, setLikingCommentIds] = useState<Set<number>>(
+    () => new Set(),
+  );
+
+  useEffect(() => {
+    const handleCommentsUpdated = (event: Event) => {
+      const detail = (event as CustomEvent<{ postId?: string }>).detail;
+
+      if (postId && detail?.postId === postId) {
+        setPersistedComments(getPersistedComments(postId));
+      }
+    };
+
+    window.addEventListener(COMMENTS_UPDATED_EVENT, handleCommentsUpdated);
+
+    return () => {
+      window.removeEventListener(COMMENTS_UPDATED_EVENT, handleCommentsUpdated);
+    };
+  }, [postId]);
 
   const handleLike = useCallback(
     async (comment: Comment) => {
-      if (isLiking) return;
+      if (likingCommentIds.has(comment.id) || !postId || !comment.id) return;
       const newReaction = comment.userReaction === 'like' ? 'none' : 'like';
+
+      setLikingCommentIds((ids) => new Set(ids).add(comment.id));
+      setComments((current) =>
+        updateCommentReaction(current, comment.id, newReaction),
+      );
 
       try {
         await likeComment({
-          postId: post.id,
+          postId,
           commentId: comment.id,
           reaction: newReaction,
         }).unwrap();
       } catch (error) {
-        console.error('Like failed:', error);
+        setComments((current) =>
+          updateCommentReaction(current, comment.id, comment.userReaction),
+        );
+        handleNetworkError({
+          error,
+          dispatch,
+          handle400Error: (error) => {
+            toast.error(
+              error.errorsMessages?.[0]?.message ??
+                'Invalid comment like request',
+            );
+          },
+          handle401Error: () => {
+            toast.error('Sign in to like comments');
+          },
+          handle404Error: (error) => {
+            toast.error(
+              error.errorsMessages?.[0]?.message ??
+                'Comment not found or deleted',
+            );
+          },
+          handle429Error: () => {
+            toast.error('Too many requests. Try again later.');
+          },
+          handle500Error: () => {
+            toast.error('Internal server error');
+          },
+          handleUnknownError: () => {
+            toast.error('Unexpected error');
+          },
+        });
+      } finally {
+        setLikingCommentIds((ids) => {
+          const nextIds = new Set(ids);
+          nextIds.delete(comment.id);
+          return nextIds;
+        });
       }
     },
-    [post.id, likeComment, isLiking],
+    [postId, likeComment, likingCommentIds, dispatch],
   );
-
-  const isLikingComment = useCallback((commentId: number) => {
-    return false;
-  }, []);
 
   const renderComments = (
     comments: Comment[],
@@ -115,14 +253,14 @@ export const PostModal = ({
           isLiked={comment.userReaction === 'like'}
           onLikeAction={() => handleLike(comment)}
           onAnswerAction={() => setReplyTo(comment.id)}
-          isLiking={isLikingComment(comment.id)}
+          isLiking={likingCommentIds.has(comment.id)}
         />
 
         {replyTo === comment.id && parentId === null && (
           <AddComment
             postId={post.id}
             parentId={comment.id}
-            onSuccess={() => setReplyTo(null)}
+            onSuccessAction={() => setReplyTo(null)}
           />
         )}
 
@@ -137,10 +275,11 @@ export const PostModal = ({
 
   const currentUserId = currentUser?.userId ? Number(currentUser.userId) : null;
 
-  // eslint-disable-next-line react-hooks/preserve-manual-memoization
-  const sortedComments = useMemo(() => {
-    if (!commentsData?.items) return [];
-    return [...commentsData.items].sort((a, b) => {
+  const mergedComments = useMemo(() => {
+    const serverComments = commentsData?.items ?? [];
+    const nextComments = mergeComments(serverComments, persistedComments);
+
+    return nextComments.sort((a, b) => {
       if (currentUserId === null) return 0;
 
       if (a.userId === currentUserId) return -1;
@@ -148,14 +287,17 @@ export const PostModal = ({
 
       return 0;
     });
-  }, [commentsData?.items, currentUserId]);
+  }, [commentsData?.items, persistedComments, currentUserId]);
 
   useEffect(() => {
-    if (replyTo && !commentsData?.items.find((c) => c.id === replyTo)) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+    setComments(mergedComments);
+  }, [mergedComments]);
+
+  useEffect(() => {
+    if (replyTo && !comments.find((c) => c.id === replyTo)) {
       setReplyTo(null);
     }
-  }, [replyTo, commentsData]);
+  }, [replyTo, comments]);
 
   const handleRequestClose = () => {
     // Если в режиме редактирования и есть несохранённые изменения
@@ -302,15 +444,20 @@ export const PostModal = ({
                       <div className={s.commentsList}>
                         {commentsLoading && <div>Loading...</div>}
 
-                        {!commentsLoading && sortedComments.length === 0 && (
+                        {!commentsLoading && comments.length === 0 && (
                           <div>No comments</div>
                         )}
 
-                        {!commentsLoading && renderComments(sortedComments)}
+                        {!commentsLoading && renderComments(comments)}
                       </div>
                     </div>
                   </div>
-                  <PostActions post={post} isAuthorized={isAuthorized} />
+                  <PostActions
+                    post={post}
+                    isAuthorized={isAuthorized}
+                    initialLikeCount={postData?.likeCount}
+                    initialReaction={postData?.userReaction}
+                  />
                 </>
               )}
             </div>

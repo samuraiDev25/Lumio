@@ -9,11 +9,25 @@ export type Post = {
   description: string;
   createdAt: string;
   userId: number;
-  userName: string;
-  avatarUrl?: string;
   postFiles: PostFile[];
-  likesCount?: number;
-  isLiked?: boolean;
+  userName?: string;
+  avatarUrl?: string;
+};
+
+export type Reaction = 'like' | 'dislike' | 'none';
+
+export type PostWithReaction = Post & {
+  likeCount: number;
+  dislikeCount: number;
+  userReaction: Reaction;
+  newestLikes?: PostLikeUser[];
+};
+
+export type PostLikeUser = {
+  userId: number;
+  username: string;
+  avatarUrl: string | null;
+  addedAt: string;
 };
 
 export type MainPageResponse = {
@@ -22,7 +36,7 @@ export type MainPageResponse = {
     page: number;
     pageSize: number;
     totalCount: number;
-    items: Post[];
+    items: PostWithReaction[];
   };
   allRegisteredUsersCount: number;
 };
@@ -38,10 +52,9 @@ export type GetMyPostsResponse = {
   page: number;
   pageSize: number;
   totalCount: number;
-  items: Post[];
+  items: PostWithReaction[];
+  role?: string;
 };
-
-export type CommentReaction = 'like' | 'dislike' | 'none';
 
 export type Comment = {
   id: number;
@@ -52,7 +65,7 @@ export type Comment = {
   userId: number;
   username: string;
   avatarUrl: string | null;
-  userReaction: CommentReaction;
+  userReaction: Reaction;
   replies: Comment[];
 };
 
@@ -72,8 +85,7 @@ export interface PostCommentsParams {
   sortBy?: 'createdAt' | 'likeCount' | 'dislikeCount';
 }
 
-export type PostLikeMutationResponse = {
+export type UpdatePostReactionRequest = {
   postId: string;
-  likesCount: number;
-  isLiked: boolean;
+  status: Reaction;
 };

@@ -9,14 +9,14 @@ import {
 } from 'react';
 import { useLazyGetMainPageDataQuery } from '@/entities/post/api/postApi';
 import { PostCard } from '@/entities/post/ui/PostCard/PostCard';
-import { Post } from '@/entities/post/model/types/postApi.types';
+import { PostWithReaction } from '@/entities/post/model/types/postApi.types';
 import type { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
 import { Loading } from '@/shared/ui/loading/Loading';
 import { UsersCount } from '@/shared/ui/users-count/UsersCount';
 import s from './MainContent.module.scss';
 
 type PostsFeedProps = {
-  posts: Post[];
+  posts: PostWithReaction[];
   pagesCount: number;
   usersCount: number;
   profileByUserId: Record<number, UserProfile | null>;

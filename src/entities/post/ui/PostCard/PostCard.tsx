@@ -37,7 +37,7 @@ export const PostCard = ({ post, profile }: PostCardProps) => {
         postId={post.id}
         isExpanded={isExpanded}
         from="main"
-        profileId={post.userId}
+        profileId={String(post.userId)}
       />
 
       <div className={s.content}>

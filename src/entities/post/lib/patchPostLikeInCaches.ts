@@ -2,9 +2,7 @@ import type { AppDispatch, RootState } from '@/app/store';
 import { postsApi } from '@/entities/post/api/postApi';
 import type {
   GetMyPostsRequest,
-  GetMyPostsResponse,
-  MainPageResponse,
-  Post,
+  Reaction,
 } from '@/entities/post/model/types/postApi.types';
 import { baseApi } from '@/shared/api/baseApi';
 
@@ -14,18 +12,26 @@ type QueryCacheEntry = {
 };
 
 export type PostLikePatch = {
-  likesCount: number;
-  isLiked: boolean;
+  likeCount: number;
+  userReaction: Reaction;
+};
+
+type ReactionPost = {
+  id: string;
+  likeCount?: number;
+  userReaction?: Reaction;
 };
 
 function applyLikeToPost(
-  draft: Post | undefined,
+  draft: ReactionPost | null | undefined,
   postId: string,
   patch: PostLikePatch,
 ) {
   if (!draft || draft.id !== postId) return;
-  draft.likesCount = patch.likesCount;
-  draft.isLiked = patch.isLiked;
+  if (draft.likeCount === undefined || draft.userReaction === undefined) return;
+
+  draft.likeCount = patch.likeCount;
+  draft.userReaction = patch.userReaction;
 }
 
 function parseGetMyPostsArgs(json: string): GetMyPostsRequest | undefined {
@@ -40,45 +46,6 @@ function getApiQueries(
     | { queries?: Record<string, QueryCacheEntry> }
     | undefined;
   return slice?.queries;
-}
-
-export function findPostInCaches(
-  state: RootState,
-  postId: string,
-): Post | null {
-  const queries = getApiQueries(state);
-  if (!queries) return null;
-
-  for (const cacheKey of Object.keys(queries)) {
-    const entry = queries[cacheKey];
-    if (!entry || entry.status !== 'fulfilled' || entry.data === undefined) {
-      continue;
-    }
-
-    if (cacheKey.startsWith('getMainPageData(')) {
-      const main = entry.data as MainPageResponse;
-      const item = main.posts?.items?.find((p) => p.id === postId);
-      if (item) return item;
-      continue;
-    }
-
-    if (
-      cacheKey.startsWith('getUserPosts(') ||
-      cacheKey.startsWith('getMyPosts(')
-    ) {
-      const list = entry.data as GetMyPostsResponse;
-      const item = list.items?.find((p) => p.id === postId);
-      if (item) return item;
-      continue;
-    }
-
-    if (cacheKey.startsWith('getProfilePost(')) {
-      const post = entry.data as Post;
-      if (post.id === postId) return post;
-    }
-  }
-
-  return null;
 }
 
 export function patchPostLikeInCaches(

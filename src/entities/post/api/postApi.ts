@@ -1,13 +1,133 @@
 import { baseApi } from '@/shared/api';
 import {
   CommentsResponse,
+  Comment,
   GetMyPostsRequest,
   GetMyPostsResponse,
   MainPageResponse,
   Post,
   PostCommentsParams,
-  PostLikeMutationResponse,
+  PostWithReaction,
+  Reaction,
+  UpdatePostReactionRequest,
 } from '@/entities/post/model/types/postApi.types';
+
+type QueryCacheEntry = {
+  status: string;
+  data?: unknown;
+};
+
+type CommentReactionSnapshot = {
+  args: PostCommentsParams;
+  likeCount: number;
+  dislikeCount: number;
+  userReaction: Reaction;
+};
+
+function getApiQueries(state: unknown): Record<string, QueryCacheEntry> {
+  const apiState = state as Record<
+    string,
+    { queries?: Record<string, QueryCacheEntry> }
+  >;
+
+  return apiState[baseApi.reducerPath]?.queries ?? {};
+}
+
+function parseEndpointArgs<T>(
+  cacheKey: string,
+  endpointName: string,
+): T | null {
+  if (!cacheKey.startsWith(`${endpointName}(`)) return null;
+
+  try {
+    return JSON.parse(cacheKey.slice(endpointName.length + 1, -1)) as T;
+  } catch {
+    return null;
+  }
+}
+
+function getPostCommentsCacheArgs(
+  state: unknown,
+  postId: string,
+): PostCommentsParams[] {
+  return Object.keys(getApiQueries(state))
+    .map((cacheKey) =>
+      parseEndpointArgs<PostCommentsParams>(cacheKey, 'getPostComments'),
+    )
+    .filter((args): args is PostCommentsParams => args?.postId === postId);
+}
+
+function findComment(comments: Comment[], commentId: number): Comment | null {
+  for (const comment of comments) {
+    if (comment.id === commentId) return comment;
+
+    const reply = findComment(comment.replies, commentId);
+    if (reply) return reply;
+  }
+
+  return null;
+}
+
+function getCommentTags(
+  comments: Comment[],
+): Array<{ type: 'PostComments'; id: string }> {
+  return comments.flatMap((comment) => [
+    {
+      type: 'PostComments' as const,
+      id: `COMMENT_${comment.id}` as const,
+    },
+    ...getCommentTags(comment.replies),
+  ]);
+}
+
+function applyCommentReaction(
+  comment: Comment,
+  reaction: 'like' | 'none' | 'dislike',
+) {
+  const previousReaction = comment.userReaction;
+
+  if (previousReaction === reaction) return;
+
+  if (previousReaction === 'like') {
+    comment.likeCount = Math.max(0, comment.likeCount - 1);
+  }
+
+  if (previousReaction === 'dislike') {
+    comment.dislikeCount = Math.max(0, comment.dislikeCount - 1);
+  }
+
+  if (reaction === 'like') {
+    comment.likeCount += 1;
+  }
+
+  if (reaction === 'dislike') {
+    comment.dislikeCount += 1;
+  }
+
+  comment.userReaction = reaction;
+}
+
+function appendComment(
+  comments: Comment[],
+  comment: Comment,
+  parentCommentId?: number,
+) {
+  const commentWithReplies = {
+    ...comment,
+    replies: comment.replies ?? [],
+  };
+
+  if (!parentCommentId) {
+    comments.unshift(commentWithReplies);
+    return true;
+  }
+
+  const parent = findComment(comments, parentCommentId);
+  if (!parent) return false;
+
+  parent.replies.unshift(commentWithReplies);
+  return true;
+}
 
 export const postsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -41,6 +161,18 @@ export const postsApi = baseApi.injectEndpoints({
         params: { pageNumber, pageSize },
       }),
       providesTags: () => [{ type: 'Posts', id: 'MAIN' }],
+    }),
+    getPostById: builder.query<PostWithReaction, string>({
+      query: (postId) => ({
+        url: `/api/v1/posts/post/${postId}`,
+      }),
+      transformResponse: (response: PostWithReaction) => {
+        console.log('GET /api/v1/posts/post/{postId} response:', response);
+        return response;
+      },
+      providesTags: (_result, _error, postId) => [
+        { type: 'Posts', id: `POST_${postId}` },
+      ],
     }),
     updatePostUser: builder.mutation<
       Post,
@@ -98,11 +230,16 @@ export const postsApi = baseApi.injectEndpoints({
       },
       providesTags: () => [{ type: 'Posts', id: 'MY' }],
     }),
-    getProfilePost: builder.query<Post, { profileId: string; postId: string }>({
+    getProfilePost: builder.query<
+      PostWithReaction | null,
+      { profileId: string; postId: string }
+    >({
       query: ({ profileId, postId }) => ({
         url: `/api/v1/posts/${profileId}`,
         params: { postId },
       }),
+      transformResponse: (response: GetMyPostsResponse, _meta, { postId }) =>
+        response.items.find((post) => post.id === postId) ?? null,
       providesTags: (_res, _err, arg) => [
         { type: 'Posts', id: `PROFILE_${arg.profileId}_${arg.postId}` },
       ],
@@ -145,18 +282,48 @@ export const postsApi = baseApi.injectEndpoints({
         url: `/api/v1/posts/${postId}/comments`,
         body: { content, parentCommentId },
       }),
+      async onQueryStarted(
+        { postId, parentCommentId },
+        { dispatch, getState, queryFulfilled },
+      ) {
+        try {
+          const { data: comment } = await queryFulfilled;
+          const patchResults = getPostCommentsCacheArgs(getState(), postId).map(
+            (args) =>
+              dispatch(
+                postsApi.util.updateQueryData(
+                  'getPostComments',
+                  args,
+                  (draft) => {
+                    if (appendComment(draft.items, comment, parentCommentId)) {
+                      draft.totalCount += 1;
+                    }
+                  },
+                ),
+              ),
+          );
+
+          if (patchResults.length === 0) {
+            return;
+          }
+        } catch {
+          // The form handles the visible error state.
+        }
+      },
       invalidatesTags: (_result, _error, { postId }) => [
         { type: 'Posts', id: `POST_${postId}` },
         { type: 'Posts', id: 'MAIN' },
         { type: 'Posts', id: 'MY' },
       ],
     }),
-    likePost: builder.mutation<PostLikeMutationResponse, { postId: string }>({
-      query: ({ postId }) => ({
-        url: `/api/v1/posts/${postId}/Like`,
+    updatePostReaction: builder.mutation<void, UpdatePostReactionRequest>({
+      query: ({ postId, status }) => ({
+        url: `/api/v1/posts/${postId}/like`,
         method: 'POST',
-        body: { reaction: 'like' as const },
+        body: { status },
       }),
+      invalidatesTags: (_result, error, { postId }) =>
+        error ? [] : [{ type: 'Posts', id: `POST_${postId}` }],
     }),
     likeComment: builder.mutation<
       void,
@@ -173,47 +340,58 @@ export const postsApi = baseApi.injectEndpoints({
       }),
       async onQueryStarted(
         { postId, commentId, reaction },
-        { dispatch, queryFulfilled },
+        { dispatch, getState, queryFulfilled },
       ) {
-        const patchResult = dispatch(
-          postsApi.util.updateQueryData(
-            'getPostComments',
-            { postId, pageNumber: 1, pageSize: 20 },
-            (draft) => {
-              const comment = draft.items.find((c) => c.id === commentId);
-              if (comment) {
-                const wasLiked = comment.userReaction === 'like';
-                const isLikeAction = reaction === 'like';
+        const snapshots: CommentReactionSnapshot[] = [];
+        const cacheArgs = getPostCommentsCacheArgs(getState(), postId);
 
-                comment.userReaction = reaction;
+        cacheArgs.forEach((args) => {
+          dispatch(
+            postsApi.util.updateQueryData('getPostComments', args, (draft) => {
+              const comment = findComment(draft.items, commentId);
 
-                comment.likeCount += isLikeAction ? 1 : -1;
+              if (!comment) return;
 
-                if (wasLiked && !isLikeAction) {
-                  comment.dislikeCount = Math.max(0, comment.dislikeCount);
-                }
-              }
-            },
-          ),
-        );
+              snapshots.push({
+                args,
+                likeCount: comment.likeCount,
+                dislikeCount: comment.dislikeCount,
+                userReaction: comment.userReaction,
+              });
+              applyCommentReaction(comment, reaction);
+            }),
+          );
+        });
 
         try {
           await queryFulfilled;
         } catch {
-          patchResult.undo();
+          snapshots.forEach((snapshot) => {
+            dispatch(
+              postsApi.util.updateQueryData(
+                'getPostComments',
+                snapshot.args,
+                (draft) => {
+                  const comment = findComment(draft.items, commentId);
+
+                  if (!comment) return;
+
+                  comment.likeCount = snapshot.likeCount;
+                  comment.dislikeCount = snapshot.dislikeCount;
+                  comment.userReaction = snapshot.userReaction;
+                },
+              ),
+            );
+          });
         }
       },
-      invalidatesTags: (_result, _error, { postId, commentId }) => [
-        { type: 'PostComments', id: `POST_${postId}` },
-        { type: 'PostComments', id: `COMMENT_${commentId}` },
-      ],
-    }),
-    unlikePost: builder.mutation<PostLikeMutationResponse, { postId: string }>({
-      query: ({ postId }) => ({
-        url: `/api/v1/posts/${postId}/Like`,
-        method: 'POST',
-        body: { reaction: 'none' as const },
-      }),
+      invalidatesTags: (_result, error, { postId, commentId }) =>
+        error
+          ? []
+          : [
+              { type: 'PostComments', id: `POST_${postId}` },
+              { type: 'PostComments', id: `COMMENT_${commentId}` },
+            ],
     }),
     getPostComments: builder.query<CommentsResponse, PostCommentsParams>({
       query: ({
@@ -235,10 +413,7 @@ export const postsApi = baseApi.injectEndpoints({
         result
           ? [
               { type: 'PostComments', id: `POST_${arg.postId || 'LIST'}` },
-              ...result.items.map(({ id }) => ({
-                type: 'PostComments' as const,
-                id: `COMMENT_${id}` as const,
-              })),
+              ...getCommentTags(result.items),
             ]
           : [{ type: 'PostComments', id: 'LIST' }],
     }),
@@ -250,14 +425,14 @@ export const {
   useDeletePostMutation,
   useGetMainPageDataQuery,
   useLazyGetMainPageDataQuery,
+  useGetPostByIdQuery,
   useUpdatePostUserMutation,
   useGetUserPostsQuery,
   useLazyGetUserPostsQuery,
   useGetProfilePostQuery,
   useGetMyPostsQuery,
   useAddCommentMutation,
-  useLikePostMutation,
-  useUnlikePostMutation,
+  useUpdatePostReactionMutation,
   useGetPostCommentsQuery,
   useLikeCommentMutation,
 } = postsApi;
