@@ -4,16 +4,21 @@ import { Button } from '@/shared/ui';
 import s from './CommentForm.module.scss';
 import { useAddCommentMutation } from '@/entities/post/api/postApi';
 import { ChangeEvent, FormEvent, useState } from 'react';
+import { handleNetworkError } from '@/shared/lib';
+import { useAppDispatch } from '@/shared/hooks';
+import { toast } from 'react-toastify';
+import { persistComment } from '@/features/posts/add-comment/model/persistedComments';
 
 type Props = {
   postId: string;
   parentId?: number;
-  onSuccess?: () => void;
+  onSuccessAction?: () => void;
 };
 
-export const AddComment = ({ postId, onSuccess }: Props) => {
+export const AddComment = ({ postId, parentId, onSuccessAction }: Props) => {
   const [text, setText] = useState('');
   const [addComment, { isLoading }] = useAddCommentMutation();
+  const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -22,11 +27,39 @@ export const AddComment = ({ postId, onSuccess }: Props) => {
     if (!trimmedText) return;
 
     try {
-      await addComment({ postId, content: trimmedText }).unwrap();
+      const comment = await addComment({
+        postId,
+        content: trimmedText,
+        parentCommentId: parentId,
+      }).unwrap();
+      persistComment(postId, comment, parentId);
       setText('');
-      onSuccess?.();
+      onSuccessAction?.();
     } catch (error) {
-      console.error('Failed to post comment:', error);
+      handleNetworkError({
+        error,
+        dispatch,
+        handle400Error: (error) => {
+          toast.error(
+            error.errorsMessages?.[0]?.message ?? 'Invalid comment text',
+          );
+        },
+        handle401Error: () => {
+          toast.error('Sign in to comment');
+        },
+        handle404Error: () => {
+          toast.error('Post or comment was not found');
+        },
+        handle429Error: () => {
+          toast.error('Too many requests. Try again later.');
+        },
+        handle500Error: () => {
+          toast.error('Internal server error');
+        },
+        handleUnknownError: () => {
+          toast.error('Could not publish comment');
+        },
+      });
     }
   };
 
