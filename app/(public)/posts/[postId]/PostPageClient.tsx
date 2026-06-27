@@ -35,7 +35,10 @@ export function PostPageClient({
       router.push('/', { scroll: false });
       return;
     }
-    router.push(`/profile/${profileId}`, { scroll: false });
+    const fallbackProfileId = Number.isFinite(profileId)
+      ? profileId
+      : post.userId;
+    router.push(`/profile/${fallbackProfileId}`, { scroll: false });
   };
 
   return (
