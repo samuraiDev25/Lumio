@@ -38,7 +38,7 @@
   display: flex;
   align-items: baseline;
   gap: 8px;
-  margin-right: 12px
+  margin-right: 12px;
 }
 .heartBeating {
   cursor: pointer;
@@ -66,4 +66,24 @@
   color: var(--color-light-900);
   padding-left: 72px;
   gap: 12px;
+}
+
+.answer-button {
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  font: inherit;
+  font-weight: var(--font-weight-semi-bold);
+  color: var(--color-light-900);
+  background: transparent;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--color-primary-500);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+  }
 }

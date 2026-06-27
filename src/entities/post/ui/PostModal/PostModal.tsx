@@ -73,6 +73,22 @@ function mergeComments(
   });
 }
 
+function removeRootDuplicatesFromReplies(comments: Comment[]): Comment[] {
+  const nestedIds = new Set<number>();
+
+  const collectNestedIds = (replies: Comment[]) => {
+    replies.forEach((reply) => {
+      nestedIds.add(reply.id);
+      collectNestedIds(reply.replies);
+    });
+  };
+
+  comments.forEach((comment) => collectNestedIds(comment.replies));
+
+  return comments.filter((comment) => !nestedIds.has(comment.id));
+}
+type OptimisticCommentReactions = Record<number, Comment['userReaction']>;
+
 function updateCommentReaction(
   comments: Comment[],
   commentId: number,
@@ -98,6 +114,17 @@ function updateCommentReaction(
       replies: updateCommentReaction(comment.replies, commentId, reaction),
     };
   });
+}
+
+function applyOptimisticCommentReactions(
+  comments: Comment[],
+  reactions: OptimisticCommentReactions,
+): Comment[] {
+  return Object.entries(reactions).reduce(
+    (nextComments, [commentId, reaction]) =>
+      updateCommentReaction(nextComments, Number(commentId), reaction),
+    comments,
+  );
 }
 
 export const PostModal = ({
@@ -135,7 +162,6 @@ export const PostModal = ({
 
   const { data: postData } = useGetPostByIdQuery(postId, {
     skip: !postId,
-    refetchOnMountOrArgChange: true,
   });
 
   const { data: commentsData, isLoading: commentsLoading } =
@@ -143,13 +169,12 @@ export const PostModal = ({
       {
         postId,
         pageNumber: 1,
-        pageSize: 20,
+        pageSize: 1,
         sortBy: 'createdAt',
         sortDirection: 'desc',
       },
       {
         skip: !postId,
-        refetchOnMountOrArgChange: true,
       },
     );
   const [replyTo, setReplyTo] = useState<number | null>(null);
@@ -162,6 +187,8 @@ export const PostModal = ({
   const [likingCommentIds, setLikingCommentIds] = useState<Set<number>>(
     () => new Set(),
   );
+  const [optimisticCommentReactions, setOptimisticCommentReactions] =
+    useState<OptimisticCommentReactions>({});
 
   useEffect(() => {
     const handleCommentsUpdated = (event: Event) => {
@@ -185,6 +212,10 @@ export const PostModal = ({
       const newReaction = comment.userReaction === 'like' ? 'none' : 'like';
 
       setLikingCommentIds((ids) => new Set(ids).add(comment.id));
+      setOptimisticCommentReactions((reactions) => ({
+        ...reactions,
+        [comment.id]: newReaction,
+      }));
       setComments((current) =>
         updateCommentReaction(current, comment.id, newReaction),
       );
@@ -196,6 +227,11 @@ export const PostModal = ({
           reaction: newReaction,
         }).unwrap();
       } catch (error) {
+        setOptimisticCommentReactions((reactions) => {
+          const nextReactions = { ...reactions };
+          delete nextReactions[comment.id];
+          return nextReactions;
+        });
         setComments((current) =>
           updateCommentReaction(current, comment.id, comment.userReaction),
         );
@@ -260,6 +296,7 @@ export const PostModal = ({
           <AddComment
             postId={post.id}
             parentId={comment.id}
+            parentComment={comment}
             onSuccessAction={() => setReplyTo(null)}
           />
         )}
@@ -277,9 +314,15 @@ export const PostModal = ({
 
   const mergedComments = useMemo(() => {
     const serverComments = commentsData?.items ?? [];
-    const nextComments = mergeComments(serverComments, persistedComments);
+    const nextComments = removeRootDuplicatesFromReplies(
+      mergeComments(serverComments, persistedComments),
+    );
+    const commentsWithOptimisticReactions = applyOptimisticCommentReactions(
+      nextComments,
+      optimisticCommentReactions,
+    );
 
-    return nextComments.sort((a, b) => {
+    return commentsWithOptimisticReactions.sort((a, b) => {
       if (currentUserId === null) return 0;
 
       if (a.userId === currentUserId) return -1;
@@ -287,7 +330,12 @@ export const PostModal = ({
 
       return 0;
     });
-  }, [commentsData?.items, persistedComments, currentUserId]);
+  }, [
+    commentsData?.items,
+    persistedComments,
+    optimisticCommentReactions,
+    currentUserId,
+  ]);
 
   useEffect(() => {
     setComments(mergedComments);
@@ -455,8 +503,8 @@ export const PostModal = ({
                   <PostActions
                     post={post}
                     isAuthorized={isAuthorized}
-                    initialLikeCount={postData?.likeCount}
-                    initialReaction={postData?.userReaction}
+                    initialLikesCount={postData?.likeCount}
+                    initialIsLiked={postData?.userReaction === 'like'}
                   />
                 </>
               )}
