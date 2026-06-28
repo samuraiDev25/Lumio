@@ -28,7 +28,6 @@ export default async function PostPage({ params, searchParams }: Props) {
   if (profileId) {
     const post = await fetchProfilePostSSR(profileId, postId);
     if (!post) notFound();
-    console.log('9999999999999999999');
     const profile = await fetchUserProfileSSR(post.userId);
     return (
       <PostPageClient

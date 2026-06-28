@@ -12,7 +12,7 @@ import {
   PaperPlaneOutline,
   TrashOutline,
 } from '@/shared/ui/icons';
-import { Post } from '@/entities/post/model/types/postApi.types';
+import { Comment, Post } from '@/entities/post/model/types/postApi.types';
 import { Button } from '@/shared/ui';
 import { handleNetworkError } from '@/shared/lib';
 import { SignUpType } from '@/features/auth/model/validation';
@@ -24,8 +24,12 @@ import { useImageNavigation } from '@/entities/post/model/hooks/useImageNavigati
 import { PostImage } from '@/entities/post/ui/PostModal/PostImage/PostImage';
 import { DeletePostModal } from '@/entities/post';
 import { useMeQuery } from '@/features/auth/api/authApi';
-import { useUpdatePostUserMutation } from '@/entities/post/api/postApi';
+import {
+  useGetPostCommentsQuery,
+  useUpdatePostUserMutation,
+} from '@/entities/post/api/postApi';
 import { usePostLike } from '@/entities/post/model/hooks/usePostLike';
+import { AddComment } from '@/features/posts/add-comment/ui/AddComment';
 
 type Props = {
   post: Post;
@@ -35,8 +39,6 @@ export const PostPage = ({ post }: Props) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isDeletePost, setIsDeletePost] = useState(false);
-  const [comments, setComments] = useState<string[]>([]);
-  const [newComment, setNewComment] = useState('');
   const dispatch = useAppDispatch();
   const [postDescription, setPostDescription] = useState(
     post.description || '',
@@ -51,7 +53,15 @@ export const PostPage = ({ post }: Props) => {
     postId,
   });
   const images = post.postFiles || [];
-
+  const { data: commentsData, isLoading: commentsLoading } =
+    useGetPostCommentsQuery({
+      postId,
+      pageNumber: 1,
+      pageSize: 5,
+      sortBy: 'createdAt',
+      sortDirection: 'desc',
+    });
+  const comments = commentsData?.items ?? [];
   const { currentIndex, nextImage, prevImage, selectImage } =
     useImageNavigation(0, images.length);
 
@@ -98,11 +108,40 @@ export const PostPage = ({ post }: Props) => {
 
   //const timeReal = formatDateFull(new Date());
 
-  const handlePublishComment = () => {
-    if (newComment.trim() === '') return;
-    setComments((prev) => [...prev, newComment.trim()]);
-    setNewComment('');
-  };
+  const renderComments = (items: Comment[]) =>
+    items.map((comment) => (
+      <div key={comment.id} className={s.commentItem}>
+        <Image
+          src={comment.avatarUrl || '/User 01.jpg'}
+          alt={comment.username || 'User'}
+          className={s.commentAvatar}
+          width={36}
+          height={36}
+        />
+        <div className={s.commentContent}>
+          <span className={s.commentUsername}>
+            {comment.username || 'User'}
+          </span>
+          <span className={s.commentText}>{comment.content}</span>
+          <div className={s.commentMeta}>
+            <span>{formatDate(comment.createdAt)}</span>
+            <span>
+              {comment.likeCount === 1
+                ? '1 like'
+                : `${comment.likeCount} likes`}
+            </span>
+            <button className={s.likeCommentButton}>
+              <HeartOutline width={14} height={14} />
+            </button>
+          </div>
+          {comment.replies.length > 0 && (
+            <div className={s.repliesList}>
+              {renderComments(comment.replies)}
+            </div>
+          )}
+        </div>
+      </div>
+    ));
 
   const handleCancelEdit = () => {
     setIsEditing(false);
@@ -248,29 +287,11 @@ export const PostPage = ({ post }: Props) => {
 
                 {/* Комментарии */}
                 <div className={s.commentsList}>
-                  {comments.map((comment, index) => (
-                    <div key={index} className={s.commentItem}>
-                      <Image
-                        src={'/User 01.jpg'}
-                        alt="User"
-                        className={s.commentAvatar}
-                        width={36}
-                        height={36}
-                      />
-                      <div className={s.commentContent}>
-                        <span className={s.commentUsername}>
-                          {currentUser?.username || 'User'}
-                        </span>
-                        <span className={s.commentText}>{comment}</span>
-                        <div className={s.commentMeta}>
-                          <span>Just now</span>
-                          <button className={s.likeCommentButton}>
-                            <HeartOutline width={14} height={14} />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                  {commentsLoading && <div>Loading...</div>}
+                  {!commentsLoading && comments.length === 0 && (
+                    <div>No comments</div>
+                  )}
+                  {!commentsLoading && renderComments(comments)}
                 </div>
               </div>
 
@@ -305,26 +326,7 @@ export const PostPage = ({ post }: Props) => {
                 {/* Поле ввода комментария */}
                 {isAuthorized && (
                   <div className={s.commentInput}>
-                    <input
-                      type="text"
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      placeholder="Add a comment..."
-                      className={s.input}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handlePublishComment();
-                        }
-                      }}
-                    />
-                    <Button
-                      variant={'link'}
-                      onClick={handlePublishComment}
-                      disabled={!newComment.trim()}
-                    >
-                      Publish
-                    </Button>
+                    <AddComment postId={postId} />
                   </div>
                 )}
               </div>

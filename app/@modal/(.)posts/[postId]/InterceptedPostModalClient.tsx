@@ -2,12 +2,12 @@
 
 import { useRouter } from 'next/navigation';
 import { PostModal } from '@/entities/post/ui/PostModal/PostModal';
-import { Post } from '@/entities/post/model/types/postApi.types';
+import { PostWithReaction } from '@/entities/post/model/types/postApi.types';
 import type { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
 import { useState } from 'react';
 
 type Props = {
-  post: Post;
+  post: PostWithReaction;
   profile: UserProfile | null;
   from?: 'main' | 'profile';
   profileId: number;
@@ -35,7 +35,10 @@ export function InterceptedPostModalClient({
       router.push('/', { scroll: false });
       return;
     }
-    router.push(`/profile/${profileId}`, { scroll: false });
+    const fallbackProfileId = Number.isFinite(profileId)
+      ? profileId
+      : post.userId;
+    router.push(`/profile/${fallbackProfileId}`, { scroll: false });
   };
 
   return (

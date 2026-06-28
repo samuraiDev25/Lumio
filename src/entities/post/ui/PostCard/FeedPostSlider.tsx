@@ -29,7 +29,10 @@ export const FeedPostSlider = ({ images, postId }: Props) => {
 
   return (
     <div className={s['slider-root']}>
-      <Link href={`/posts/${postId}`} className={s['image-link']}>
+      <Link
+        href={`/posts/${postId}?returnTo=/feed`}
+        className={s['image-link']}
+      >
         <Image
           src={images[currentIndex].url}
           alt="Post content"

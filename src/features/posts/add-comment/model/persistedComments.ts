@@ -5,6 +5,11 @@ export const COMMENTS_UPDATED_EVENT = 'lumio:postCommentsUpdated';
 
 type CommentsByPost = Record<string, Comment[]>;
 
+type AppendResult = {
+  comments: Comment[];
+  appended: boolean;
+};
+
 function normalizeComment(comment: Comment): Comment {
   return {
     ...comment,
@@ -12,10 +17,85 @@ function normalizeComment(comment: Comment): Comment {
   };
 }
 
+function removeRootDuplicatesFromReplies(comments: Comment[]): Comment[] {
+  const nestedIds = new Set<number>();
+
+  const collectNestedIds = (replies: Comment[]) => {
+    replies.forEach((reply) => {
+      nestedIds.add(reply.id);
+      collectNestedIds(reply.replies);
+    });
+  };
+
+  comments.forEach((comment) => collectNestedIds(comment.replies));
+
+  return comments.filter((comment) => !nestedIds.has(comment.id));
+}
+
+function mergeReplies(primary: Comment[], secondary: Comment[]): Comment[] {
+  const repliesById = new Map<number, Comment>();
+
+  [...primary, ...secondary].forEach((reply) => {
+    repliesById.set(reply.id, reply);
+  });
+
+  return Array.from(repliesById.values());
+}
+
+function appendCommentToTree(
+  comments: Comment[],
+  comment: Comment,
+  parentCommentId: number,
+  parentComment?: Comment,
+): AppendResult {
+  let appended = false;
+
+  const nextComments = comments.map((item) => {
+    if (item.id === parentCommentId) {
+      appended = true;
+      const normalizedParent = parentComment
+        ? normalizeComment(parentComment)
+        : item;
+      const replies = mergeReplies(normalizedParent.replies, item.replies);
+      const exists = replies.some((reply) => reply.id === comment.id);
+
+      return {
+        ...item,
+        ...normalizedParent,
+        replies: exists ? replies : [comment, ...replies],
+      };
+    }
+
+    const nextReplies = appendCommentToTree(
+      item.replies,
+      comment,
+      parentCommentId,
+      parentComment,
+    );
+
+    if (!nextReplies.appended) {
+      return item;
+    }
+
+    appended = true;
+
+    return {
+      ...item,
+      replies: nextReplies.comments,
+    };
+  });
+
+  return {
+    comments: appended ? nextComments : comments,
+    appended,
+  };
+}
+
 function appendComment(
   comments: Comment[],
   comment: Comment,
   parentCommentId?: number,
+  parentComment?: Comment,
 ): Comment[] {
   if (!parentCommentId) {
     const exists = comments.some((item) => item.id === comment.id);
@@ -23,21 +103,35 @@ function appendComment(
     return exists ? comments : [comment, ...comments];
   }
 
-  return comments.map((item) => {
-    if (item.id === parentCommentId) {
-      const exists = item.replies.some((reply) => reply.id === comment.id);
+  const appendResult = appendCommentToTree(
+    comments,
+    comment,
+    parentCommentId,
+    parentComment,
+  );
 
-      return {
-        ...item,
-        replies: exists ? item.replies : [comment, ...item.replies],
-      };
-    }
+  if (appendResult.appended) {
+    return appendResult.comments;
+  }
 
-    return {
-      ...item,
-      replies: appendComment(item.replies, comment, parentCommentId),
-    };
-  });
+  if (!parentComment) {
+    return comments;
+  }
+
+  const normalizedParent = normalizeComment(parentComment);
+  const exists = normalizedParent.replies.some(
+    (reply) => reply.id === comment.id,
+  );
+
+  return [
+    {
+      ...normalizedParent,
+      replies: exists
+        ? normalizedParent.replies
+        : [comment, ...normalizedParent.replies],
+    },
+    ...comments,
+  ];
 }
 
 function getCommentsByPost(): CommentsByPost {
@@ -53,22 +147,29 @@ function getCommentsByPost(): CommentsByPost {
 }
 
 export function getPersistedComments(postId: string): Comment[] {
-  return getCommentsByPost()[postId]?.map(normalizeComment) ?? [];
+  const comments = getCommentsByPost()[postId]?.map(normalizeComment) ?? [];
+
+  return removeRootDuplicatesFromReplies(comments);
 }
 
 export function persistComment(
   postId: string,
   comment: Comment,
   parentCommentId?: number,
+  parentComment?: Comment,
 ) {
   if (typeof window === 'undefined') return;
 
   const commentsByPost = getCommentsByPost();
-  const currentComments = commentsByPost[postId]?.map(normalizeComment) ?? [];
+  const currentComments = removeRootDuplicatesFromReplies(
+    commentsByPost[postId]?.map(normalizeComment) ?? [],
+  );
+  const normalizedComment = normalizeComment(comment);
   const nextComments = appendComment(
     currentComments,
-    normalizeComment(comment),
+    normalizedComment,
     parentCommentId,
+    parentComment,
   );
 
   commentsByPost[postId] = nextComments;

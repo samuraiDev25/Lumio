@@ -68,9 +68,13 @@ export const CommentItem = ({
         <div className={s.timestamp}>
           <div>{formatDate(createdAt)}</div>
           <div>{likes === 1 ? '1 like' : `${likes} likes`}</div>
-          <div>
-            <span onClick={onAnswerAction}>Answer</span>
-          </div>
+          <button
+            className={s['answer-button']}
+            type="button"
+            onClick={onAnswerAction}
+          >
+            Answer
+          </button>
         </div>
       )}
     </div>

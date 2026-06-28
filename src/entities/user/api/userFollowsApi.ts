@@ -29,8 +29,42 @@ export type UserFollowInfo = {
   followingCount: number;
 };
 
+export type UserFeedPostFile = {
+  id: number;
+  url: string;
+  postId: number | string;
+};
+
+export type UserFeedPost = {
+  id: string;
+  description: string;
+  createdAt: string;
+  userId: number;
+  username: string;
+  avatarUrl: string | null;
+  postFiles: UserFeedPostFile[];
+  likesCount?: number;
+  likeCount?: number;
+  commentsCount?: number;
+  isLiked?: boolean;
+  userReaction?: 'like' | 'dislike' | 'none';
+};
+
+export type UserFeedResponse = {
+  items: UserFeedPost[];
+  totalCount: number;
+  pagesCount: number;
+  page: number;
+  pageSize: number;
+};
+
 type SearchUsersArgs = {
   username: string;
+  pageNumber?: number;
+  pageSize?: number;
+};
+
+type GetUserFeedArgs = {
   pageNumber?: number;
   pageSize?: number;
 };
@@ -72,7 +106,6 @@ const getItems = (response: UsersApiResponse | UsersApiItem[]) => {
 
   return response.items ?? response.users ?? [];
 };
-
 export const userFollowsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getUserDetailedProfile: builder.query<UserDetailedProfile, number>({
@@ -109,6 +142,21 @@ export const userFollowsApi = baseApi.injectEndpoints({
       transformResponse: (response: UsersApiResponse | UsersApiItem[]) =>
         getItems(response).map(normalizeUser).filter(Boolean) as SearchUser[],
     }),
+    getUserFeed: builder.query<UserFeedResponse, GetUserFeedArgs | undefined>({
+      query: (params) => {
+        const { pageNumber = 1, pageSize = 5 } = params || {};
+
+        return {
+          url: '/api/v1/users/feed',
+          method: 'GET',
+          params: {
+            pageNumber,
+            pageSize,
+          },
+        };
+      },
+      providesTags: () => [{ type: 'Posts', id: 'FEED' }],
+    }),
     followUser: builder.mutation<
       FollowUserResponse,
       { userId: number; currentUserId: number | null }
@@ -140,6 +188,7 @@ export const {
   useGetUserDetailedProfileQuery,
   useGetUserFollowInfoQuery,
   useSearchUsersQuery,
+  useGetUserFeedQuery,
   useFollowUserMutation,
   useUnfollowUserMutation,
 } = userFollowsApi;
