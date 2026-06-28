@@ -1,5 +1,6 @@
 import type { AppDispatch, RootState } from '@/app/store';
 import { postsApi } from '@/entities/post/api/postApi';
+import { userFollowsApi } from '@/entities/user/api/userFollowsApi';
 import type {
   GetMyPostsRequest,
   Reaction,
@@ -22,6 +23,12 @@ type ReactionPost = {
   userReaction?: Reaction;
 };
 
+type FeedReactionPost = {
+  id: string;
+  likesCount?: number;
+  isLiked?: boolean;
+};
+
 function applyLikeToPost(
   draft: ReactionPost | null | undefined,
   postId: string,
@@ -32,6 +39,18 @@ function applyLikeToPost(
 
   draft.likeCount = patch.likeCount;
   draft.userReaction = patch.userReaction;
+}
+
+function applyLikeToFeedPost(
+  draft: FeedReactionPost | null | undefined,
+  postId: string,
+  patch: PostLikePatch,
+) {
+  if (!draft || draft.id !== postId) return;
+  if (draft.likesCount === undefined || draft.isLiked === undefined) return;
+
+  draft.likesCount = patch.likeCount;
+  draft.isLiked = patch.userReaction === 'like';
 }
 
 function parseGetMyPostsArgs(json: string): GetMyPostsRequest | undefined {
@@ -58,6 +77,23 @@ export function patchPostLikeInCaches(
   if (!queries) return;
 
   for (const cacheKey of Object.keys(queries)) {
+    if (cacheKey.startsWith('getUserFeed(')) {
+      const json = cacheKey.slice('getUserFeed('.length, -1);
+      let args: { pageNumber?: number; pageSize?: number } | undefined;
+      try {
+        args = json === 'undefined' ? undefined : JSON.parse(json);
+      } catch {
+        continue;
+      }
+      dispatch(
+        userFollowsApi.util.updateQueryData('getUserFeed', args, (draft) => {
+          const item = draft.items?.find((p) => p.id === postId);
+          applyLikeToFeedPost(item, postId, patch);
+        }),
+      );
+      continue;
+    }
+
     if (cacheKey.startsWith('getMainPageData(')) {
       const json = cacheKey.slice('getMainPageData('.length, -1);
       let args: { pageNumber?: number; pageSize: number };

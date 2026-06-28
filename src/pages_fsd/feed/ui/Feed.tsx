@@ -2,8 +2,7 @@
 
 import s from './Feed.module.scss';
 import { useEffect, useRef, useState } from 'react';
-import { useGetMainPageDataQuery } from '@/entities/post/api/postApi';
-import { PostWithReaction } from '@/entities/post/model/types/postApi.types';
+import { useGetUserFeedQuery, type UserFeedPost } from '@/entities/user';
 import { FeedPostCard } from '@/entities/post/ui/PostCard/FeedPostCard';
 import { Loading } from '@/shared/ui/loading/Loading';
 
@@ -14,8 +13,8 @@ const PAGE_SIZE = 8;
  * Вынесена за пределы компонента, чтобы код был человеческим и понятным.
  */
 const getUpdatedPosts = (
-  prev: PostWithReaction[],
-  newItems: PostWithReaction[],
+  prev: UserFeedPost[],
+  newItems: UserFeedPost[],
   isFirstPage: boolean,
 ) => {
   if (isFirstPage) return newItems;
@@ -28,20 +27,20 @@ const getUpdatedPosts = (
 
 export function Feed() {
   const [page, setPage] = useState(1);
-  const [allPosts, setAllPosts] = useState<PostWithReaction[]>([]);
+  const [allPosts, setAllPosts] = useState<UserFeedPost[]>([]);
 
-  const { data, isLoading, isFetching } = useGetMainPageDataQuery({
+  const { data, isLoading, isFetching } = useGetUserFeedQuery({
     pageNumber: page,
     pageSize: PAGE_SIZE,
   });
 
-  const pagesCount = data?.posts?.pagesCount || 1;
+  const pagesCount = data?.pagesCount || 1;
   const hasMore = page < pagesCount;
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Синхронизация данных с API и нашим стейтом
   useEffect(() => {
-    const items = data?.posts?.items;
+    const items = data?.items;
     if (!items) return;
 
     // Используем таймаут, чтобы избежать ошибки линтера о каскадных рендерах.

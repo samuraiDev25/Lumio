@@ -4,12 +4,14 @@ import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
-import { PostWithReaction } from '@/entities/post/model/types/postApi.types';
-import {
-  useFollowUserMutation,
-  useGetUserDetailedProfileQuery,
-} from '@/entities/user';
+import { useGetPostByIdQuery } from '@/entities/post/api/postApi';
+import { useFollowUserMutation, type UserFeedPost } from '@/entities/user';
 import { useMeQuery } from '@/features/auth/api/authApi';
+import { AddComment } from '@/features/posts/add-comment/ui/AddComment';
+import {
+  COMMENTS_UPDATED_EVENT,
+  getPersistedComments,
+} from '@/features/posts/add-comment/model/persistedComments';
 import { getRelativeTime } from '@/shared/lib';
 import { Typography } from '@/shared/ui';
 import {
@@ -29,45 +31,57 @@ import { FeedPostSlider } from './FeedPostSlider';
 import { usePostLike } from '@/entities/post/model/hooks/usePostLike';
 
 type Props = {
-  post: PostWithReaction;
+  post: UserFeedPost;
 };
 
 export const FeedPostCard = ({ post }: Props) => {
   const { data: me } = useMeQuery();
+  const feedLikesCount = post.likesCount ?? post.likeCount ?? 0;
+  const feedIsLiked = post.isLiked ?? post.userReaction === 'like';
   const { likeCount, isLiked, isSubmitting, toggleLike } = usePostLike({
     postId: post.id,
-    initialLikeCount: post.likeCount,
-    initialReaction: post.userReaction,
+    initialLikesCount: feedLikesCount,
+    initialIsLiked: feedIsLiked,
   });
-  const currentUserId = me?.userId ? Number(me.userId) : null;
 
+  const { data: postDetails } = useGetPostByIdQuery(post.id, {
+    skip: !post.id || feedLikesCount === 0,
+  });
+  const [persistedCommentsCount, setPersistedCommentsCount] = useState(0);
+  const commentsCount = (post.commentsCount ?? 0) + persistedCommentsCount;
+  const currentUserId = me?.userId ? Number(me.userId) : null;
   /** Если пост мой — скрываем кнопку отписки (нельзя отписаться от себя) */
   const isMyPost = currentUserId === post.userId;
-
-  /**
-   * Запрос профиля автора для получения статуса подписки (isFollowing).
-   * skip: оптимизация — не запрашиваем профиль, если это наш собственный пост, чтобы не грузить сервер
-   */
-  const { data: profile } = useGetUserDetailedProfileQuery(post.userId, {
-    skip: !post.userId || isMyPost,
-  });
 
   const [unfollow] = useUnfollowUserMutation();
   const [follow] = useFollowUserMutation();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(true);
 
-  const userName = profile?.username || post.userName || `User ${post.userId}`;
-  const avatarUrl = profile?.avatarUrl || post.avatarUrl;
+  const userName = post.username || `User ${post.userId}`;
+  const avatarUrl = post.avatarUrl;
+  const newestLikes = postDetails?.newestLikes ?? [];
 
-  /** Обновляем кнопку подписки, когда данные профиля загрузятся */
   useEffect(() => {
-    if (profile) {
-      setIsFollowing(profile.isFollowing);
-    }
-  }, [profile]);
+    const updatePersistedCommentsCount = () => {
+      setPersistedCommentsCount(getPersistedComments(post.id).length);
+    };
+
+    updatePersistedCommentsCount();
+    window.addEventListener(
+      COMMENTS_UPDATED_EVENT,
+      updatePersistedCommentsCount,
+    );
+
+    return () => {
+      window.removeEventListener(
+        COMMENTS_UPDATED_EVENT,
+        updatePersistedCommentsCount,
+      );
+    };
+  }, [post.id]);
 
   /** Логика закрытия выпадающего меню при клике в любую область экрана */
   useEffect(() => {
@@ -121,17 +135,17 @@ export const FeedPostCard = ({ post }: Props) => {
   const renderAvatar = (size = 36) => {
     const firstLetter = userName ? userName[0].toUpperCase() : 'U';
     return (
-      <div className={s.avatarBox} style={{ width: size, height: size }}>
+      <div className={s['avatar-box']} style={{ width: size, height: size }}>
         {avatarUrl ? (
           <Image
             src={avatarUrl}
             alt=""
             width={size}
             height={size}
-            className={s.avatarImg}
+            className={s['avatar-img']}
           />
         ) : (
-          <span className={s.letterPlaceholder}>{firstLetter}</span>
+          <span className={s['letter-placeholder']}>{firstLetter}</span>
         )}
       </div>
     );
@@ -218,39 +232,48 @@ export const FeedPostCard = ({ post }: Props) => {
           </div>
 
           <div className={s['like-group']}>
-            {/* Место для UC-5: аватарки лайкнувших */}
-            <div className={s['avatars-stack']}>
-              <div className={s['mini-avatar']}>
-                <span className={s['mini-letter']}>A</span>
+            {newestLikes.length > 0 && (
+              <div className={s['avatars-stack']}>
+                {newestLikes.slice(0, 3).map((like) => {
+                  const firstLetter = like.username?.[0]?.toUpperCase() ?? 'U';
+
+                  return (
+                    <div className={s['mini-avatar']} key={like.userId}>
+                      {like.avatarUrl ? (
+                        <Image
+                          src={like.avatarUrl}
+                          alt={like.username}
+                          width={24}
+                          height={24}
+                          className={s['mini-avatar-img']}
+                        />
+                      ) : (
+                        <span className={s['mini-letter']}>{firstLetter}</span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-              <div className={s['mini-avatar']}>
-                <span className={s['mini-letter']}>B</span>
-              </div>
-              <div className={s['mini-avatar']}>
-                <span className={s['mini-letter']}>C</span>
-              </div>
-            </div>
+            )}
             <Typography
               variant="regular_text_14"
               className={s['likes-count-text']}
             >
-              <strong>{likeCount.toLocaleString()}</strong>{' '}
-              {likeCount === 1 ? 'like' : 'likes'}
+              <strong>{likeCount}</strong> {likeCount === 1 ? 'like' : 'likes'}
             </Typography>
           </div>
 
           {/* Место для UC-4: просмотр комментариев */}
-          <Link href={`/posts/${post.id}`} className={s['view-comments']}>
-            View All Comments (114)
+          <Link
+            href={`/posts/${post.id}?returnTo=/feed`}
+            className={s['view-comments']}
+          >
+            View All Comments ({commentsCount})
           </Link>
 
           {/* Место для UC-3: создание комментария */}
           <div className={s['add-comment']}>
-            <input
-              placeholder="Add a Comment..."
-              className={s['comment-input']}
-            />
-            <button className={s['publish-btn']}>Publish</button>
+            <AddComment postId={post.id} />
           </div>
         </div>
       </footer>

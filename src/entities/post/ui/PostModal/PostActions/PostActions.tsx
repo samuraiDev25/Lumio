@@ -9,26 +9,26 @@ import {
 } from '@/shared/ui/icons';
 import { formatDateFull } from '@/entities/post/lib/formatDate';
 import { AddComment } from '@/features/posts/add-comment/ui/AddComment';
-import type { Post, Reaction } from '@/entities/post/model/types/postApi.types';
+import type { Post } from '@/entities/post/model/types/postApi.types';
 import { usePostLike } from '@/entities/post/model/hooks/usePostLike';
 
 type Props = {
   post: Post;
   isAuthorized: boolean;
-  initialLikeCount?: number;
-  initialReaction?: Reaction;
+  initialLikesCount?: number;
+  initialIsLiked?: boolean;
 };
 export const PostActions = ({
   post,
   isAuthorized,
-  initialLikeCount,
-  initialReaction,
+  initialLikesCount,
+  initialIsLiked,
 }: Props) => {
   const timeReal = formatDateFull(new Date());
   const { likeCount, isLiked, isSubmitting, toggleLike } = usePostLike({
     postId: post.id,
-    initialLikeCount,
-    initialReaction,
+    initialLikesCount,
+    initialIsLiked,
   });
 
   return (

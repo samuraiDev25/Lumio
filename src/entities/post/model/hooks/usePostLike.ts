@@ -12,27 +12,28 @@ import { useAppDispatch } from '@/shared/hooks';
 
 type UsePostLikeParams = {
   postId: string;
-  initialLikeCount?: number;
-  initialReaction?: Reaction;
+  initialLikesCount?: number;
+  initialIsLiked?: boolean;
 };
 
 export function usePostLike({
   postId,
-  initialLikeCount = 0,
-  initialReaction = 'none',
+  initialLikesCount = 0,
+  initialIsLiked = false,
 }: UsePostLikeParams) {
   const dispatch = useAppDispatch() as AppDispatch;
   const store = useStore<RootState>();
   const { data: me } = useMeQuery();
   const [updatePostReaction] = useUpdatePostReactionMutation();
-  const [likeCount, setLikeCount] = useState(initialLikeCount);
+  const initialReaction: Reaction = initialIsLiked ? 'like' : 'none';
+  const [likeCount, setLikeCount] = useState(initialLikesCount);
   const [userReaction, setUserReaction] = useState<Reaction>(initialReaction);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    setLikeCount(initialLikeCount);
-    setUserReaction(initialReaction);
-  }, [postId, initialLikeCount, initialReaction]);
+    setLikeCount(initialLikesCount);
+    setUserReaction(initialIsLiked ? 'like' : 'none');
+  }, [postId, initialLikesCount, initialIsLiked]);
 
   const isLiked = userReaction === 'like';
 
