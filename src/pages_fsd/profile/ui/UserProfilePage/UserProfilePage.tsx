@@ -8,7 +8,6 @@ import { Button, Typography } from '@/shared/ui';
 import { PostGrid } from '@/entities/post/ui/PostGrid/PostGrid';
 import { Loading } from '@/shared/ui/loading/Loading';
 import { useLazyGetUserPostsQuery } from '@/entities/post/api/postApi';
-import { useGetUserProfileQuery } from '@/pages_fsd/profile/api/profileApi';
 import { useGetUserDetailedProfileQuery } from '@/entities/user';
 import {
   GetMyPostsResponse,
@@ -54,18 +53,12 @@ function UserProfilePageContent({
   const isValidUserId = Number.isFinite(userId);
   const isOwnProfile = currentUser?.userId?.toString() === userId.toString();
 
-  const { data: profileFromApi, isLoading: isProfileLoading } =
-    useGetUserProfileQuery(userId, {
-      skip: !isValidUserId,
-      refetchOnMountOrArgChange: false,
-    });
-
   const { data: detailedProfile } = useGetUserDetailedProfileQuery(userId, {
     skip: !isValidUserId,
     refetchOnMountOrArgChange: false,
   });
 
-  const displayProfile = detailedProfile ?? profileFromApi ?? initialProfile;
+  const displayProfile = detailedProfile ?? initialProfile;
   const followingCount =
     detailedProfile?.followingCount ?? displayProfile?.followingCount ?? 0;
   const followersCount =
@@ -124,8 +117,6 @@ function UserProfilePageContent({
   }, [loadMore]);
 
   if (!displayProfile) {
-    if (isProfileLoading) return <Loading />;
-
     return (
       <div className={s.error}>
         <Typography variant="h2">User not found</Typography>

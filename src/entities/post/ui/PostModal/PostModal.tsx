@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { toast } from 'react-toastify';
 import s from './PostModal.module.scss';
 import { CloseOutline } from '@/shared/ui/icons';
-import { Post } from '@/entities/post/model/types/postApi.types';
+import { PostWithReaction } from '@/entities/post/model/types/postApi.types';
 import type { UserProfile } from '@/pages_fsd/profile/modal/types/profileApi.types';
 import { ConfirmClosePost } from '@/entities/post/ui/ConfirmClosePost/ConfirmClosePost';
 import { useProtectedRoute } from '@/shared/hooks/useProtectedRoute';
@@ -21,7 +21,6 @@ import { CommentItem } from '@/entities/post/ui/PostModal/CommentItem/CommentIte
 import { PostActions } from '@/entities/post/ui/PostModal/PostActions/PostActions';
 import { MenuDropdown } from '@/entities/post/ui/PostModal/MenuDropdown/MenuDropdown';
 import {
-  useGetPostByIdQuery,
   useGetPostCommentsQuery,
   useLikeCommentMutation,
 } from '@/entities/post/api/postApi';
@@ -36,12 +35,25 @@ import {
 
 type Props = {
   children?: ReactNode;
-  post: Post;
+  post: PostWithReaction;
   profile: UserProfile | null;
   initialImageIndex?: number;
   isOpen?: boolean;
   onCloseAction?: () => void;
 };
+
+function mergeCommentWithAuthor(
+  serverComment: Comment,
+  persistedComment: Comment,
+): Comment {
+  return {
+    ...persistedComment,
+    ...serverComment,
+    username: serverComment.username || persistedComment.username,
+    avatarUrl: serverComment.avatarUrl ?? persistedComment.avatarUrl,
+    replies: mergeComments(serverComment.replies, persistedComment.replies),
+  };
+}
 
 function mergeComments(
   serverComments: Comment[],
@@ -65,11 +77,7 @@ function mergeComments(
     if (!serverComment) return persistedComment!;
     if (!persistedComment) return serverComment;
 
-    return {
-      ...persistedComment,
-      ...serverComment,
-      replies: mergeComments(serverComment.replies, persistedComment.replies),
-    };
+    return mergeCommentWithAuthor(serverComment, persistedComment);
   });
 }
 
@@ -160,16 +168,12 @@ export const PostModal = ({
   const userName = profile?.username || `User ${post.userId}`;
   const avatarUrl = profile?.avatarUrl ?? '/User 03.jpg';
 
-  const { data: postData } = useGetPostByIdQuery(postId, {
-    skip: !postId,
-  });
-
   const { data: commentsData, isLoading: commentsLoading } =
     useGetPostCommentsQuery(
       {
         postId,
         pageNumber: 1,
-        pageSize: 1,
+        pageSize: 20,
         sortBy: 'createdAt',
         sortDirection: 'desc',
       },
@@ -503,8 +507,8 @@ export const PostModal = ({
                   <PostActions
                     post={post}
                     isAuthorized={isAuthorized}
-                    initialLikesCount={postData?.likeCount}
-                    initialIsLiked={postData?.userReaction === 'like'}
+                    initialLikesCount={post.likeCount}
+                    initialIsLiked={post.userReaction === 'like'}
                   />
                 </>
               )}

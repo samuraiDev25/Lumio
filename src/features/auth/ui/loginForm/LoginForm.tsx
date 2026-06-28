@@ -60,7 +60,6 @@ export const LoginForm = () => {
       //const userId = user.userId;
 
       router.push(APP_ROUTES.ROOT);
-      router.refresh();
     } catch (error: unknown) {
       handleNetworkError({
         error,
