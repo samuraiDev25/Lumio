@@ -166,10 +166,6 @@ export const postsApi = baseApi.injectEndpoints({
       query: (postId) => ({
         url: `/api/v1/posts/post/${postId}`,
       }),
-      transformResponse: (response: PostWithReaction) => {
-        console.log('GET /api/v1/posts/post/{postId} response:', response);
-        return response;
-      },
       providesTags: (_result, _error, postId) => [
         { type: 'Posts', id: `POST_${postId}` },
       ],
@@ -314,6 +310,7 @@ export const postsApi = baseApi.injectEndpoints({
         { type: 'Posts', id: `POST_${postId}` },
         { type: 'Posts', id: 'MAIN' },
         { type: 'Posts', id: 'MY' },
+        { type: 'PostComments', id: `POST_${postId}` },
       ],
     }),
     updatePostReaction: builder.mutation<void, UpdatePostReactionRequest>({
@@ -397,7 +394,7 @@ export const postsApi = baseApi.injectEndpoints({
       query: ({
         postId,
         pageNumber = 1,
-        pageSize = 20,
+        pageSize = 5,
         sortBy,
         sortDirection,
       }) => ({

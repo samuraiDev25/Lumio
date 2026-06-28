@@ -18,20 +18,15 @@ export const Header = () => {
         <div className={s.headerWrapper}>
           <Link href={'/'}>
             <Typography variant={'large'} as={'span'} className={s.logo}>
-              L U M I O
-              <span
-                onClick={() => {
-                  fetch('https://lumio.su/api/v1/testing/all-data', {
-                    method: 'DELETE',
-                  }).then((responce) => {
-                    if (responce.status === 204) {
-                      console.log('Данные успешно удалены');
-                    }
-                  });
-                }}
-              >
-                .
-              </span>
+              L U M I O{/*<span*/}
+              {/*  onClick={() => {*/}
+              {/*    fetch('https://lumio.su/api/v1/testing/all-data', {*/}
+              {/*      method: 'DELETE',*/}
+              {/*    });*/}
+              {/*  }}*/}
+              {/*>*/}
+              {/*  .*/}
+              {/*</span>*/}
             </Typography>
           </Link>
 
@@ -53,11 +48,6 @@ export const Header = () => {
                   </Button>
                 </>
               )}
-              {/*{data?.email && (*/}
-              {/*  <Link href="/posts/999999999" scroll={false}>*/}
-              {/*    Open missing post*/}
-              {/*  </Link>*/}
-              {/*)}*/}
             </div>
           </div>
         </div>

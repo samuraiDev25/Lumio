@@ -32,21 +32,37 @@ function removeRootDuplicatesFromReplies(comments: Comment[]): Comment[] {
   return comments.filter((comment) => !nestedIds.has(comment.id));
 }
 
+function mergeReplies(primary: Comment[], secondary: Comment[]): Comment[] {
+  const repliesById = new Map<number, Comment>();
+
+  [...primary, ...secondary].forEach((reply) => {
+    repliesById.set(reply.id, reply);
+  });
+
+  return Array.from(repliesById.values());
+}
+
 function appendCommentToTree(
   comments: Comment[],
   comment: Comment,
   parentCommentId: number,
+  parentComment?: Comment,
 ): AppendResult {
   let appended = false;
 
   const nextComments = comments.map((item) => {
     if (item.id === parentCommentId) {
       appended = true;
-      const exists = item.replies.some((reply) => reply.id === comment.id);
+      const normalizedParent = parentComment
+        ? normalizeComment(parentComment)
+        : item;
+      const replies = mergeReplies(normalizedParent.replies, item.replies);
+      const exists = replies.some((reply) => reply.id === comment.id);
 
       return {
         ...item,
-        replies: exists ? item.replies : [comment, ...item.replies],
+        ...normalizedParent,
+        replies: exists ? replies : [comment, ...replies],
       };
     }
 
@@ -54,6 +70,7 @@ function appendCommentToTree(
       item.replies,
       comment,
       parentCommentId,
+      parentComment,
     );
 
     if (!nextReplies.appended) {
@@ -86,7 +103,12 @@ function appendComment(
     return exists ? comments : [comment, ...comments];
   }
 
-  const appendResult = appendCommentToTree(comments, comment, parentCommentId);
+  const appendResult = appendCommentToTree(
+    comments,
+    comment,
+    parentCommentId,
+    parentComment,
+  );
 
   if (appendResult.appended) {
     return appendResult.comments;
@@ -142,9 +164,10 @@ export function persistComment(
   const currentComments = removeRootDuplicatesFromReplies(
     commentsByPost[postId]?.map(normalizeComment) ?? [],
   );
+  const normalizedComment = normalizeComment(comment);
   const nextComments = appendComment(
     currentComments,
-    normalizeComment(comment),
+    normalizedComment,
     parentCommentId,
     parentComment,
   );

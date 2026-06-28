@@ -9,6 +9,8 @@ import { handleNetworkError } from '@/shared/lib';
 import { useAppDispatch } from '@/shared/hooks';
 import { toast } from 'react-toastify';
 import { persistComment } from '@/features/posts/add-comment/model/persistedComments';
+import { useMeQuery } from '@/features/auth/api/authApi';
+import { useGetUserDetailedProfileQuery } from '@/entities/user';
 
 type Props = {
   postId: string;
@@ -26,6 +28,14 @@ export const AddComment = ({
   const [text, setText] = useState('');
   const [addComment, { isLoading }] = useAddCommentMutation();
   const dispatch = useAppDispatch();
+  const { data: me } = useMeQuery();
+  const currentUserId = me?.userId ? Number(me.userId) : null;
+  const { data: currentUserProfile } = useGetUserDetailedProfileQuery(
+    currentUserId ?? 0,
+    {
+      skip: !currentUserId,
+    },
+  );
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -39,7 +49,17 @@ export const AddComment = ({
         content: trimmedText,
         parentCommentId: parentId,
       }).unwrap();
-      persistComment(postId, comment, parentId, parentComment);
+      const commentWithAuthor: Comment = {
+        ...comment,
+        username:
+          comment.username ||
+          currentUserProfile?.username ||
+          me?.username ||
+          '',
+        avatarUrl: comment.avatarUrl ?? currentUserProfile?.avatarUrl ?? null,
+        replies: comment.replies ?? [],
+      };
+      persistComment(postId, commentWithAuthor, parentId, parentComment);
       setText('');
       onSuccessAction?.();
     } catch (error) {
