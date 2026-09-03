@@ -415,6 +415,7 @@ export const postsApi = baseApi.injectEndpoints({
           : [{ type: 'PostComments', id: 'LIST' }],
     }),
   }),
+  overrideExisting: process.env.NODE_ENV === 'development',
 });
 
 export const {
