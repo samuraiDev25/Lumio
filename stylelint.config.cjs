@@ -8,5 +8,5 @@ module.exports = {
   rules: {
     'prettier/prettier': true, // Prettier проверяет формат
   },
-  ignoreFiles: ['**/node_modules/**', '**/.next/**'],
+  ignoreFiles: ['**/node_modules/**', '**/.next/**', 'lumio-backend/**'],
 };

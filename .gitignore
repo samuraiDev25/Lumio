@@ -39,7 +39,17 @@ next-env.d.ts
 
 .idea/
 
+#env
+.env.development
+.env.local
+.env.production
 
 *storybook.log
 storybook-static
 /app/test/page.tsx
+
+#agent
+AGENTS.md
+
+# standalone backend repo checked out inside this project
+/lumio-backend
