@@ -98,6 +98,7 @@ export const baseQueryWithReauth: BaseQueryFn<
               const data = refreshResult.data as { accessToken?: string };
               if (data.accessToken) {
                 localStorage.setItem('accessToken', data.accessToken);
+                window.dispatchEvent(new Event('auth:access-token-updated'));
               } else {
                 handleRefreshFailure(api);
               }
@@ -138,6 +139,7 @@ export const baseQueryWithReauth: BaseQueryFn<
           const data = refreshResult.data as { accessToken?: string };
           if (data.accessToken) {
             localStorage.setItem('accessToken', data.accessToken);
+            window.dispatchEvent(new Event('auth:access-token-updated'));
             result = await baseQuery(args, api, extraOptions);
           } else {
             handleRefreshFailure(api);
